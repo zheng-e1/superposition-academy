@@ -147,6 +147,7 @@
   position: sticky;
   top: var(--topbar-h);
   height: calc(100vh - var(--topbar-h));
+  height: calc(100dvh - var(--topbar-h));
   overflow-y: auto;
   overscroll-behavior: contain;
   border-right: 1px solid var(--line);
@@ -867,4 +868,17 @@
 .sidebar-backdrop[data-open='true'] {
   opacity: 1;
   pointer-events: auto;
+}
+
+/* 触屏：加大可点区域 */
+@media (pointer: coarse), (max-width: 640px) {
+  .side-lesson {
+    min-height: 42px;
+    padding-block: 9px;
+  }
+
+  .quiz-option {
+    min-height: 48px;
+    padding: 13px 15px;
+  }
 }

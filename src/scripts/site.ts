@@ -56,6 +56,15 @@ function initDrawer() {
     btn.setAttribute('aria-expanded', String(open));
     if (backdrop) backdrop.dataset.open = String(open);
     document.body.style.overflow = open ? 'hidden' : '';
+    if (open) {
+      // 打开抽屉时把当前课节滚到视线中间，手机上不用再找
+      requestAnimationFrame(() => {
+        const cur = sidebar.querySelector<HTMLElement>('.side-lesson[aria-current="page"]');
+        if (!cur) return;
+        const top = cur.getBoundingClientRect().top - sidebar.getBoundingClientRect().top + sidebar.scrollTop;
+        sidebar.scrollTop = Math.max(0, top - sidebar.clientHeight / 2);
+      });
+    }
   };
 
   btn.addEventListener('click', () => set(sidebar.dataset.open !== 'true'));

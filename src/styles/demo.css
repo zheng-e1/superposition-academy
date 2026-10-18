@@ -554,3 +554,19 @@
   flex: 1 1 100%;
 }
 
+
+/* 触屏：扩大线路图里门与插入位的命中区，视觉尺寸不变 */
+.cj-gate::after,
+.cj-insert::after {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  border-radius: 10px;
+}
+
+@media (pointer: coarse), (max-width: 640px) {
+  .cj-gate::after,
+  .cj-insert::after {
+    inset: -11px;
+  }
+}

@@ -263,6 +263,8 @@ export function mount(host: HTMLElement, props: Record<string, unknown> = {}) {
     dragging = false;
   };
   kit.canvas.style.cursor = 'grab';
+  // 让手指拖拽旋转时不要同时滚动页面
+  kit.canvas.style.touchAction = 'none';
   kit.canvas.addEventListener('pointerdown', pointerDown);
   kit.canvas.addEventListener('pointermove', pointerMove);
   kit.canvas.addEventListener('pointerup', pointerUp);
