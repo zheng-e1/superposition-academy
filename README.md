@@ -8,6 +8,8 @@
 - **引擎**：自研 `qsim`，零依赖 TypeScript 状态向量模拟器，支持 1–14 比特、采样、布洛赫矢量、OpenQASM 2.0 导出
 - **构建产物**：纯静态，零后端，可托管在任意 CDN
 
+> 开发过程、关键决策、已知问题与下一步，都记在 [docs/DEVLOG.md](docs/DEVLOG.md)；部署步骤见 [docs/DEPLOY.md](docs/DEPLOY.md)。换人或换会话时，先读这两份就能接上。
+
 ## 预览
 
 ![首页](docs/preview-home.png)
