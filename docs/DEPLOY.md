@@ -14,6 +14,28 @@
 
 绑定自定义域名后，把 `PUBLIC_SITE_URL` 设为新域名（或在两个配置文件里改回退值），再 push 一次即可。
 
+### 域名审核期间的待办
+
+`diejiacademy.com` 已在阿里云购买，处于实名/注册审核（3–5 天）。通过后按顺序执行：
+
+1. Cloudflare → **Domains → Overview → Add a site → Connect a domain** → 输入 `diejiacademy.com` → Free → 记下两个 NS
+2. 阿里云域名控制台 → 管理 → **DNS 修改** → 用这两个 NS 替换默认的 `dns1/dns2.hichina.com`
+3. 等 Cloudflare 站点状态变 **Active**（`Resolve-DnsName diejiacademy.com -Type NS` 能看到 Cloudflare 的 NS）
+4. 一条命令切换站点域名（自动改 canonical、构建、提交、推送）：
+
+```powershell
+npm run set-domain -- -Domain diejiacademy.com
+```
+
+5. Worker → **Settings → Domains & Routes → Add custom domain** → `diejiacademy.com`
+6. 回到线上核对：证书、`/robots.txt`、`<link rel="canonical">`
+
+脚本支持预演，不写文件也不推送：
+
+```powershell
+npm run set-domain -- -Domain diejiacademy.com -DryRun
+```
+
 推荐路线：**GitHub 仓库 → Cloudflare（Pages 或 Workers 静态资源）**。免费，国内可访问（速度一般），绑定自定义域名随时加。
 
 > 2026 年的 Cloudflare 控制台把 Pages 的创建入口并进了 Workers：新建项目时只看到 “Configure your Worker project”、没有 “Build output directory” 字段，就走第 3.5 节的 **Workers 静态资源**，效果一样（免费、push 自动部署），只是网址是 `*.workers.dev`。
