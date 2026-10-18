@@ -2,6 +2,18 @@
 
 目标：不买域名，先拿到一个能访问的网址，之后每次 `git push` 自动更新。
 
+## 当前线上状态（2026-10）
+
+| 项 | 值 |
+|---|---|
+| 仓库 | `github.com/zheng-e1/superposition-academy`（SSH over 443 推送） |
+| 部署 | Cloudflare Workers 静态资源，项目名 `superposition-academy` |
+| 网址 | `https://superposition-academy.481828896.workers.dev`（国内访问需代理） |
+| 自动部署 | 已生效：push 到 `main` 触发构建（`npm run build` → `npx wrangler deploy`） |
+| Build variables | 暂未设置；canonical 回退值写在 `astro.config.mjs` 与 `src/config.ts` |
+
+绑定自定义域名后，把 `PUBLIC_SITE_URL` 设为新域名（或在两个配置文件里改回退值），再 push 一次即可。
+
 推荐路线：**GitHub 仓库 → Cloudflare（Pages 或 Workers 静态资源）**。免费，国内可访问（速度一般），绑定自定义域名随时加。
 
 > 2026 年的 Cloudflare 控制台把 Pages 的创建入口并进了 Workers：新建项目时只看到 “Configure your Worker project”、没有 “Build output directory” 字段，就走第 3.5 节的 **Workers 静态资源**，效果一样（免费、push 自动部署），只是网址是 `*.workers.dev`。
