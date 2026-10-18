@@ -2,7 +2,9 @@
 
 目标：不买域名，先拿到一个能访问的网址，之后每次 `git push` 自动更新。
 
-推荐路线：**GitHub 仓库 → Cloudflare Pages**。免费，国内可访问（速度一般），绑定自定义域名随时加。
+推荐路线：**GitHub 仓库 → Cloudflare（Pages 或 Workers 静态资源）**。免费，国内可访问（速度一般），绑定自定义域名随时加。
+
+> 2026 年的 Cloudflare 控制台把 Pages 的创建入口并进了 Workers：新建项目时只看到 “Configure your Worker project”、没有 “Build output directory” 字段，就走第 3.5 节的 **Workers 静态资源**，效果一样（免费、push 自动部署），只是网址是 `*.workers.dev`。
 
 ---
 
@@ -89,6 +91,38 @@ PUBLIC_SITE_URL = https://<project-name>.pages.dev
 6. 点 **Save and Deploy**，等 1–3 分钟。
 
 首次构建会做三件事：`astro build` 生成静态页 → `pagefind` 建全文索引 → 上传 `dist`。日志里能看到 `68 page(s) built` 和 `Indexed ... pages`。
+
+---
+
+## 3.5 Workers 静态资源（控制台只有 Workers 时走这里）
+
+如果创建页只显示 “Configure your **Worker** project”、没有 **Build output directory**，说明 Pages 入口已被并入 Workers。仓库里已经放了 `wrangler.jsonc`，它把 `./dist` 声明成静态资源，不需要你写任何 Worker 代码。
+
+| 字段 | 值 |
+|---|---|
+| Repository | `<你的用户名>/superposition-academy` |
+| Project name | `superposition-academy` |
+| Production branch | `main` |
+| Build command | `npm run build` |
+| Deploy command | `npx wrangler deploy`（默认值，保留） |
+| Preview command | 建议把 **Enable Preview builds** 关掉（默认的 `npx wrangler preview` 已不是有效命令） |
+| Root directory | 留空 |
+
+环境变量（在 **Advanced settings** 里）加一条：
+
+```
+PUBLIC_SITE_URL = https://superposition-academy.<你的 workers.dev 子域>.workers.dev
+```
+
+不知道子域就**先不填**：部署完成后控制台会显示实际网址，把它填进变量，再点 **Retry deployment**（或随便 push 一次）触发重建。canonical、sitemap 会在那次构建后指向正确域名。
+
+本地等价命令（不想走 Git 集成时）：
+
+```powershell
+npm run build
+npx wrangler login
+npm run deploy
+```
 
 ---
 

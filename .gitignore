@@ -5,3 +5,5 @@ dist/
 .edge-profile*/
 .DS_Store
 *.log
+.wrangler/
+dist.zip
