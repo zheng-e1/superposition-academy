@@ -1,5 +1,10 @@
-# 把本地仓库推到 GitHub（首次使用）
-# 用法：powershell -ExecutionPolicy Bypass -File scripts/push-to-github.ps1 -User 你的GitHub用户名
+# Push this repository to GitHub (first-time setup).
+# Usage:
+#   powershell -ExecutionPolicy Bypass -File scripts/push-to-github.ps1 -User your-github-name
+#
+# NOTE: keep this file ASCII-only. Windows PowerShell 5.1 reads UTF-8 without BOM
+# as ANSI, so non-ASCII literals would break parsing.
+
 param(
   [Parameter(Mandatory = $true)][string]$User,
   [string]$Repo = 'superposition-academy'
@@ -9,12 +14,12 @@ $ErrorActionPreference = 'Stop'
 Set-Location (Split-Path -Parent $PSScriptRoot)
 
 if (-not (Test-Path '.git')) {
-  throw '当前目录不是 git 仓库，请确认在 quantum-site 下运行。'
+  throw 'Not a git repository. Run this from the quantum-site folder.'
 }
 
 $url = "https://github.com/$User/$Repo.git"
-Write-Host "目标仓库：$url" -ForegroundColor Cyan
-Write-Host '请先在 https://github.com/new 建一个空仓库（不要勾 README / .gitignore / license）。' -ForegroundColor Yellow
+Write-Host "Target: $url" -ForegroundColor Cyan
+Write-Host 'Create an EMPTY repo at https://github.com/new first (no README, no .gitignore, no license).' -ForegroundColor Yellow
 
 $existing = git remote get-url origin 2>$null
 if ($LASTEXITCODE -eq 0) {
@@ -27,6 +32,10 @@ git branch -M main
 git push -u origin main
 
 if ($LASTEXITCODE -eq 0) {
-  Write-Host '推送完成。下一步：Cloudflare Pages → Connect to Git → 选这个仓库。' -ForegroundColor Green
-  Write-Host '构建命令 npm run build，输出目录 dist，环境变量 PUBLIC_SITE_URL=https://<项目名>.pages.dev' -ForegroundColor Green
+  Write-Host 'Push OK.' -ForegroundColor Green
+  Write-Host 'Next: Cloudflare Pages -> Connect to Git -> build "npm run build", output "dist", env PUBLIC_SITE_URL=https://<project>.pages.dev' -ForegroundColor Green
+} else {
+  Write-Host 'Push failed.' -ForegroundColor Yellow
+  Write-Host '404: the repository does not exist yet, or the name/user is wrong.' -ForegroundColor Yellow
+  Write-Host 'Auth cancelled: run "git push -u origin main" again and finish the browser login.' -ForegroundColor Yellow
 }
