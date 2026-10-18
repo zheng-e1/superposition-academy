@@ -1,0 +1,66 @@
+---
+slug: quantum-chemistry
+title: 量子化学：最可能先有用的地方
+thesis: 模拟分子基态是量子计算机的原生任务
+part: p-app
+topic: t-chem
+tag: 概念
+minutes: 8
+order: 701
+demos: []
+quiz:
+  - q: 为什么经典计算机模拟分子基态会越来越吃力？
+    options: ['经典计算机不会解微分方程', '自旋轨道数增加，组态空间按 2 的幂增长', '分子的原子坐标存不进内存', '量子力学在分子尺度上不适用']
+    answer: 1
+    explain: n 个自旋轨道对应的组态空间有 2 的 n 次方维，轨道一多，需要存的振幅数指数上升。经典计算机当然会解微分方程，坐标存储也不是瓶颈，量子力学恰恰是描述分子的正确理论，所以另外三项都不成立。
+  - q: 把费米子映射到量子比特（如 Jordan-Wigner 变换）解决的是什么问题？
+    options: ['把分子变成周期性晶体', '把实验温度降到毫开尔文', '把反对易的费米子算符写成比特上的泡利串', '让经典优化器收敛得更快']
+    answer: 2
+    explain: 费米子算符满足反对易关系，量子比特的门却作用在张量积空间上，映射用一串 Z 把符号补齐，使算符可以写成泡利串。它不改变化学体系，也不涉及制冷或优化器，其余三项都与它无关。
+  - q: 目前量子化学演示的规模仍然有限，最主要的原因是？
+    options: ['哈密顿量在数学上写不出来', '缺少经典优化器', '分子不能被量子化', '逻辑比特数与门保真度还不够']
+    answer: 3
+    explain: 哈密顿量早已能写出来，变分方法也配了成熟的经典优化器，卡住的是硬件：需要更多低错误率的逻辑比特，才能跑足够深的线路。所以问题不在理论表述，而在工程规模，另外三项都不是主因。
+sources:
+  - 'Feynman, 1982, Simulating Physics with Computers, International Journal of Theoretical Physics'
+  - 'McArdle et al., 2020, Quantum computational chemistry, Reviews of Modern Physics'
+  - 'Cao et al., 2019, Quantum Chemistry in the Age of Quantum Computing, Chemical Reviews'
+updated: 2026-10-18
+---
+
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+实验室里筛一种催化剂，常常要先试几十种配方。每一次试，都是在猜电子会怎么排布。量子计算机最像「原生」任务的地方正是这个：不去猜，直接把电子波函数放到比特上演化。
+
+## 指数墙
+
+一个分子里 n 个自旋轨道的组态，要用 2 的 n 次方个振幅才能完整描述。50 个轨道就是约 $10^{15}$ 个数——存不下，更算不动。
+
+经典方法一直在绕这堵墙。平均场把电子当成在平均势场里独立运动，便宜，却丢掉了关联；耦合簇方法把关联一层层补回来，精度高，代价随体系迅速上涨。它们都有效，但都有适用范围。
+
+量子计算机的路线是换一种表示：把电子的产生、湮灭算符搬到比特上，让 <Term id="hamiltonian">哈密顿量</Term> 变成一个可以直接演化的算符：
+
+$$
+H = \sum_{ij} h_{ij}\, a_i^\dagger a_j + \frac{1}{2}\sum_{ijkl} h_{ijkl}\, a_i^\dagger a_j^\dagger a_k a_l
+$$
+
+费米子算符反对易，不能直接写成比特门。Jordan-Wigner 变换用一串 Z 把符号补齐，Bravyi-Kitaev 变换把串的长度压到对数级。映射之后，基态能量就是一个期望值，可以交给 <Term id="vqe">VQE</Term> 这类变分方法去估。
+
+## 为什么现在还算不动
+
+不是算法没写出来，是比特不够多、门不够准。一个含过渡金属的活性中心，需要几十到上百个逻辑比特，每个逻辑比特又要许多物理比特；线路深到超出当前保真度能承受的范围。截至 2026 年公开报道的量级，演示集中在十几个到上百个比特的小分子与模型体系，离工业催化还有明显距离。
+
+现实目标挑得很准：固氮酶、电池电解液、碳捕集材料。这些体系电子关联强，经典近似最容易失效，也正好是量子模拟理论上最占优的地方。
+
+<Misconception
+  note="「原生任务」说的是表示方式合适，不是说现在的机器已经够用。合适与够用之间，隔着纠错。"
+>
+  <Fragment slot="wrong">量子计算机一旦造出来，就能模拟任何分子，包括蛋白质折叠。</Fragment>
+  <Fragment slot="right">它能高效表示电子波函数，但需要足够多、足够准的逻辑比特；大分子与复杂环境仍是长期目标。</Fragment>
+</Misconception>
+
+<Conclusion>
+  量子化学是量子计算最可能先落地的地方，因为分子基态本来就是量子系统的状态。今天卡住的不是公式，而是逻辑比特的数量与保真度。判断一类问题值不值得上量子，先看它的经典近似是不是真的失效了。
+</Conclusion>

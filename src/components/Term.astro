@@ -1,0 +1,21 @@
+---
+import { GLOSSARY } from '../data/glossary';
+
+interface Props {
+  id: string;
+}
+const { id } = Astro.props;
+const entry = GLOSSARY.find((g) => g.id === id);
+---
+
+{
+  entry ? (
+    <a class="term" href={`/glossary#${id}`} title={entry.def}>
+      <slot />
+    </a>
+  ) : (
+    <span class="term" title="术语表里还没有这个词">
+      <slot />
+    </span>
+  )
+}

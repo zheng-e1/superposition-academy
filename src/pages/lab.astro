@@ -1,0 +1,113 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Demo from '../components/Demo.astro';
+import { site } from '../config';
+import '../styles/portal.css';
+
+const exercises = [
+  {
+    title: '造一个 Bell 态',
+    desc: '用 H 和 CNOT 让两个比特完全相关。做出来后采样 1000 次，看是不是只剩 |00⟩ 和 |11⟩。',
+    hint: '提示：H 加在 q0，然后把 CNOT 的控制位设为 q0、目标 q1。',
+  },
+  {
+    title: '让 H 走两次',
+    desc: '只加两个 H，看概率是否回到 100% 的 |0⟩。再在中间插一个 Z，观察结果有没有变化。',
+    hint: '提示：HZH = X，干涉让相位变得可测。',
+  },
+  {
+    title: '把控制位换一下',
+    desc: 'CNOT 的控制位从 q0 换到 q1，看输出分布是否相同。想清楚：为什么会有差别？',
+    hint: '提示：控制位和目标位不是对称的，H 只作用在一个比特上。',
+  },
+];
+
+const limits = [
+  ['可模拟比特数', '1 – 14 个（建议 ≤ 8）'],
+  ['状态向量规模', '2ⁿ 个复数，14 比特 = 16384'],
+  ['门集', 'H X Y Z S T · CNOT CZ · 单比特 Ry'],
+  ['导出格式', 'OpenQASM 2.0'],
+  ['采样', '同一线路重复测量 1000 次'],
+];
+---
+
+<BaseLayout
+  title="量子实验室：自己搭一条线路"
+  description="在浏览器里拖门、单步执行、看概率分布，并导出 OpenQASM 2.0 拿去真机或本地模拟器运行。"
+  path="/lab"
+>
+  <div class="lab-page">
+    <span class="eyebrow">量子实验室</span>
+    <h1 class="section-title" style="font-size:clamp(28px,3.6vw,38px);margin:12px 0 10px">
+      自己搭一条线路
+    </h1>
+    <p class="section-sub" style="max-width:66ch">
+      不用注册、不用安装。选一个比特、点一个门，线路就长出来了；
+      点「下一步」能看见每一步之后的状态，点「采样」能看见测量统计；把鼠标移到两道门之间会出现一个「+」，点它插门；点门本身可以删除。做完可以复制成 QASM，或直接复制分享链接。
+    </p>
+
+    <div style="margin-top:26px">
+      <Demo
+        kind="circuit"
+        label="线路实验室"
+        props={{ qubits: 2, share: true }}
+        caption="预设里有 Bell 态、GHZ、相位回踢和 Grover 一步；也可以选 2–4 个比特从头搭。建议先点「下一步」把每个门走一遍，再看概率柱怎么变。"
+      />
+    </div>
+
+    <section class="section" style="padding:44px 0 0">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">三个练习</h2>
+          <p class="section-sub">按顺序做完，比读三节课管用。</p>
+        </div>
+      </div>
+      <div class="feature-grid">
+        {
+          exercises.map((ex, i) => (
+            <article class="feature">
+              <div class="feature-num">练习 {String(i + 1).padStart(2, '0')}</div>
+              <h3>{ex.title}</h3>
+              <p>{ex.desc}</p>
+              <p style="margin-top:10px;color:var(--faint);font-size:12.5px">{ex.hint}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="section" style="padding:44px 0 0">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">实验室的边界</h2>
+          <p class="section-sub">
+            这是个教学用的状态向量模拟器，不是真机。它没有噪声模型，也没有编译优化。
+          </p>
+        </div>
+      </div>
+      <div class="card" style="padding:6px 18px">
+        <table class="prose" style="margin:0">
+          <tbody>
+            {
+              limits.map(([k, v]) => (
+                <tr>
+                  <td style="width:38%;color:var(--sub)">{k}</td>
+                  <td class="mono" style="font-size:13.5px">{v}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="section-sub" style="margin-top:16px">
+        导出的 QASM 可以粘到任何支持 OpenQASM 2.0 的平台。真机会有噪声、排队和连通性限制，
+        结果不会像这里这么干净——这正是第 06 篇要讲的事。
+      </p>
+    </section>
+
+    <p class="tiny muted" style="margin-top:30px">
+      线路引擎是本站自研的 qsim（零依赖 TypeScript），已用手写的 numpy 参照值做过逐振幅比对。
+      发现数值不对，请写信给 {site.email}。
+    </p>
+  </div>
+</BaseLayout>

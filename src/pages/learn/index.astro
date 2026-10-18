@@ -1,0 +1,74 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { loadCourse, formatMinutes, partOf } from '../../lib/course';
+import { TAG_CLASS } from '../../data/course';
+import { courseJsonLd } from '../../lib/seo';
+import { site } from '../../config';
+import '../../styles/portal.css';
+
+const course = await loadCourse();
+const first = course.flat[0];
+let index = 0;
+---
+
+<BaseLayout
+  title={`课程目录 · ${course.flat.length} 节`}
+  description={`${site.name}完整课程目录：${course.parts.length} 个篇章、${course.flat.length} 节正文，从偏振片到量子纠错，每节配交互演示与自测。`}
+  path="/learn"
+  jsonLd={courseJsonLd(course)}
+>
+  <div class="syllabus">
+    <header class="syllabus-head">
+      <span class="eyebrow">课程目录</span>
+      <h1 class="section-title" style="font-size:clamp(28px,3.6vw,38px);margin:12px 0 10px">
+        {course.flat.length} 节，{formatMinutes(course.totalMinutes)}走完
+      </h1>
+      <p class="section-sub" style="max-width:64ch">
+        每节只讲一件事，配一个演示、三道题。带「交互」标记的课节里有可以动手改参数的东西，
+        建议先猜结果再点开。
+      </p>
+      {
+        first && (
+          <a class="btn btn-primary" href={`/learn/${first.slug}`} style="margin-top:18px">
+            从「{first.title}」开始 <span class="arrow">→</span>
+          </a>
+        )
+      }
+    </header>
+
+    {
+      course.parts.map((part) => (
+        <section class="part-block" id={part.def.id}>
+          <div class="part-block-head">
+            <span class="num">{part.def.num}</span>
+            <h2>{part.def.title}</h2>
+            <span class="pill pill-ghost">{part.count} 节 · {formatMinutes(part.minutes)}</span>
+          </div>
+          <p class="part-block-desc">{part.def.desc}</p>
+
+          {part.topics.map((topic) => (
+            <div class="topic-block">
+              <h3>{topic.title}</h3>
+              {topic.lessons.map((lesson) => {
+                index += 1;
+                return (
+                  <a class="lesson-row" href={`/learn/${lesson.slug}`}>
+                    <span class="idx">{String(index).padStart(2, '0')}</span>
+                    <span class="body">
+                      <span class="t">{lesson.title}</span>
+                      <span class="d">{lesson.thesis}</span>
+                    </span>
+                    <span class="right">
+                      <span class={`pill ${TAG_CLASS[lesson.tag] ?? 'pill-ghost'}`}>{lesson.tag}</span>
+                      <span class="min">{lesson.minutes}′</span>
+                    </span>
+                  </a>
+                );
+              })}
+            </div>
+          ))}
+        </section>
+      ))
+    }
+  </div>
+</BaseLayout>

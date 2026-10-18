@@ -1,0 +1,47 @@
+---
+interface Props {
+  slug: string;
+  extraNote?: string;
+}
+const { slug } = Astro.props;
+---
+
+<div class="search-overlay" id="searchOverlay" data-open="false" role="dialog" aria-modal="true" aria-label="搜索课程">
+  <div class="search-panel">
+    <div class="search-field">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="color:var(--faint)">
+        <circle cx="11" cy="11" r="7"></circle>
+        <path d="m20 20-3.6-3.6" stroke-linecap="round"></path>
+      </svg>
+      <input
+        id="searchInput"
+        type="search"
+        placeholder="搜索课节、概念、算法…"
+        autocomplete="off"
+        spellcheck="false"
+        aria-label="搜索关键词"
+        aria-controls="searchResults"
+      />
+      <button class="icon-only" id="searchClose" aria-label="关闭搜索" style="width:26px;height:26px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18" stroke-linecap="round"></path>
+        </svg>
+      </button>
+    </div>
+    <div class="search-results" id="searchResults" role="listbox" aria-label="搜索结果"></div>
+    <div class="search-hint">
+      <span><kbd>↑</kbd><kbd>↓</kbd> 选择</span>
+      <span><kbd>↵</kbd> 打开</span>
+      <span><kbd>esc</kbd> 关闭</span>
+      <span style="margin-left:auto">{slug ? '课程内搜索' : '全站搜索'}</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const close = document.getElementById('searchClose');
+  close?.addEventListener('click', () => {
+    const overlay = document.getElementById('searchOverlay');
+    if (overlay) overlay.dataset.open = 'false';
+  });
+</script>

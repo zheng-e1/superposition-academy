@@ -1,0 +1,100 @@
+/* ─────────────────────────────────────────────────────────────
+   设计令牌：纸感底色 + 冷调蓝，橙色全站只留给「相位」
+   ───────────────────────────────────────────────────────────── */
+:root {
+  color-scheme: light;
+
+  --bg: #f7f6f2;
+  --bg-alt: #f1efe9;
+  --card: #ffffff;
+  --card-2: #fbfaf7;
+
+  --ink: #191a1e;
+  --sub: #5d626b;
+  --faint: #8b9098;
+
+  --accent: #1f5f8b;
+  --accent-hover: #17496b;
+  --accent-soft: #e8f0f5;
+  --accent-line: rgba(31, 95, 139, 0.24);
+
+  --teal: #0f766e;
+  --teal-soft: #e4f1ef;
+
+  --phase: #b45309;
+  --phase-soft: #fbf1e4;
+
+  --danger: #b42318;
+  --danger-soft: #fdf0ee;
+  --success: #1c7a4c;
+  --success-soft: #e9f6ef;
+
+  --line: rgba(24, 26, 31, 0.09);
+  --line-strong: rgba(24, 26, 31, 0.16);
+  --hover: rgba(24, 26, 31, 0.04);
+  --code-bg: rgba(24, 26, 31, 0.055);
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-lg: 20px;
+
+  --shadow-card: 0 1px 2px rgba(24, 26, 31, 0.05);
+  --shadow-pop: 0 12px 40px rgba(24, 26, 31, 0.12);
+
+  --content-w: 748px;
+  --wide-w: 1080px;
+  --topbar-h: 58px;
+  --sidebar-w: 288px;
+
+  --fs-xs: 12px;
+  --fs-sm: 13.5px;
+  --fs-base: 16.5px;
+  --fs-lg: 18px;
+  --fs-xl: 21px;
+  --fs-2xl: 26px;
+  --fs-3xl: 34px;
+  --fs-4xl: 44px;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "Noto Sans SC", "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #0e1116;
+  --bg-alt: #12161c;
+  --card: #151a21;
+  --card-2: #1a2028;
+
+  --ink: #e8ebf0;
+  --sub: #a3abb7;
+  --faint: #79818d;
+
+  --accent: #7db4d8;
+  --accent-hover: #9ccae8;
+  --accent-soft: rgba(125, 180, 216, 0.12);
+  --accent-line: rgba(125, 180, 216, 0.3);
+
+  --teal: #4ecdc4;
+  --teal-soft: rgba(78, 205, 196, 0.12);
+
+  --phase: #e8a45c;
+  --phase-soft: rgba(232, 164, 92, 0.12);
+
+  --danger: #f08a80;
+  --danger-soft: rgba(240, 138, 128, 0.1);
+  --success: #6fce9b;
+  --success-soft: rgba(111, 206, 155, 0.1);
+
+  --line: rgba(255, 255, 255, 0.1);
+  --line-strong: rgba(255, 255, 255, 0.2);
+  --hover: rgba(255, 255, 255, 0.05);
+  --code-bg: rgba(255, 255, 255, 0.07);
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-pop: 0 16px 48px rgba(0, 0, 0, 0.55);
+}

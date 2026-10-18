@@ -1,0 +1,20 @@
+---
+import { loadCourse, type Course, type LessonNode } from '../../lib/course';
+import LessonLayout from '../../layouts/LessonLayout.astro';
+
+export async function getStaticPaths() {
+  const course = await loadCourse();
+  return course.flat.map((node) => ({
+    params: { slug: node.slug },
+    props: { node, course },
+  }));
+}
+
+interface Props {
+  node: LessonNode;
+  course: Course;
+}
+const { node, course } = Astro.props as Props;
+---
+
+<LessonLayout node={node} course={course} />

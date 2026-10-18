@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/portal.css';
+---
+
+<BaseLayout title="页面不存在" description="这个地址没有内容。" noindex={true}>
+  <div class="doc-page" style="text-align:center;padding-top:90px">
+    <div class="mono" style="font-size:64px;font-weight:700;color:var(--accent);line-height:1">404</div>
+    <h1 class="section-title" style="margin:14px 0 10px">这个态不存在</h1>
+    <p class="section-sub" style="margin:0 auto 24px">
+      地址可能写错了，或者那一节还没写。回到目录看看现在有什么。
+    </p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <a class="btn btn-primary" href="/learn">课程目录</a>
+      <a class="btn btn-ghost" href="/">回到首页</a>
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,69 @@
+---
+slug: superconducting
+title: 超导：一个人造原子
+thesis: 用微波指挥的宏观量子电路
+part: p-hw
+topic: t-modality
+tag: 概念
+minutes: 8
+order: 602
+demos: ['hardware']
+quiz:
+  - q: '如果 LC 谐振子的能级严格等间距，会发生什么？'
+    options: ['没法把最低两个能级单独当比特用，驱动会同时激发更高能级', '比特的相干时间会变成零', '没法用微波控制它', '约瑟夫森结会失效']
+    answer: 0
+    explain: '等间距意味着 0→1 与 1→2 的共振频率相同，一束微波会把布居一路推到更高能级，二能级近似失效。相干时间与能否用微波都不由能级间距决定，约瑟夫森结恰恰是用来打破等间距的，所以另外三项都不对。'
+  - q: '稀释制冷机把环境降到 10 mK 量级，最直接的作用是什么？'
+    options: ['让电路进入超导态', '把热激发概率压得很低，使比特基本待在基态', '提高微波脉冲的频率', '减少控制线的数量']
+    answer: 1
+    explain: '超导转变发生在几 K 量级，10 mK 远低于它，所以制冷的目的不是「变成超导」，而是让热能量远小于 GHz 能级间距，抑制热激发。频率由电路参数决定，线数也不会因为更冷而减少。'
+  - q: '超导路线要把比特数做上去，当前最直接的瓶颈是哪一组？'
+    options: ['门太慢，深线路跑不完', '相干时间只有纳秒量级', '布线、串扰与介质损耗随规模一起变严重', '无法实现双比特门']
+    answer: 2
+    explain: '超导门在几十纳秒，是几条路线里最快的之一；相干时间在百微秒量级，双比特门也早已成熟。真正难的是把更多比特和更多控制线放进同一个低温环境，同时压住串扰与损耗，所以另外三项与事实相反。'
+sources:
+  - 'Blais, Grimsmo, Girvin & Wallraff, 2021, Circuit quantum electrodynamics, Reviews of Modern Physics'
+  - 'Kjaergaard et al., 2020, Superconducting Qubits: Current State of Play, Annual Review of Condensed Matter Physics'
+  - 'IBM Quantum 官方文档：超导量子比特与稀释制冷机'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+一块几毫米见方的电路，被冷到 10 mK 量级——比宇宙微波背景还冷。它的行为却像一颗原子：只有离散的能级，只能用特定频率的微波去拨动。
+
+## 从 LC 振荡器到人造原子
+
+LC 振荡器量子化之后是谐振子，能级严格等间距：$E_n=\hbar\omega(n+1/2)$。等间距是麻烦：频率为 $\omega$ 的微波会同时驱动 0→1、1→2、2→3，你没法只跟最低两个能级说话。
+
+约瑟夫森结把等间距破坏掉。它引入一个非线性电感，使相邻能级间距不再相等，间距之差（非谐性）在几百 MHz 量级。只要微波脉冲的频谱宽度小于这个差，就可以只驱动 0↔1，把更高能级晾在一边。<Term id="transmon">超导量子比特</Term> 的基本设计就是这样：拿非谐性换一个可寻址的二能级系统。
+
+顺带的好处是快。门时间在几十纳秒量级，因为耦合强；制造工艺则借了半导体产业的产线。
+
+<Demo
+  kind="hardware"
+  label="五条路线对照"
+  caption="把这张表按比特数排一遍，再按双门保真度排一遍。超导在比特数上靠前，在保真度上并不领先。"
+/>
+
+## 微波、腔与 10 mK
+
+控制靠几个 GHz 的微波脉冲。读出靠旁边的谐振腔：比特处于不同状态时，腔的共振频率有微小移动，反射微波的相位随之不同，测这个相位就知道结果。
+
+为什么非要 10 mK？热激发的概率由 $k_BT$ 与 $\hbar\omega$ 的比值决定：5 GHz 的光子对应约 240 mK 的温度，环境在 10 mK 时，热激发概率被压到 $10^{-10}$ 量级（$e^{-24}$），比特才基本待在基态。稀释制冷机做的就是这件事，它还得把微波线上的热噪声挡在外面。
+
+代价在连线与串扰。每个比特都要控制线，比特一多，布线、串扰、介质损耗一起上来，<Term id="coherence-time">相干时间</Term> 停在百微秒量级，T₁ 与 T₂ 都是如此。
+
+<Misconception
+  note="「宏观」不等于「经典」。超导比特的关键正是：微观的量子规则，被一个毫米级的电路集体遵守。"
+>
+  <Fragment slot="wrong">超导比特是毫米级的宏观电路，所以它其实是经典的，不受量子噪声影响。</Fragment>
+  <Fragment slot="right">它由大量库珀对共同处于同一个量子态，尺寸大不带来保护；低温与非谐性只是让它可操控，退相干照旧。</Fragment>
+</Misconception>
+
+<Conclusion>
+  超导比特是「人造原子」：LC 振荡器提供能级，约瑟夫森结的非谐性让最低两个能级可以被单独寻址，微波负责控制，谐振腔负责读出，稀释制冷机负责压住热噪声。它快、工艺成熟，但被布线、串扰与损耗卡住。
+</Conclusion>

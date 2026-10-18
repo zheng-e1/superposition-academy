@@ -1,0 +1,69 @@
+---
+slug: teleportation
+title: 隐形传态：传的是态不是物质
+thesis: 传态需要两个经典比特，而且原态会被销毁
+part: p-entangle
+topic: t-teleport
+tag: 概念
+minutes: 8
+order: 421
+demos: []
+quiz:
+  - q: '传态完成后，Alice 原来那个比特上的态怎么样了？'
+    options: ['仍然完好，Bob 得到的是副本', '已在 Bell 测量中被销毁', '被转移到 Bob 那里，但 Alice 也保留一半', '变成了 Bell 态，可以再次使用']
+    answer: 1
+    explain: 'Bell 测量把 Alice 的两个比特投影到确定态，原来的 $|\psi\rangle$ 不再存在。若 Alice 仍保有原态，加上 Bob 的重建就构成了复制，违反不可克隆定理。'
+  - q: '经典比特还在路上时，Bob 能从自己的比特里学到 $\alpha$、$\beta$ 吗？'
+    options: ['能，因为纠缠已经把信息传过来了', '不能，他的约化态是最大混态', '能，只要他改测 X 基', '能，但只能学到一个比特']
+    answer: 1
+    explain: '未收到经典信息前，Bob 的约化密度矩阵是 $I/2$，任何基的测量都是各一半。纠缠只给相关性，不给可读出的参数；换测量基也改变不了这一点。'
+  - q: '完成一次传态，必须消耗什么？'
+    options: ['一个预先共享的 Bell 态和两个经典比特', '一个 Bell 态和一个经典比特', '两个 Bell 态，不需要经典信息', '一个未知态的两个副本']
+    answer: 0
+    explain: '协议需要一对纠缠、Alice 的 Bell 测量，以及把两个结果送到 Bob 的经典信道。一个经典比特不够区分四种修正；不需要经典信息的版本会违反不可超光速，若原态还保留，又会违反不可克隆。'
+sources:
+  - 'Bennett, Brassard, Crépeau, Jozsa, Peres & Wootters, 1993, Teleporting an unknown quantum state via dual classical and Einstein-Podolsky-Rosen channels, Physical Review Letters'
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §1.3.7（量子隐形传态）'
+  - 'Wootters & Zurek, 1982, A single quantum cannot be cloned, Nature'
+updated: 2026-10-18
+---
+
+import Callout from '../../../components/Callout.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+你想把一个不知道系数的量子态送到远处。不能复制，也不能一路「看」着它走过去——任何测量都会改掉它。隐形传态给出一条绕路：把态拆成「纠缠 + 两个经典比特」，让接收方自己重建。
+
+## 三步协议
+
+第一步，制备纠缠。Alice 与 Bob 各拿一个比特，合起来处于 $|\Phi^+\rangle$。Alice 手里还有一个待传的 $|\psi\rangle=\alpha|0\rangle+\beta|1\rangle$。
+
+第二步，Bell 测量。Alice 对自己手里的两个比特做 CNOT 与 H，再在计算基上测量，得到两个经典比特。测量把原来的纠缠与 $|\psi\rangle$ 一起破坏掉，两个结果看起来完全随机，和 $\alpha$、$\beta$ 没有关系。
+
+第三步，修正。Alice 把这两个测量结果用普通信道发给 Bob；Bob 按这两个结果决定要不要补 X、要不要补 Z。四种组合对应四种修正，做完之后，他手里的比特就是 $|\psi\rangle$。
+
+注意顺序：经典比特不到，Bob 什么也做不了。他手里的约化态在等待期间一直是 $I/2$，测不出任何关于 $\alpha$、$\beta$ 的信息。
+
+## 为什么不是复制，也不是超光速
+
+  <Term id="no-cloning">不可克隆定理</Term>说，不存在一个酉操作能把任意未知态精确复制。传态没有违反它：Alice 的原始比特在 Bell 测量中被销毁了，最后只剩 Bob 手里这一份。传的是「态」，不是「物质的副本」。
+
+也不能超光速。两个经典比特必须真的从 Alice 走到 Bob，而携带它们的信号走不快于光；在它们到达之前，Bob 的本地态与 $|\psi\rangle$ 无关。纠缠提供的是相关性，不是信道。这条绕路并不快，它只是把「必须传的量子信息」换成了「必须传的经典信息」。
+
+<Callout title="两个比特，不是两个「设置」" tone="teal">
+  经典比特携带的是修正指令，不是 $\alpha$、$\beta$ 的数值。任何一条指令都不透露这两个数；它们只告诉你该做哪种修正。
+</Callout>
+
+实验上，光子、超导、离子阱等平台都做过传态；难度不在原理，而在让纠缠分发、Bell 测量和经典通信同时足够快、足够准。每传一次，都要消耗一对预先分发的纠缠。
+
+<Misconception
+  note="「隐形」指的是不需要知道态的参数，不是不需要信道。"
+>
+  <Fragment slot="wrong">隐形传态把粒子本身瞬移到远处，所以比光快。</Fragment>
+  <Fragment slot="right">传态只把态转移到预先存在的纠缠比特上，原件被测量销毁，且必须等两个经典比特到达才能完成。</Fragment>
+</Misconception>
+
+<Conclusion>
+  <Term id="teleportation">隐形传态</Term>用一对纠缠和两个经典比特，把一个未知量子态搬到远处；原态在测量中销毁，接收方要等经典指令才能重建。它既不是复制，也不是超光速，而是把「量子信息」和「经典信息」分工得最清楚的一条协议。
+</Conclusion>

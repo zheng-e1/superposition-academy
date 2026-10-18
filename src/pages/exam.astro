@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { loadCourse } from '../lib/course';
+import { PART_BY_ID } from '../data/course';
+import '../styles/portal.css';
+
+const course = await loadCourse();
+const parts = course.parts.map((p) => ({
+  id: p.def.id,
+  title: p.def.title,
+  num: p.def.num,
+  count: p.lessons.reduce((s, l) => s + l.entry.data.quiz.length, 0),
+}));
+const total = parts.reduce((s, p) => s + p.count, 0);
+---
+
+<BaseLayout
+  title={`自测中心 · 共 ${total} 题`}
+  description={`按篇章抽题自测，答完即时判分并给出解析，错题可回到对应课节复习。共 ${total} 道题。`}
+  path="/exam"
+>
+  <div class="exam-page">
+    <span class="eyebrow">自测中心</span>
+    <h1 class="section-title" style="font-size:clamp(28px,3.6vw,38px);margin:12px 0 10px">
+      测一下，哪一节没真的学会
+    </h1>
+    <p class="section-sub" style="max-width:64ch">
+      从全部 {total} 道题里抽 10 道，答完即时给解析。错的那道，点标题回到对应课节重读。
+    </p>
+
+    <div class="exam-bar">
+      <div class="chip-row" id="examParts">
+        <button class="chip" type="button" data-part="all" aria-pressed="true">全部篇章</button>
+        {
+          parts.map((p) => (
+            <button class="chip" type="button" data-part={p.id} aria-pressed="false">
+              {p.num} {p.title}
+            </button>
+          ))
+        }
+      </div>
+      <button class="btn btn-primary btn-sm" type="button" id="examStart" style="margin-left:auto">
+        抽 10 道题
+      </button>
+    </div>
+
+    <div id="examStage" class="exam-stage">
+      <div class="exam-empty card" style="padding:28px;text-align:center;color:var(--sub);font-size:14px">
+        选一个篇章，然后点「抽 10 道题」。也可以直接抽全站混合卷。
+      </div>
+    </div>
+
+    <div id="examResult"></div>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../scripts/exam';
+</script>

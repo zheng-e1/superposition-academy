@@ -1,0 +1,93 @@
+---
+slug: bloch-sphere
+title: 布洛赫球：一个比特的全貌
+thesis: 一个比特的全部纯态，就是球面上的点
+part: p-qubit
+topic: t-state
+tag: 交互
+minutes: 7
+order: 301
+demos: ['bloch']
+quiz:
+  - q: 布洛赫球上 θ=π 对应的态是哪一个？
+    options:
+      - "|0⟩"
+      - "|1⟩"
+      - "|+⟩"
+      - "|+i⟩"
+    answer: 1
+    explain: 代入坐标，θ=π 时 cos(θ/2)=0、sin(θ/2)=1，态是 e^{iφ}|1⟩，只差一个全局相位，所以它落在南极。|0⟩ 在北极，|+⟩ 与 |+i⟩ 都在赤道上。
+  - q: 一个态在布洛赫球上的 z 分量是 0.5，沿 z 轴测量得到 0 的概率是多少？
+    options:
+      - 25%
+      - 50%
+      - 75%
+      - 100%
+    answer: 2
+    explain: 代入 P(0)=(1+z)/2，得到 (1+0.5)/2=0.75。z=0 才是 50%，z=1 才是 100%。
+  - q: 一个态的箭头落在球内、长度为 0.6 的位置，最恰当的描述是什么？
+    options:
+      - 这是一个纯态，只是画得短了一点
+      - 这是混态，纯度小于 1
+      - 这表示比特同时是 0 和 1
+      - 这是归一化没做好的纯态
+    answer: 1
+    explain: 纯态的箭头一定贴在球面上，球内的点对应混态，其密度矩阵的纯度小于 1。纯态不会因为「画得短」而掉进球内，那不是绘图问题。
+sources:
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §1.2 与 §4.2'
+  - 'Qiskit 官方文档，plot_bloch_vector 与 Statevector.draw 的说明'
+  - 'Preskill, Quantum Computation 讲义（Caltech Ph219），单比特态与密度矩阵部分'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+一个比特的态是两个复数，也就是四个实数。去掉归一化，再去掉一个谁也看不见的全局相位，只剩两个。两个数刚好够在球面上点一个点，而球面上的每个点都对应一个真能制备的态。这颗球就是布洛赫球。
+
+## 球面上的两个角
+
+$$
+|\psi\rangle=\cos\frac{\theta}{2}|0\rangle+e^{i\varphi}\sin\frac{\theta}{2}|1\rangle
+$$
+
+θ 是极角，从 0 到 π；φ 是方位角，从 0 到 2π。θ=0 时态是 $|0\rangle$，在北极；θ=π 时是 $|1\rangle$，在南极；θ=π/2、φ=0 时两个系数都是 $1/\sqrt2$，得到 $|+\rangle$，落在 +x 轴上。这就是 <Term id="bloch-sphere">布洛赫球</Term>。
+
+为什么是 θ/2？因为箭头转 α 角，系数里只出现 α/2：转满 360° 时箭头回到原处，态矢却多一个负号。半角把这件事编进了坐标。
+
+拖一拖，再按一下 H，看箭头怎么从北极跳到赤道。
+
+<Demo
+  kind="bloch"
+  label="布洛赫球"
+  caption="拖动旋转视角。按 H 把箭头从北极推到 +x；拉 Ry 滑块，让箭头沿经线走。"
+/>
+
+## 读球上的数
+
+沿 z 轴测量，得到 0 的概率是
+
+$$
+P(0)=\frac{1+z}{2}
+$$
+
+北极 z=1，得到 0 的概率是 100%；赤道 z=0，正好一半；南极 z=−1，一定是 1。所以「态有多偏向 0」就是箭头在 z 轴上有多高。想知道 x 方向的偏置，把球转过来看 x 轴上的投影就行。
+
+$|+\rangle$ 与 $|-\rangle$ 都在赤道上，球面上相隔 180°，区别只在方位角，也就是相对相位。赤道上的点不是一种态，而是无穷多种等权重的叠加；它们测 z 基的结果完全一样，却会在后续的门里走出不同的路。
+
+球面上正对的两点对应正交态，比如 $|0\rangle$ 与 $|1\rangle$、$|+\rangle$ 与 $|-\rangle$。拿其中一个态去另一个的方向上测，通过的概率严格为零。夹角决定它们有多好区分。
+
+球面是纯态。球内的点长度小于 1，对应 <Term id="density-matrix">密度矩阵</Term> 描述的混态，它的 <Term id="purity">纯度</Term> 不到 1。实验里的退相干，几何上就是把箭头从球面往球心推；推到球心，x、y、z 三个方向都没有偏置。
+
+<Misconception
+  note="叠加是一个确定的纯态，混态是「信息已经漏出去」的状态，两者的差别在球面上就是球壳与球内。"
+>
+  <Fragment slot="wrong">球内越靠近球心，越说明这个比特「既是 0 又是 1」，只是我们还不知道。</Fragment>
+  <Fragment slot="right">球内的点表示混态，来自与环境纠缠或经典的不确定性；「既是 0 又是 1」的纯叠加在赤道的球面上。</Fragment>
+</Misconception>
+
+<Conclusion>
+  一个比特的全部纯态，就是布洛赫球球面上的点：θ 定高度，φ 定方位。沿 z 测量得到 0 的概率只由高度决定，等于 $(1+z)/2$。球内不是更多的态，而是纯度掉了的态。
+</Conclusion>

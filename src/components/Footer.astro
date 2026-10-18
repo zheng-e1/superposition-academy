@@ -1,0 +1,27 @@
+---
+import { site } from '../config';
+const year = new Date().getFullYear();
+const established = year <= site.startYear ? `${site.startYear}` : `${site.startYear}–${year}`;
+---
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="foot-brand">
+      <strong>{site.name}</strong> · {site.latinName}
+      <br />
+      免费开放的量子计算学习站。{established} · 内容以教材与论文为准，勘误请来信。
+    </div>
+    <nav class="foot-links" aria-label="页脚导航">
+      <a href="/learn">课程目录</a>
+      <a href="/roadmap">学习路线</a>
+      <a href="/lab">实验室</a>
+      <a href="/exam">自测中心</a>
+      <a href="/glossary">术语表</a>
+      <a href="/about">关于与引用</a>
+    </nav>
+    <div class="foot-note">
+      <span>© {established} {site.name} · 内容采用 CC BY-NC-SA 4.0 授权</span>
+      <span>本站不推荐任何金融产品，量子计算投资风险极高</span>
+    </div>
+  </div>
+</footer>

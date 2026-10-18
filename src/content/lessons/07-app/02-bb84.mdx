@@ -1,0 +1,75 @@
+---
+slug: bb84
+title: BB84：窃听必留痕
+thesis: QKD 的安全性来自物理定律，不是计算难度
+part: p-app
+topic: t-crypto
+tag: 交互
+minutes: 8
+order: 711
+demos: ['bb84']
+quiz:
+  - q: 为什么筛后密钥只剩一半左右？
+    options: ['Eve 每次都拿走一半的比特', '两人选到相同基的概率约一半', '光纤损耗吃掉了一半光子', '一半比特被留作校验位']
+    answer: 1
+    explain: Alice 与 Bob 各自独立随机选基，相同的概率是一半；基不同的位无法比对，只能丢弃。Eve 是否在场不影响这个比例，损耗影响的是收到多少光子，校验位也不是「一半」的固定开销，所以另外三项都不对。
+  - q: Eve 截获、测量、重发之后，筛后密钥的误码率为什么约为 25%？
+    options: ['她一定会猜对基，但测量会变慢', '她能复制原态，所以误码来自探测器', '她猜错基的概率是一半，猜错后 Bob 的结果再错一半', '误码率与 Eve 无关，只由信道决定']
+    answer: 2
+    explain: 两个「一半」相乘：猜错基的概率 1/2，猜错后发出的态让 Bob 在正确基下得到随机结果，再乘 1/2，得到 25%。她无法复制未知量子态，误码也不是探测器的错，所以其余三项都不成立。
+  - q: 下面哪句话正确区分了 QKD 与后量子密码？
+    options: ['两者都是量子算法，都要在量子计算机上运行', 'QKD 已经被 Shor 算法破解，PQC 是替代品', 'PQC 是 QKD 的硬件实现', 'QKD 靠物理扰动保证安全，PQC 靠经典算法抵抗量子攻击']
+    answer: 3
+    explain: QKD 的安全性来自测量会留下误码、未知量子态不可克隆；PQC 仍是经典密码，只是换了量子计算机也不擅长的数学难题。QKD 不需要量子计算机来运行，也没有被 Shor 算法破解，两者更不是同一套方案的软硬件两半。
+sources:
+  - 'Bennett & Brassard, 1984, Quantum Cryptography: Public Key Distribution and Coin Tossing, Proceedings of the IEEE International Conference on Computers, Systems and Signal Processing'
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §12'
+  - 'NIST, 2024, Post-Quantum Cryptography Standards（FIPS 203/204/205）'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+两个人想共享一串只有他们知道的密钥。传统办法靠数学难题，量子办法靠一条更硬的规则：在理想单光子、无侧信道的模型里，偷看必然扰动量子态，在筛后密钥里留下误码；设备漏洞（探测器致盲、效率失配）是另一类风险，需要单独防护。
+
+## 两种基，四种态
+
+Alice 每一位随机选一个比特（0 或 1）和一个基（+ 或 ×），编码成四种偏振态之一。Bob 收到后也随机选基测量：基相同，结果必然等于 Alice 的比特；基不同，结果与比特无关。两人公开比对用了哪个基——只说基，不说比特——保留相同基的位。这一步叫筛后，大约剩一半。
+
+Eve 若截获、测量、重发，她不知道 Alice 的基，只能猜。猜错的概率是一半；猜错之后，她发出的态与 Alice 的原态不同，Bob 即使基选对了，结果也有一半概率是错的。对筛后保留的位，误码率就是：
+
+$$
+P_{\text{err}} = \frac{1}{2}\times\frac{1}{2} = 25\%
+$$
+
+Alice 与 Bob 抽一部分密钥公开比对。误码率明显高于约 11%，整批丢弃——这个阈值来自安全性证明里的容错上界，不是拍脑袋的经验值。
+
+打开 Eve，跑几批，看误码率跳到 25% 上下，判决行变红。
+
+<Demo
+  kind="bb84"
+  label="BB84 与窃听"
+  caption="先关着 Eve 跑一批，筛后误码率应为 0；再打开 Eve 重跑，误码率会跳到 25% 上下，超过 11% 的判决线。"
+/>
+
+## QKD 与 PQC 是两件事
+
+<Term id="qkd">量子密钥分发</Term>常被说成「用量子计算机保护通信」，这是两回事。它不靠计算难度，靠的是测量会扰动状态、未知量子态不可克隆。对手就算有无限算力，偷看也会留下误码。
+
+<Term id="pqc">后量子密码</Term>走的是另一条路：仍然是经典算法，只是把难题换成量子计算机也不擅长的，比如格上的问题。NIST 已经发布相关标准。一个管分发密钥，一个管公钥算法，经常被媒体混成一句话。
+
+现实限制也要说清：光纤损耗让距离上不去，量子中继还不成熟；长链路要靠可信节点中继，而可信节点本身是一个信任假设；设备还可能被侧信道攻击。QKD 不是「无条件安全」的魔法。
+
+<Misconception
+  note="「必留痕」不是修辞，痕就是误码率。它可测、可统计，也可以被噪声掩盖——所以还要做抽样与保密性放大。"
+>
+  <Fragment slot="wrong">只要窃听者足够小心，就能在不被发现的情况下拿到密钥。</Fragment>
+  <Fragment slot="right">要拿到比特值就必须选基测量，选错就扰动状态；误码率是统计量，抽样比对就能发现。除非她能复制未知量子态，而<Term id="no-cloning">不可克隆定理</Term>不允许。</Fragment>
+</Misconception>
+
+<Conclusion>
+  <Term id="bb84">BB84</Term> 的安全性来自物理定律，不是计算难度。筛后、误码率、阈值、保密性放大，每一步都能在演示里看到。它也不是万能药：距离、可信节点与设备漏洞，都是工程上要单独解决的问题。
+</Conclusion>

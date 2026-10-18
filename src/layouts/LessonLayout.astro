@@ -1,0 +1,105 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Sidebar from '../components/Sidebar.astro';
+import Quiz from '../components/Quiz.astro';
+import { render } from 'astro:content';
+import { neighbours, partOf, topicTitle, type Course, type LessonNode } from '../lib/course';
+import { TAG_CLASS } from '../data/course';
+import { breadcrumbJsonLd, lessonJsonLd } from '../lib/seo';
+
+interface Props {
+  node: LessonNode;
+  course: Course;
+}
+const { node, course } = Astro.props;
+const { Content } = await render(node.entry);
+const part = partOf(node);
+const topic = topicTitle(node, course);
+const { prev, next, index } = neighbours(course, node.slug);
+const updated = node.entry.data.updated;
+
+const jsonLd = [
+  lessonJsonLd(node, course),
+  breadcrumbJsonLd([
+    { name: '课程', url: '/learn' },
+    { name: part.title, url: `/learn#${part.id}` },
+    { name: node.title, url: `/learn/${node.slug}` },
+  ]),
+];
+---
+
+<BaseLayout
+  title={node.title}
+  description={node.thesis}
+  path="/learn"
+  slug={node.slug}
+  type="article"
+  jsonLd={jsonLd}
+>
+  <div class="reading-progress" id="readingProgress"></div>
+  <div class="reader">
+    <Sidebar course={course} current={node.slug} />
+    <div class="main">
+      <article class="article" data-lesson data-slug={node.slug}>
+        <header class="lesson-head">
+          <nav class="lesson-crumbs" aria-label="面包屑">
+            <a href="/learn">课程</a>
+            <span class="sep">/</span>
+            <span>{part.num} {part.title}</span>
+            <span class="sep">/</span>
+            <span>{topic}</span>
+          </nav>
+          <h1 class="lesson-title">{node.title}</h1>
+          <p class="lesson-thesis">{node.thesis}</p>
+          <div class="lesson-meta">
+            <span class={`pill ${TAG_CLASS[node.tag] ?? 'pill-ghost'}`}>{node.tag}</span>
+            <span>{node.minutes} 分钟</span>
+            <span class="sep"></span>
+            <span>第 {index + 1} / {course.flat.length} 节</span>
+            {updated && <><span class="sep"></span><span>更新于 {updated}</span></>}
+          </div>
+        </header>
+
+        <div class="prose">
+          <Content />
+        </div>
+
+        <Quiz items={node.entry.data.quiz} slug={node.slug} />
+
+        <footer class="lesson-foot">
+          <div class="sources">
+            <span class="sources-title">来源与延伸</span>
+            <ul>
+              {node.entry.data.sources.map((s) => <li>{s}</li>)}
+            </ul>
+          </div>
+
+          <nav class="pager" aria-label="课节导航">
+            <a
+              href={prev ? `/learn/${prev.slug}` : '/learn'}
+              data-dir="prev"
+              data-disabled={!prev}
+            >
+              <span class="dir">← 上一节</span>
+              <span class="ttl">{prev ? prev.title : '回到课程目录'}</span>
+            </a>
+            <a
+              href={next ? `/learn/${next.slug}` : '/learn'}
+              data-dir="next"
+              data-disabled={!next}
+            >
+              <span class="dir">下一节 →</span>
+              <span class="ttl">{next ? next.title : '课程目录'}</span>
+            </a>
+          </nav>
+
+          <p class="feedback">
+            这节有哪里不清楚、或者讲错了？
+            <a href={`mailto:hi@superposition.academy?subject=${encodeURIComponent(`勘误：${node.title}`)}`}>来信指出</a>
+            ，勘误会标在文末。
+          </p>
+        </footer>
+      </article>
+    </div>
+  </div>
+</BaseLayout>

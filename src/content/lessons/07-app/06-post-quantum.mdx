@@ -1,0 +1,62 @@
+---
+slug: post-quantum
+title: 后量子密码：不等量子计算机来
+thesis: 换算法比换硬件快得多
+part: p-app
+topic: t-crypto
+tag: 实战
+minutes: 7
+order: 713
+demos: []
+quiz:
+  - q: '对称加密（比如 AES）面对量子计算机，正确的应对方式是什么？'
+    options: ['整体换成格密码', '把密钥加长，因为 Grover 只给平方根加速', '改用 RSA 来加密', '必须配合 QKD 才能安全']
+    answer: 1
+    explain: 'Grover 把暴力搜索的代价从 N 降到 √N 量级，128 比特密钥相当于只剩 64 比特强度，加长到 256 比特就能补回来。格密码是给公钥体系用的，RSA 更脆弱，QKD 解决的是密钥分发而不是分组加密，所以另外三项都不对。'
+  - q: 'NIST 在 2024 年发布的三份标准，分别对应什么？'
+    options: ['FIPS 203 密钥封装、FIPS 204 数字签名、FIPS 205 无状态哈希签名', 'FIPS 203 签名、FIPS 204 密钥封装、FIPS 205 哈希', 'FIPS 203 哈希、FIPS 204 密钥封装、FIPS 205 签名', '三份都是密钥封装，只是安全级别不同']
+    answer: 0
+    explain: 'FIPS 203 是 ML-KEM，用来协商密钥；FIPS 204 是 ML-DSA，用来签名；FIPS 205 是 SLH-DSA，用哈希构造无状态签名。三者的用途不同，不能互相替代，其余三项都把角色弄混了。'
+  - q: '一个系统今天只支持 RSA-2048，最合理的迁移判断是什么？'
+    options: ['等量子计算机造出来再换，现在换是浪费', '「先存后解」的风险已经存在，应尽早规划混合部署与证书迁移', '把 RSA 密钥加长到 4096 位就安全了', '换成 QKD 就不用改软件了']
+    answer: 1
+    explain: '攻击者可以先录下今天的密文，等机器成熟再解，所以迁移的时钟从现在开始走；混合部署能让新旧系统平滑过渡。Shor 的代价随模数比特数多项式增长，加长 RSA 挡不住它；QKD 要专用硬件，也不替代签名与公钥加密。'
+sources:
+  - 'NIST, 2024, FIPS 203: Module-Lattice-Based Key-Encapsulation Mechanism Standard (ML-KEM)'
+  - 'NIST, 2024, FIPS 204 (ML-DSA) 与 FIPS 205 (SLH-DSA)'
+  - 'Shor, 1994, Algorithms for quantum computation: discrete logarithms and factoring, FOCS 1994'
+updated: 2026-10-18
+---
+
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+你今天发出的加密流量，可能已经被存下来了。对方等的不是今天的计算机，是十年后能跑 Shor 的那一台。等它出现再换算法，已经晚了。
+
+## 谁被威胁，谁只要加长钥匙
+
+<Term id="shor">Shor 算法</Term> 打的是公钥：RSA 靠分解大整数，ECC 靠离散对数，两者都能归约到周期查找，量子机器有多项式算法。对称加密和哈希是另一回事。<Term id="grover">Grover 算法</Term> 只给平方根加速，把 128 比特密钥的暴力搜索从 $2^{128}$ 降到 $2^{64}$ 量级——加长密钥就能补回来。AES-256、SHA-384 这类参数，在量子时代仍然够用。
+
+这条区别很重要：不是「所有密码都会被量子计算机破解」，而是「依赖分解与离散对数的那一类必须换」。对付 Grover 只要把钥匙加长，代价是性能，不是安全模型的崩塌。
+
+## 换数学，不换机器
+
+<Term id="pqc">后量子密码</Term> 是能在量子攻击下存活的经典算法，跑在你现在的服务器上。主流方向有三类：格上的问题（ML-KEM、ML-DSA）、哈希（SLH-DSA）、编码与多变量。
+
+NIST 在 2024 年定下首批标准：FIPS 203 是 ML-KEM，做密钥封装；FIPS 204 是 ML-DSA，做数字签名；FIPS 205 是 SLH-DSA，用哈希做无状态签名。三个各管一段，不能互相替代。
+
+紧迫性来自「先存后解」：今天录下的密文，等机器成熟再解。迁移的麻烦在存量系统：证书、协议、固件，哪一样都要改，还要留混合部署的过渡期。
+
+这和 <Term id="qkd">量子密钥分发</Term> 不是一回事。QKD 把安全性建立在量子物理与设备假设上，要专用硬件与链路；PQC 把安全性建立在计算困难性假设上，只需要改代码。两者都不是无条件保证。一个换硬件，一个换算法——后者快得多。
+
+<Misconception
+  note="名字里的「后」指的是「量子之后仍然成立」，不是「要等量子计算机」。它是现在就部署的经典软件。"
+>
+  <Fragment slot="wrong">后量子密码是量子算法，得等量子计算机造出来才能用。</Fragment>
+  <Fragment slot="right">PQC 是经典算法，现在的浏览器和服务器就能跑；它防的是未来的量子攻击，不是用量子计算。</Fragment>
+</Misconception>
+
+<Conclusion>
+  Shor 威胁的是 RSA 与 ECC；对称加密只要加长密钥就能扛住 Grover。PQC 用经典算法换掉依赖分解与离散对数的难题，FIPS 203/204/205 已经把密钥封装、签名与无状态哈希签名标准化。迁移的时钟由「先存后解」拨动，不由机器哪天造出来决定。
+</Conclusion>

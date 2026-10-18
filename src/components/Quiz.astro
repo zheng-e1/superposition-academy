@@ -1,0 +1,58 @@
+---
+import { renderMath } from '../lib/math';
+
+interface Item {
+  q: string;
+  options: string[];
+  answer: number;
+  explain: string;
+}
+interface Props {
+  items: Item[];
+  slug: string;
+}
+const { items, slug } = Astro.props;
+const letters = ['A', 'B', 'C', 'D'];
+---
+
+<section class="quiz" data-quiz data-slug={slug} aria-label="本节自测">
+  <div class="quiz-head">
+    <div class="quiz-title">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M9 11.5a3 3 0 1 1 4.2 2.8c-.8.4-1.2 1-1.2 1.9v.3" stroke-linecap="round"></path>
+        <circle cx="12" cy="19.4" r="1.1" fill="currentColor" stroke="none"></circle>
+        <circle cx="12" cy="12" r="9.2" stroke-width="1.6"></circle>
+      </svg>
+      本节自测 · {items.length} 题
+    </div>
+    <div class="quiz-score" data-quiz-score>未作答</div>
+  </div>
+  <div class="quiz-list">
+    {
+      items.map((item, qi) => (
+        <div class="quiz-item" data-answer={item.answer}>
+          <div class="quiz-q">
+            <span class="quiz-num">{String(qi + 1).padStart(2, '0')}</span>
+            <span set:html={renderMath(item.q)} />
+          </div>
+          <div class="quiz-options">
+            {item.options.map((opt, oi) => (
+              <button class="quiz-option" type="button" data-opt={oi}>
+                <span class="key">{letters[oi]}</span>
+                <span set:html={renderMath(opt)} />
+              </button>
+            ))}
+          </div>
+          <div class="quiz-explain" hidden>
+            <b>解析 · </b>
+            <span set:html={renderMath(item.explain)} />
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<script>
+  import '../scripts/quiz';
+</script>

@@ -1,0 +1,118 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { loadCourse, formatMinutes, partOf } from '../lib/course';
+import { routes, site } from '../config';
+import { PART_BY_ID } from '../data/course';
+import '../styles/portal.css';
+
+const course = await loadCourse();
+const routeData = routes.map((route) => {
+  const parts = route.parts
+    .map((id) => course.parts.find((p) => p.def.id === id))
+    .filter((p): p is NonNullable<typeof p> => Boolean(p));
+  const lessons = parts.flatMap((p) => p.lessons);
+  return {
+    ...route,
+    parts,
+    lessons,
+    minutes: lessons.reduce((s, l) => s + l.minutes, 0),
+  };
+});
+---
+
+<BaseLayout
+  title="学习路线：四条路，各走各的"
+  description="按目标裁剪课程：只想搞懂、考试与竞赛、动手做、要判断力。每条路线列出要读的篇章、节数与预计时间。"
+  path="/roadmap"
+>
+  <div class="roadmap-page">
+    <span class="eyebrow">学习路线</span>
+    <h1 class="section-title" style="font-size:clamp(28px,3.6vw,38px);margin:12px 0 10px">
+      先选目标，再决定读到哪
+    </h1>
+    <p class="section-sub">
+      同一套内容，四种读法。路线之间没有高下，只有「你接下来要拿它干什么」。
+      选错了也没关系，随时换，目录不会锁死。
+    </p>
+
+    <div class="roadmap-switch" role="tablist" aria-label="路线切换">
+      {
+        routeData.map((route, i) => (
+          <button
+            class="chip"
+            role="tab"
+            type="button"
+            id={`tab-${route.id}`}
+            aria-controls={`panel-${route.id}`}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            data-route-tab={route.id}
+          >
+            {route.name}
+          </button>
+        ))
+      }
+    </div>
+
+    {
+      routeData.map((route, ri) => (
+        <section
+          class="roadmap-panel"
+          id={`panel-${route.id}`}
+          role="tabpanel"
+          aria-labelledby={`tab-${route.id}`}
+          hidden={ri !== 0}
+        >
+          <div class="feature" style="margin-bottom:16px;background:var(--card-2)">
+            <div class="feature-num">
+              {route.lessons.length} 节 · {formatMinutes(route.minutes)} · 约 {route.weeks} 周
+            </div>
+            <h3>{route.desc}</h3>
+            <p>按顺序读下面这些篇章。遇到「深入」标记的可以先跳过，不影响后面的理解。</p>
+          </div>
+
+          <div class="roadmap-track">
+            {route.parts.map((part, i) => (
+              <a class="roadmap-step" href={`/learn#${part.def.id}`}>
+                <span class="n">{String(i + 1).padStart(2, '0')}</span>
+                <div>
+                  <h3>{part.def.num} {part.def.title}</h3>
+                  <p>{part.def.desc}</p>
+                  <div class="stats">
+                    <span>{part.count} 节</span>
+                    <span>{formatMinutes(part.minutes)}</span>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+
+          {route.lessons.length > 0 && (
+            <p class="section-sub" style="margin-top:22px">
+              这条路从
+              <a href={`/learn/${route.lessons[0].slug}`}>「{route.lessons[0].title}」</a>
+              开始，到
+              <a href={`/learn/${route.lessons[route.lessons.length - 1].slug}`}>
+                「{route.lessons[route.lessons.length - 1].title}」
+              </a>
+              结束。
+            </p>
+          )}
+        </section>
+      ))
+    }
+  </div>
+</BaseLayout>
+
+<script>
+  const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-route-tab]'));
+  const panels = Array.from(document.querySelectorAll<HTMLElement>('.roadmap-panel'));
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const id = tab.dataset.routeTab;
+      tabs.forEach((t) => t.setAttribute('aria-selected', String(t === tab)));
+      panels.forEach((p) => {
+        p.hidden = p.id !== `panel-${id}`;
+      });
+    });
+  });
+</script>

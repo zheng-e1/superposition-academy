@@ -1,0 +1,72 @@
+---
+slug: deutsch-jozsa
+title: Deutsch–Jozsa：一次查询看全局
+thesis: 一次查询判定常数或平衡，靠的是相位踢回
+part: p-algo
+topic: t-oracle
+tag: 概念
+minutes: 8
+order: 511
+demos: ['circuit']
+quiz:
+  - q: 一个 n=100 的 Deutsch–Jozsa 问题，函数保证是常数或平衡。确定性的经典算法最坏要查询多少次？
+    options: ['100 次', '2^99 + 1 次', '2^100 次', '1 次']
+    answer: 1
+    explain: 经典算法即使查了 2^99 个输入都相同，也不能排除剩下 2^99 个全取另一值，所以必须再查一个。2^100 是全查一遍，不是最坏情况下的下界。
+  - q: 量子算法只查一次，凭什么能判断？
+    options: ['因为神谕一次算出了所有 f(x) 并存进了寄存器', '因为把目标位放在 |−⟩ 上，f(x) 变成相位，再用 H 层让相位干涉', '因为测量会直接读出 f 的真值表', '因为常数函数和平衡函数的概率分布不同']
+    answer: 1
+    explain: 相位踢回把每个 x 的 f(x) 写进振幅的符号，H 层再把这些符号相加；常数时同相增强，平衡时相消。神谕并没有把真值表存下来，一次调用只得到一个整体的相位图案。
+  - q: 算法跑完、测量得到全零。它能告诉你什么？
+    options: ['f 在所有输入上都等于 0', 'f 是常数函数', 'f 的真值表', 'f 的周期']
+    answer: 1
+    explain: 全零只说明 f 是常数，至于是全 0 还是全 1，算法不区分。它判定的是一个整体性质，不是函数的全部信息；想知道具体取值还得另外查。
+sources:
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §1.4.4'
+  - 'Deutsch & Jozsa, 1992, Rapid solution of problems by quantum computation, Proceedings of the Royal Society A'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+黑箱里藏着一个函数 $f:\{0,1\}^n\to\{0,1\}$。你每次只能问一个输入，它回你 0 或 1；它保证要么是常数（全 0 或全 1），要么是平衡（一半输入给 0，一半给 1）。你要判断是哪一种。
+
+## 经典的最坏情况有多坏
+
+确定性经典算法最坏要问 $2^{n-1}+1$ 次。理由很朴素：你问了 $2^{n-1}$ 个输入，答案全一样，仍然不能排除剩下那一半全是另一个值——函数可能恰好是平衡的。再问一个，才敢下结论。
+
+量子算法只调用一次 <Term id="oracle">神谕</Term>。注意「一次」的含义：它没有读到 $2^n$ 个函数值，只拿到了一个比特的判定——常数还是平衡。
+
+这个差距限定在「确定性、零错误」的查询模型里。允许小概率出错时，经典随机抽几个点也能把错误压得很低；它证明的是查询模型里的分离，不是全面碾压。
+
+下面的线路演示相位怎么被踢回控制位。先点预设「相位回踢」，再用「下一步」逐格走完这 5 个门。
+
+<Demo
+  kind="circuit"
+  label="相位踢回"
+  caption="先点预设「相位回踢」，用「下一步」逐格走完 5 个门，注意直方图始终看不出相位；随后给 q0 补一个 H。CNOT 把 −1 写回控制位的相位，最后这个 H 才让它变成概率差：q0 从 50/50 变成 |1⟩。"
+/>
+
+## 把答案写进相位
+
+先把输入寄存器放到均匀叠加 $\frac{1}{\sqrt{2^n}}\sum_x |x\rangle$，目标位准备成 $|-\rangle$。神谕是 $U_f:|x\rangle|y\rangle\mapsto|x\rangle|y\oplus f(x)\rangle$。
+
+当目标位处在 $|-\rangle$ 上，$f(x)=0$ 时它不变，$f(x)=1$ 时它多一个负号。这就是**相位踢回**：函数的取值没有写进目标位，而是以 $(-1)^{f(x)}$ 的形式留在了输入寄存器的 <Term id="amplitude">振幅</Term> 里。
+
+接着给每个输入比特再加一个 <Term id="hadamard">H 门</Term>。常数函数的所有振幅同号，叠加后互相加强，测量只能得到全零；平衡函数一半正一半负，全零那一项的振幅正好抵消，测量必然得到某个非零串。一次查询、一层 <Term id="interference">干涉</Term>，判定就出来了。
+
+这也解释了它为什么只给一个比特：<Term id="phase">相位</Term> 里编码的是 $f$ 的全局对称性，不是逐点的值。要把真值表读出来，仍然需要指数多的信息。
+
+<Misconception
+  note="并行性本身不产生优势，干涉才把它筛成一个答案；把「一次调用作用在所有输入上」读成「一次拿到所有答案」，是常见误读。"
+>
+  <Fragment slot="wrong">量子并行性让神谕一次算完所有 f(x)，所以一次查询就拿到了整张真值表。</Fragment>
+  <Fragment slot="right">一次调用确实同时作用在所有 x 上，但结果被压进一个相位图案；H 层只把这个图案的「常数还是平衡」一面翻成概率。</Fragment>
+</Misconception>
+
+<Conclusion>
+  Deutsch–Jozsa 是第一个把「量子更快」讲清楚的玩具问题：经典要 $2^{n-1}+1$ 次确定性查询，量子只要 1 次。它靠的不是把答案都算出来，而是用相位踢回把函数的一个整体性质写进振幅，再用 H 层干涉读出来。
+</Conclusion>

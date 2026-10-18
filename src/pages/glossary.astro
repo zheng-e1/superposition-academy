@@ -1,0 +1,63 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { GLOSSARY } from '../data/glossary';
+import '../styles/portal.css';
+
+const sorted = [...GLOSSARY].sort((a, b) => a.term.localeCompare(b.term, 'zh-CN'));
+---
+
+<BaseLayout
+  title={`术语表 · ${GLOSSARY.length} 条`}
+  description={`量子计算常用术语速查：${GLOSSARY.length} 条中英对照与一句话解释，课节里的术语都可以跳回这里。`}
+  path="/glossary"
+>
+  <div class="doc-page">
+    <span class="eyebrow">术语表</span>
+    <h1 class="section-title" style="font-size:clamp(28px,3.6vw,38px);margin:12px 0 10px">
+      {GLOSSARY.length} 条，够用了
+    </h1>
+    <p class="section-sub">
+      只收本站正文里真正用到的词。每条一句话，写得比维基短，比教材直白。
+    </p>
+
+    <div style="margin-top:20px;max-width:360px">
+      <input
+        id="glossFilter"
+        type="search"
+        placeholder="筛选，例如「相位」「纠错」"
+        aria-label="筛选术语"
+        style="width:100%;padding:10px 12px;border:1px solid var(--line-strong);border-radius:9px;background:var(--card);font-size:14px;color:var(--ink)"
+      />
+    </div>
+
+    <div class="glossary-list" id="glossList">
+      {
+        sorted.map((entry) => (
+          <div class="glossary-item" id={entry.id} data-term={`${entry.term} ${entry.en} ${entry.def}`}>
+            <div class="glossary-term">
+              <b>{entry.term}</b>
+              <span class="en">{entry.en}</span>
+            </div>
+            <p class="glossary-def">{entry.def}</p>
+          </div>
+        ))
+      }
+    </div>
+
+    <p class="tiny muted" style="margin-top:26px">
+      发现解释不准或有遗漏，写信给 hi@superposition.academy。
+    </p>
+  </div>
+</BaseLayout>
+
+<script>
+  const input = document.getElementById('glossFilter') as HTMLInputElement | null;
+  const list = document.getElementById('glossList');
+  input?.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    list?.querySelectorAll<HTMLElement>('[data-term]').forEach((row) => {
+      const hay = (row.dataset.term || '').toLowerCase();
+      row.style.display = !q || hay.includes(q) ? '' : 'none';
+    });
+  });
+</script>

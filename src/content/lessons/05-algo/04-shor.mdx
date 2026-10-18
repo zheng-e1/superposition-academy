@@ -1,0 +1,64 @@
+---
+slug: shor
+title: Shor：周期查找与 RSA 的黄昏
+thesis: Shor 的核心不是分解，是找周期
+part: p-algo
+topic: t-search
+tag: 深入
+minutes: 9
+order: 522
+demos: []
+quiz:
+  - q: 取 N=15、a=2，模幂序列 1, 2, 4, 8, 1, … 的周期是 4。用 gcd(2^2−1, 15) 和 gcd(2^2+1, 15) 能得到什么？
+    options: ['1 和 15', '3 和 5', '2 和 7', '什么都得不到，周期必须是奇数']
+    answer: 1
+    explain: 2^2=4，gcd(3,15)=3，gcd(5,15)=5，正好是 15 的两个非平凡因子。前提是周期为偶数且 a^{r/2} 不等于 −1 mod N，这里 4≠14，条件满足。
+  - q: 量子傅里叶变换在 Shor 算法里承担什么角色？
+    options: ['直接做整数除法', '把模幂的周期变成相位估计里的频率峰值', '把 RSA 公钥读进来', '替经典计算机做 gcd']
+    answer: 1
+    explain: 相位估计把模幂算符的本征相位测出来，QFT 把「周期 r」转成可读的频率；r 再由连分数还原。分解和 gcd 仍然是经典后处理，QFT 不直接输出因数。
+  - q: 关于后量子密码（PQC），下面哪种说法准确？
+    options: ['它用量子计算机给数据加密', '它换掉依赖分解和离散对数的难题，用经典算法抵抗量子攻击', '它只是把 RSA 密钥长度加倍', '它只用于量子密钥分发']
+    answer: 1
+    explain: PQC 仍是经典算法，安全性建立在格、编码、哈希等问题的困难性上，而不是分解大整数。把 PQC 和 QKD 混为一谈，或以为「加长密钥」就能挡住 Shor，都是常见误解。
+sources:
+  - 'Shor, 1994, Algorithms for quantum computation: discrete logarithms and factoring, FOCS 1994'
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §5.1–§5.3'
+  - 'NIST, 2024, FIPS 203 / FIPS 204 / FIPS 205（ML-KEM、ML-DSA、SLH-DSA）'
+updated: 2026-10-18
+---
+
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+RSA 的安全性押在一句话上：分解一个大整数很难。<Term id="shor">Shor 算法</Term> 在 1994 年把这句话拆成两半：一半是经典数论，一半是周期查找。量子机器只加速后一半，但这一半足够致命。
+
+## 分解只是外壳
+
+取一个与 $N$ 互素的底 $a$，看模幂序列 $a^0, a^1, a^2, \dots$（模 $N$）。它一定会重复，最小的正周期叫 $r$。如果 $r$ 是偶数，且 $a^{r/2}\not\equiv -1 \pmod N$，那么 $\gcd(a^{r/2}-1,N)$ 与 $\gcd(a^{r/2}+1,N)$ 就是 $N$ 的两个非平凡因子。
+
+拿 $N=15$、$a=2$ 试：序列是 1, 2, 4, 8, 1, …，周期 $r=4$。$2^2=4$，$\gcd(3,15)=3$，$\gcd(5,15)=5$，分解完成。
+
+所以 Shor 的量子部分根本不「分解」，它只负责找 $r$；找到之后，剩下的活由经典计算机干。
+
+## 周期为什么能撬动 RSA
+
+构造算符 $U|y\rangle=|ay \bmod N\rangle$，它的本征相位与 $r$ 挂钩。用 <Term id="phase-estimation">相位估计</Term>（核心是 <Term id="qft">QFT</Term>）把周期翻成频率；测到频率，用连分数还原 $r$。量子机器不必把整条序列写下来，这是它比经典快的地方。
+
+威胁也在这里：RSA 靠分解，椭圆曲线密码（ECC）靠离散对数，而离散对数同样能归约到周期查找。受影响的是这两类公钥体系，不是所有密码；对称加密和哈希不会被 Shor 直接攻破。
+
+公开的资源估算给出的量级是：分解一个 2048 比特的 RSA 模数，需要数千个 <Term id="logical-qubit">逻辑比特</Term>，还要为纠错付出大量物理比特。截至 2026 年公开报道的量级，逻辑比特的演示规模仍远低于所需，差距在几个数量级；这里没有「某年一定被破解」的时间表。
+
+另一条路是 <Term id="pqc">后量子密码</Term>：不换机器，换数学难题，用格、编码或哈希构造经典算法，让 Shor 无从下手。NIST 已在 2024 年把首批标准写进 FIPS 203/204/205；迁移的真正麻烦在存量系统和协议，不在算法本身。
+
+<Misconception
+  note="把「原理上可行」读成「工程上临近」，是这类报道最常见的夸大。"
+>
+  <Fragment slot="wrong">量子计算机一旦比特数够多，RSA 就会在某一年突然失效。</Fragment>
+  <Fragment slot="right">破解 RSA 需要数千个逻辑比特，还要为纠错付出大量物理比特；截至 2026 年公开报道的量级，差距还有几个数量级，没有确定日期。</Fragment>
+</Misconception>
+
+<Conclusion>
+  Shor 的量子部分只做一件事：找模幂序列的周期。QFT 把这个周期变成可读的频率，经典后处理再把周期变成因子。它威胁的是依赖分解与离散对数的公钥体系；应对它的 PQC 已经在标准化，但迁移是工程问题，不是某天突然发生的新闻。
+</Conclusion>

@@ -1,0 +1,73 @@
+---
+slug: collapse
+title: 坍缩：测量的另一面
+thesis: 测量把叠加换成结果，而且不可撤销
+part: p-qubit
+topic: t-measure
+tag: 概念
+minutes: 6
+order: 321
+demos: ['amplitude']
+quiz:
+  - q: '在 Z 基测得 0 之后，立刻在同一比特上再测一次 Z 基，结果是什么？'
+    options: ['仍然是 0', '0 与 1 各一半', '一定是 1', '无法预测，因为第一次测量已经破坏了态']
+    answer: 0
+    explain: '第一次测量把态投影到 $|0\rangle$，第二次测 Z 得到 0 的概率是 1。说「无法预测」混淆了「态被改变」和「态不再确定」；换到 X 基才会重新变成各一半。'
+  - q: '接上题，如果第二次改在 X 基测量，结果是什么？'
+    options: ['仍然是 0', '一定是 $|+\rangle$', '各一半', '取决于第一次用的是哪台仪器']
+    answer: 2
+    explain: '$|0\rangle=(|+\rangle+|-\rangle)/\sqrt2$，在 X 基上两个结果的概率各为 $1/2$。第一次的 Z 结果不改变这个展开；仪器型号也不进入预测。'
+  - q: '两位物理学家对测量问题持不同诠释，对同一个实验的预测会怎样？'
+    options: ['完全相同', '一定不同', '只有一个能被实验检验', '取决于测量基的选择']
+    answer: 0
+    explain: '诠释的差别在如何叙述坍缩，不在概率规则；同一实验的统计预测由公设给出，因而相同。说「只有一个能被检验」把哲学立场和可观测预言混为一谈。'
+sources:
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §2.2.3（量子测量）'
+  - 'Stanford Encyclopedia of Philosophy, Quantum Mechanics 条目（测量问题与诠释）'
+  - 'von Neumann, 1932, Mathematical Foundations of Quantum Mechanics'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+先测一次，再测一次，只要中间不打扰它，第二次一定得到同一个结果。这条规则平淡得像常识，代价却很大：第一次测量不只是读出一个值，它把态换成了那个值对应的态。
+
+## 测量是一条投影
+
+设被测的量有一组正交归一的基 $|i\rangle$。得到结果 $i$ 的概率是 $|\langle i|\psi\rangle|^2$；一旦得到 $i$，态就更新为 $|i\rangle$。这条规则叫<Term id="measurement">测量</Term>的投影公设，也是酉演化之外的一条独立规则。
+
+连续测量为什么稳定？第一次在 Z 基测得 0，态已是 $|0\rangle$；紧接着再测 Z，$|0\rangle$ 落在 $|0\rangle$ 上的概率是 1，只能再得 0。中间若插一个 H，态变成 $|+\rangle$，再测 Z 又回到各一半：测量基一换，确定性就没了。
+
+第二次测量也是投影，只是投到同一个基上；两次之间若有门或噪声，结论就变了。
+
+演示里已经有第一个 H；再按一次 H，就能把 $|+\rangle$ 原样收回 $|0\rangle$。这条路走得通，正因为中间没有测量。
+
+<Demo
+  kind="amplitude"
+  label="干涉还是坍缩"
+  caption="打开时已是 |+⟩，两个结果各 50%；再按一次 H，振幅相消，全部回到 |0⟩。若中间测量，这一次 H 面对的就不是原来的态了。"
+/>
+
+测量把两条可能的路径变成一条，另一条不会因为再施加一个 H 就恢复。
+
+## 坍缩是描述，不是机制
+
+「坍缩」这个词很容易让人以为波函数是一团有弹性的东西，被仪器一压就缩成一点。公设里没有这个「压」：它只规定测量后用哪个态、以什么概率，不解释为什么。把它当成动力学过程，是科普里常见的越界。
+
+这就是测量问题：酉演化给出连续的叠加，测量却给出单个结果，两套描述在哪里衔接，公设没有回答。哥本哈根诠释、多世界诠释，以及退相干式的说明，对同一个实验给出的预测完全一样；差别在怎么讲述，不在实验室里能测到什么。
+
+对写线路的人，结论只有一条：测量是非酉的、不可逆的，一旦发生，原来的相位关系就没了，所以线路通常把测量放到最后。
+
+<Misconception
+  note="把描述当成机制，就会误以为测量问题已经有了物理解答。"
+>
+  <Fragment slot="wrong">坍缩是仪器把波函数压扁的物理过程，换一台更精密的仪器就能避开。</Fragment>
+  <Fragment slot="right">坍缩是投影公设对测量后态的更新；它不是一条被观测到的动力学过程，也不能靠提高仪器精度取消。</Fragment>
+</Misconception>
+
+<Conclusion>
+  测量不是把隐藏的值翻出来，而是把叠加投影成一个结果，并按这个结果改写态。同一基上连续测量因此稳定，换一个基就重新随机。<Term id="collapse">坍缩</Term>描述的是这次改写，不是改写背后的机器。
+</Conclusion>

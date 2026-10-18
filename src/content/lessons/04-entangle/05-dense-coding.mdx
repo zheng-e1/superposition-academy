@@ -1,0 +1,86 @@
+---
+slug: dense-coding
+title: 超密编码：一个量子比特送两个经典比特
+thesis: 纠缠让一个比特携带两比特的经典信息
+part: p-entangle
+topic: t-teleport
+tag: 概念
+minutes: 7
+order: 422
+demos: []
+quiz:
+  - q: 'Alice 与 Bob 共享 |Φ+⟩，Alice 想送经典比特「10」。按协议她把 Z 作用在自己那半上，Bob 收到后做 Bell 测量，读到的是哪一组？'
+    options:
+      - '|Φ+⟩，对应 00'
+      - '|Ψ+⟩，对应 01'
+      - '|Φ−⟩，对应 10'
+      - '|Ψ−⟩，对应 11'
+    answer: 2
+    explain: 'Z 只给 |11⟩ 那一支添负号，得到 (|00⟩−|11⟩)/√2，也就是 |Φ−⟩；约定它对应 10。X 才给出 |Ψ+⟩，XZ 给出 |Ψ−⟩（差一个全局相位），什么都没做则仍是 |Φ+⟩。'
+  - q: '一个量子比特最多携带一个经典比特的信息，超密编码为什么能送两个？'
+    options:
+      - '因为量子比特的容量本来就是两比特'
+      - '因为多出的那一位来自预共享的纠缠，而这份纠缠在协议中被消耗掉了'
+      - '因为 Bob 做了本地计算，把信息补了出来'
+      - '因为两个比特分别编码在振幅的实部和虚部里'
+    answer: 1
+    explain: '单个量子比特的经典容量受 Holevo 界限制，还是一位；多出来的那一位是预共享的 Bell 态付的账，测量之后它不再是纠缠态。本地计算造不出信息；振幅的实部与虚部也不是可以各装一位的独立通道。'
+  - q: '超密编码与隐形传态的对照，哪一条准确？'
+    options:
+      - '超密编码需要两对 Bell 态，传态只需要一对'
+      - '超密编码不需要经典信道，所以更快'
+      - '两者资源相同、方向相反：传态送一个量子比特，超密编码送两个经典比特'
+      - '超密编码可以替代隐形传态，因为它能传任意态'
+    answer: 2
+    explain: '两者都消耗一对预共享的 ebit，但账本方向相反：传态另耗两个经典比特、送出一个量子比特；超密编码另耗一个量子比特的物理传输、送出两个经典比特。超密编码仍然需要 Bob 真的收到那个量子比特，不是免费信道；它传的是经典比特，不可能替代传态。'
+sources:
+  - 'Bennett & Wiesner, 1992, Communication via one- and two-particle operators on Einstein-Podolsky-Rosen states, Physical Review Letters'
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §2.3（超密编码）'
+  - 'Holevo, 1973, Bounds for the quantity of information transmitted by a quantum communication channel'
+updated: 2026-10-18
+---
+
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+Alice 要给 Bob 送两个经典比特。她只寄出一个量子比特，Bob 却能把两个比特都读出来。这不是把 1 变成 2 的魔术——那半个量子比特，她早就寄过去了。
+
+## 四种操作，四个正交态
+
+开局共享 <Term id="bell-state">Bell 态</Term> |Φ+⟩，一人一半。Alice 要在自己那半上做四个操作之一，每个操作对应两个比特的一种取值：
+
+$$
+|\Phi^+\rangle \xrightarrow{\ \mathrm{I},\,X,\,Z,\,XZ\ } |\Phi^+\rangle,\ |\Psi^+\rangle,\ |\Phi^-\rangle,\ |\Psi^-\rangle
+$$
+
+四个结果正好是四个 Bell 态，两两正交。这一步里 Alice 什么也没测，只在自己那半上施加了一个幺正操作；四种操作把共享态搬到四个互相垂直的方向上。
+
+Bob 收到那个比特后做一次 Bell 测量：CNOT 加 H，再在计算基上读两个比特。四个正交态可以无歧义地区分，于是 00、01、10、11 中的一个被读出来。
+
+## 多出来的那一位从哪来
+
+如果只看 Alice 寄出的那一个量子比特，它最多携带一个经典比特——这是 Holevo 界的精神：n 个量子比特能可靠传递的经典信息不超过 n 比特。超密编码送了两个，多出来的那一位来自预共享的纠缠。
+
+代价也很清楚：那对 Bell 态在协议结束时已经被消耗，Bob 测量之后手上不再是纠缠态。所以准确的说法不是「一个比特装两个比特」，而是「一位预共享的纠缠加一个量子比特，一起装下两个比特」。下次再送，得重新制备纠缠。
+
+它也快不起来：那个量子比特仍要真的送到 Bob 手上，纠缠还得事先分发好。
+
+## 和隐形传态对照
+
+两件事用的是同一份资源，方向相反。
+
+<Term id="teleportation">隐形传态</Term>：一对预共享纠缠加两个经典比特，送过去一个未知量子态，原态在测量中被销毁。超密编码：一对预共享纠缠加一个量子比特的传输，送过去两个经典比特，纠缠被消耗。
+
+一个用两个经典比特换走一个量子态，一个用一个量子比特换走两个经典比特。两者都没突破各自的界：传态不能超光速，超密编码也不能让一个比特凭空多装一位。方向不同，账本相同。
+
+<Misconception
+  note="把「协议的一次使用」当成「存储介质的容量」，是这类结论最常见的夸大方式。"
+>
+  <Fragment slot="wrong">超密编码证明一个量子比特能存两个比特，所以量子内存的密度是经典的两倍。</Fragment>
+  <Fragment slot="right">多出来的一位来自预共享的纠缠，且纠缠在协议中被消耗；单个量子比特的经典容量仍然只有一比特。</Fragment>
+</Misconception>
+
+<Conclusion>
+  超密编码用一对预共享的 Bell 态和一个量子比特的传输，送出两个经典比特。四种本地操作把共享态变成四个正交 Bell 态，接收方一次 Bell 测量全部读出；多出的那一位是纠缠付的账，用完就没了。
+</Conclusion>

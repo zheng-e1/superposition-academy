@@ -1,0 +1,91 @@
+---
+slug: unitary
+title: 酉矩阵：为什么演化必须可逆
+thesis: 量子演化保内积，所以必须可逆
+part: p-math
+topic: t-linear
+tag: 概念
+minutes: 6
+order: 211
+demos: ['bloch']
+quiz:
+  - q: H 门作用在 |0⟩ 上得到 |+⟩，再作用一次 H 又回到 |0⟩。这说明了 H 的什么性质？
+    options:
+      - H 是酉矩阵，所以它有逆，而且逆就是它自己
+      - H 把两个态混在一起，第二次作用又把它们分开
+      - H 是测量算符，第二次作用抵消了第一次的测量
+      - H 只对 |0⟩ 有效，作用在 |+⟩ 上没有定义
+    answer: 0
+    explain: H†H=I，所以 H 的逆存在且等于 H，两次作用回到原态。它不是测量，作用之后态仍是纯态 |+⟩；H 对任何单比特态都有定义，对 |+⟩ 给出 |0⟩。
+  - q: 把 X 门作用在未知态 α|0⟩+β|1⟩ 上，再作用一次 X，结果是什么？
+    options:
+      - 原来的态，因为 X 两次等于 I
+      - 一个混态，因为中间发生了测量
+      - β|0⟩+α|1⟩，系数被交换且再也换不回来
+      - 原来的态，但相对相位已经丢失
+    answer: 0
+    explain: X 交换两个基矢，作用两次就交换回来，X 的平方等于 I，这一点不需要知道 α 与 β 的具体值。相对相位也没有丢，只有测量才会破坏叠加。
+  - q: 下面哪一步在量子线路里不是酉操作？
+    options:
+      - 一个 H 门
+      - 一个 CNOT 门
+      - 对一个比特做 z 基测量
+      - 一个 Ry(θ) 旋转
+    answer: 2
+    explain: 测量把态投影到某个本征态，输出是一个经典结果，且无法从结果反推出测量前的态，因此它不是酉的。H、CNOT、Ry 都由酉矩阵描述，都能被逆操作撤销。
+sources:
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §2.1 与 §2.2'
+  - 'Preskill, Quantum Computation 讲义（Caltech Ph219），量子线路与酉演化部分'
+  - 'Wootters & Zurek, 1982, A single quantum cannot be cloned, Nature'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+量子线路里的门都能倒着走，但「倒着走」不等于「再按一次同一个按钮」：每个门 $U$ 都有逆 $U^\dagger$，作用 $U^\dagger$ 才回到原处。H、X、CNOT 恰好满足 $U^\dagger=U$，按两次就能复原；S、T、Ry 不行，它们的逆是 S†、T†、Ry(−θ)。这不是设计者的偏好，而是一条硬要求。它来自一个更朴素的条件——概率加起来必须始终是 1。
+
+## 归一化不许变
+
+一个态的长度必须是 1，因为各振幅模平方之和就是概率总和。门作用之后总概率还是 1，长度就不能变。更强的条件是保内积：对任意两个态，
+
+$$
+\langle U\psi\,|\,U\phi\rangle=\langle\psi\,|\,\phi\rangle
+$$
+
+写成矩阵就是 $U^\dagger U=I$。满足这条的矩阵叫 <Term id="unitary">酉矩阵</Term>，这样的演化叫酉演化。保长度只是态与自身的内积这一特例；保内积还把两个不同态之间的夹角和相对相位一起保住了。
+
+在布洛赫球上，酉门就是球面上的旋转。
+
+<Demo
+  kind="bloch"
+  label="酉门就是旋转"
+  caption="拖动视角，再按 X、H、S：箭头始终贴着球面走，长度没有变过。"
+/>
+
+## 两个门的矩阵
+
+$$
+\mathrm{H}=\frac{1}{\sqrt2}\begin{pmatrix}1&1\\1&-1\end{pmatrix},
+\qquad
+X=\begin{pmatrix}0&1\\1&0\end{pmatrix}
+$$
+
+H 把 $|0\rangle$ 送到 $|+\rangle$，把 $|1\rangle$ 送到 $|-\rangle$；X 把 $|0\rangle$ 与 $|1\rangle$ 对调。两个都满足 $U^\dagger U=I$：H 厄米且平方等于 I，所以它的逆就是它自己；X 也一样。门能撤销，靠的正是这一条——给定输出态，你能唯一地算回输入态。
+
+保内积还有一个听起来更硬的推论：酉门从不把两个不同的输入送到同一个输出。真要是送进去了，它们的内积就会从 0 变成 1，条件当场被破坏。所以酉门既不能把态「抹掉」，也不能复制任意未知量子态（基态可以被 CNOT 复制，那不算违反不可克隆），只能换一种写法保存下来。矩阵只差一个全局相位 $e^{i\alpha}$ 的两个门，在物理上就是同一个操作：那个相位乘在整个态上，谁也看不见。
+
+测量是唯一的例外。它把叠加压成一个结果，你拿不到原来的系数，也就没有逆操作。在理想酉线路里，信息真正被丢掉的地方只有测量；真实设备上环境耦合也会让约化态丢信息，那不是测量，而是退相干。这也顺带解释了为什么不能「删掉」一个未知量子态：删除要把两个不同的态映到同一个态，而这会破坏内积，不可能是酉的。复制同样不行。
+
+<Misconception
+  note="混淆点在于把线路里的门和测量当成同一类步骤：门是旋转，测量是投影，后者会把维数降下来。"
+>
+  <Fragment slot="wrong">可逆的意思是，任何一步都能再作用一次撤销掉，测量也一样。</Fragment>
+  <Fragment slot="right">只有酉演化可逆。测量不是酉的，测完之后原来的叠加已经没了，再作用什么门都补不回来。</Fragment>
+</Misconception>
+
+<Conclusion>
+  酉矩阵就是「保内积的矩阵」，归一化、两个态之间的夹角、相对相位都归它管。它因此可逆，也因此在原则上不丢信息。线路里唯一的非酉步骤是测量——那里才是信息真正消失的地方。
+</Conclusion>

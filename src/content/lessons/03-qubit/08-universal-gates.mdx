@@ -1,0 +1,91 @@
+---
+slug: universal-gates
+title: 通用门集：为什么 H、T、CNOT 就够了
+thesis: 有限的门能逼近任意酉变换
+part: p-qubit
+topic: t-gates
+tag: 深入
+minutes: 8
+order: 314
+demos: ['circuit']
+quiz:
+  - q: '有人说「通用门集」是指 {H, T, CNOT} 加起来能得到任意酉矩阵，这句话哪里不准确？'
+    options:
+      - '不是任意，只对两比特有效'
+      - '是逼近而不是相等：任意精度都能做到，但门数有限时总留一点误差'
+      - 'H、T、CNOT 并不通用，必须再加上测量'
+      - '通用的是无穷多个门，有限集不可能通用'
+    answer: 1
+    explain: '通用性说的是一族线路在门群中稠密：给定 ε 就能拼出一条足够接近的线路，一般不会精确相等。只对两比特有效的说法不成立，结论对任意 n 成立；测量不进线路的酉部分；通用性从来不要求门集无限大。'
+  - q: '只用 H、S、CNOT 能造出 Bell 态，为什么这套门仍被认为不够用？'
+    options:
+      - '因为 S 门不是酉的，线路不可逆'
+      - '因为 Clifford 门只能作用在单比特上'
+      - '因为这类线路可以在经典计算机上多项式时间模拟，拿不到量子优势'
+      - '因为它们造不出纠缠'
+    answer: 2
+    explain: 'H、S、CNOT 生成 Clifford 群，Gottesman 与 Knill 给出经典高效模拟的办法，把态写成稳定子清单而不是 2^n 个振幅。S 是酉门；Clifford 里包含 CNOT 这种两比特门；它恰恰能造纠缠，所以另外两项都错。'
+  - q: '在 H 与 CNOT 拼出的 Bell 态上，对其中一个比特加一个 T，会发生什么？'
+    options:
+      - '什么也不变，T 只是给整体添了一个相位'
+      - 'Bell 态立刻瓦解，变成四个等概率结果'
+      - '两个比特立刻退纠缠，变成乘积态'
+      - '其中一支振幅被乘上 e^{iπ/4}，态离开稳定子集合，这是 Clifford 之外的一步'
+    answer: 3
+    explain: 'T 只给 |1⟩ 添 e^{iπ/4}，落在叠加的一支上就是相对相位，态不再是被 Clifford 门保持的稳定子态。它加的不是全局相位；纠缠度不变，所以既不会瓦解也不会退纠缠。'
+sources:
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §4.5（通用量子门）'
+  - 'Gottesman, 1998, The Heisenberg representation of quantum computers'
+  - 'Preskill, Quantum Computation 讲义（Caltech Ph219），通用门集与 Solovay–Kitaev 部分'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+一台量子计算机的门清单可以短到三行：H、T、CNOT。可任意 n 比特的酉变换有连续无穷多个，三行门看上去怎么都覆盖不完。它们确实覆盖不完——但能无限靠近。
+
+## 通用是「逼近」，不是「等于」
+
+说一个门集<Term id="universal-gate">通用</Term>，意思是：给定任意 n 比特<Term id="unitary">酉矩阵</Term> $U$ 和任意精度 $\varepsilon>0$，都存在一条只由这三种门拼成的有限长线路，使两者的整体差距小于 $\varepsilon$。
+
+$$
+\|U-U_{\text{线路}}\|<\varepsilon
+$$
+
+注意两件事。第一，是逼近不是相等，门数加得越多，$\varepsilon$ 能压得越小，但一般不会正好归零。第二，$\varepsilon$ 衡量的是整体作用，不是每个门各自准一点：它要求这条线路在任何输入上都和 $U$ 接近。
+
+有限个门为什么能铺满连续的门群？因为线路长度不设上限，长度一长，可拼出的组合数就指数增长，很快就比任何精度网格都细。这就是「稠密」的全部内容。
+
+## 差的就是那一个 T
+
+在实验室里只用 <Term id="hadamard">H</Term> 和 <Term id="cnot">CNOT</Term>，你能拼出的态有一个共同点：振幅全是实数，一点复相位都没有。想碰到相位，就得请出 T。
+
+<Demo
+  kind="circuit"
+  label="差一个 T"
+  caption="选两比特，按 H 再按 CNOT：直方图从四项塌成 |00⟩ 与 |11⟩ 各 50%。再按一个 T，概率一点没变，柱子上看不出任何动静——T 改的是相位，只有后面的干涉才能把它显形。"
+/>
+
+加一个 T 看起来只是添了点相位，可它把可达集合从「离散的一小片」扩成了「处处稠密」。
+
+## Clifford 为什么不够
+
+把 H、S、CNOT 反复组合，得到的是 Clifford 群。它不弱：能造纠缠，能把泡利门在共轭下换来换去。但 Gottesman 与 Knill 证明了一件要命的事：只用 Clifford 门加计算基测量的线路，能在经典计算机上多项式时间模拟。
+
+诀窍不在硬件，在记账方式。这类线路作用在计算基态上，态永远落在少数几个「稳定子」态里，于是可以用一张生成元的清单描述，而不必写下 $2^n$ 个振幅。线路再深，清单也不变长。换句话说，Clifford 线路只是把经典可描述的东西换了个写法。
+
+T 是捅破这层纸的那一个。$T=\operatorname{diag}(1,e^{i\pi/4})$ 把稳定子态变成非稳定子态，Clifford 加上它就通用。代价在门数：Solovay–Kitaev 定理说，把误差压到 $\varepsilon$，门数随 $\log(1/\varepsilon)$ 的多项式增长。听着温和，但它不承诺线路短，实际编译还要看门集和硬件的连通性。
+
+<Misconception
+  note="把「任意精度」读成「精确相等」，会让所有成本估算失真：误差每降一个量级，门数都要再涨一截。"
+>
+  <Fragment slot="wrong">通用门集的意思是，只要门足够多，H、T、CNOT 最终能精确等于任意酉矩阵。</Fragment>
+  <Fragment slot="right">通用是逼近：任意 ε 都能做到，但门数有限时总留一点误差；结论对任意 n 比特一致成立。</Fragment>
+</Misconception>
+
+<Conclusion>
+  H、T、CNOT 这三个门通用，不是因为它们能精确复刻每个酉矩阵，而是因为它们拼出的线路在门群中稠密。Clifford 那部分（H、S、CNOT）再花哨也能被经典模拟，T 才是把线路推出这个圈子的一步；代价是门数随精度增长，编译与纠错都要为它付账。
+</Conclusion>

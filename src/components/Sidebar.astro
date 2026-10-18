@@ -1,0 +1,71 @@
+---
+import type { Course } from '../lib/course';
+import { PART_BY_ID } from '../data/course';
+
+interface Props {
+  course: Course;
+  current?: string;
+}
+const { course, current = '' } = Astro.props;
+const total = course.flat.length;
+---
+
+<aside class="sidebar" id="sidebar" data-open="false" aria-label="课程目录">
+  <div class="side-progress">
+    <svg class="progress-ring" viewBox="0 0 38 38" aria-hidden="true">
+      <circle class="track" cx="19" cy="19" r="15.5"></circle>
+      <circle
+        class="fill"
+        cx="19"
+        cy="19"
+        r="15.5"
+        data-progress-fill
+        style="stroke-dasharray:97.4;stroke-dashoffset:97.4"></circle>
+    </svg>
+    <div class="side-progress-text">
+      <b data-progress-label>0 / {total}</b><br />已读课节
+    </div>
+    <a href="/learn" class="btn btn-ghost btn-sm" style="margin-left:auto">目录</a>
+  </div>
+
+  {
+    course.parts.map((part) => (
+      <div
+        class="side-group"
+        data-side-group
+        data-open={current && part.lessons.some((l) => l.slug === current) ? 'true' : 'false'}
+        data-part={part.def.id}
+      >
+        <button
+          class="side-group-head"
+          type="button"
+          data-side-toggle
+          aria-expanded={current && part.lessons.some((l) => l.slug === current) ? 'true' : 'false'}
+        >
+          <span class="side-group-num">{part.def.num}</span>
+          <span>{part.def.title}</span>
+          <span class="side-group-count">{part.count}</span>
+        </button>
+        <div class="side-group-body">
+          {part.topics.map((topic) => (
+            <>
+              <div class="side-topic">{topic.title}</div>
+              {topic.lessons.map((l) => (
+                <a
+                  class="side-lesson"
+                  href={`/learn/${l.slug}`}
+                  data-slug={l.slug}
+                  aria-current={l.slug === current ? 'page' : undefined}
+                >
+                  <span class="dot" />
+                  <span>{l.title}</span>
+                </a>
+              ))}
+            </>
+          ))}
+        </div>
+      </div>
+    ))
+  }
+</aside>
+<div class="sidebar-backdrop" id="sidebarBackdrop" data-open="false"></div>

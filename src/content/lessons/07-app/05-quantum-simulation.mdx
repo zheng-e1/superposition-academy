@@ -1,0 +1,66 @@
+---
+slug: quantum-simulation
+title: 量子模拟：费米子怎么搬到比特上
+thesis: 用可控的量子系统去模拟难算的量子系统
+part: p-app
+topic: t-chem
+tag: 概念
+minutes: 8
+order: 702
+demos: []
+quiz:
+  - q: '为什么不能把 $e^{-i(H_1+H_2)t}$ 直接当成 $e^{-iH_1t}e^{-iH_2t}$ 一次做出来？'
+    options: ['因为哈密顿量不是厄米的', '因为两项一般不对易，指数不能拆成两个指数相乘', '因为量子计算机不能实现时间演化', '因为 Trotter 分解会破坏幺正性']
+    answer: 1
+    explain: '只有当两项对易时，指数才能拆成乘积；一般哈密顿量的局部项不对易，所以要按 Trotter 切片。哈密顿量是厄米的，时间演化正是量子线路擅长的事，Trotter 的每一步也仍是幺正的，所以另外三项都不对。'
+  - q: '把 Trotter 步数 n 加倍，通常意味着什么？'
+    options: ['误差减小，但线路深度大约加倍', '误差与深度都减半', '误差不变，只是比特数变多', '演化时间变成两倍']
+    answer: 0
+    explain: '一阶 Trotter 的误差随步长下降，n 加倍误差约减半；但每一片都要把所有局部项跑一遍，门数随 n 线性增长。演化时间由 t 决定，与切片数无关，比特数也不会因此改变，所以其余三项都不成立。'
+  - q: '一个 40 比特的量子模拟实验，经典计算机其实也能模拟。这说明什么？'
+    options: ['量子模拟没有实际价值', '规模还在经典可及的范围里，优势要等比特数与精度同时上去', '经典计算机已经能模拟任意分子', '实验数据一定有问题']
+    answer: 1
+    explain: '40 比特的态向量约 $10^{12}$ 个振幅，经典机器勉强存得下也算得动，所以这类演示验证的是方法与硬件，不是规模上的优势。说它没有价值或数据有问题都越过了证据，而任意分子远超经典能力。'
+sources:
+  - 'Feynman, 1982, Simulating Physics with Computers, International Journal of Theoretical Physics'
+  - 'Lloyd, 1996, Universal Quantum Simulators, Science'
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §4.7'
+updated: 2026-10-18
+---
+
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+1982 年，费曼在一次演讲里问：如果自然本身是量子的，为什么我们非要用经典计算机去模拟它？他的建议反过来——找一台可控的量子系统，让它去模拟另一台难算的量子系统。
+
+## 目标是把 $e^{-iHt}$ 做出来
+
+量子模拟的流程很短：制备初态，让系统按哈密顿量演化一段时间 $t$，再测量。核心操作是 $e^{-iHt}$。
+
+麻烦在 $H$ 通常是一堆局部项之和，$H=H_1+H_2+\dots$，而各项一般不对易，$e^{-i(H_1+H_2)t}$ 并不等于 $e^{-iH_1t}e^{-iH_2t}$。整块演化没法一次做出来，只能切片。Trotter 分解把 $t$ 切成 $n$ 段：
+
+$$
+e^{-iHt}\approx\left(e^{-iH_1t/n}e^{-iH_2t/n}\cdots\right)^n
+$$
+
+$n$ 越大误差越小，代价是门数随 $n$ 线性增长。这条「精度换深度」的账，是量子模拟所有资源估算的起点。
+
+## 费米子怎么搬到比特上
+
+电子要先解决表示问题：一个自旋轨道对应一个比特，$n$ 个轨道就要 $2^n$ 个振幅。量子侧的办法是把产生、湮灭算符映射成比特上的泡利串——Jordan-Wigner 用一串 Z 补齐反对易需要的负号，Bravyi-Kitaev 把串长压到对数级，两种标准做法各有取舍。维数那笔账第 01 篇已经算过，这里只看它对线路的影响。
+
+映射之后，$H$ 变成可逐项演化的泡利串之和，Trotter 才有东西可拆。这里的每一步都在给硬件加要求：比特数决定线路宽度，哈密顿量的项数决定每层 Trotter 的门数，切片数决定深度，错误率决定你能跑多深。
+
+这节讲方法，「量子化学」那节讲前景，「VQE」那节讲怎么用变分绕开深线路。同一件事的三个侧面，这里只把「怎么搬」说清楚。
+
+<Misconception
+  note="费曼的想法是「用一台量子机器模拟另一台」，不是「把波函数输入量子计算机」。中间的映射与拆解，才是量子模拟真正的工程量。"
+>
+  <Fragment slot="wrong">量子模拟就是用量子计算机解薛定谔方程，任何体系都能直接放进去。</Fragment>
+  <Fragment slot="right">要先把体系写成局域哈密顿量、映射成比特上的泡利串、再按 Trotter 拆成门；精度与规模都受硬件限制。</Fragment>
+</Misconception>
+
+<Conclusion>
+  量子模拟是费曼的原初想法：用可控的量子系统去模拟难算的量子系统。方法上是三件事——把哈密顿量映射成比特上的泡利串、用 Trotter 分解把演化拆成可执行的门、在误差累积到不可用之前完成测量。
+</Conclusion>

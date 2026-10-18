@@ -1,0 +1,83 @@
+---
+slug: tensor-product
+title: 张量积：两个比特不是一个比特
+thesis: 两比特的状态空间是 4 维，不是两个 2 维
+part: p-math
+topic: t-tensor
+tag: 概念
+minutes: 7
+order: 221
+demos: ['amplitude']
+quiz:
+  - q: 两个量子比特组成的系统，态空间是多少维？
+    options:
+      - 2 维
+      - 3 维
+      - 4 维
+      - 要看两个比特是否纠缠
+    answer: 2
+    explain: 两比特的基是 |00⟩、|01⟩、|10⟩、|11⟩，维数是 2×2=4，与是否纠缠无关。纠缠影响的是这个 4 维态能不能拆成两个单比特态，不改变维数本身。
+  - q: (|00⟩+|11⟩)/√2 与 |+⟩⊗|0⟩ 的关键区别是什么？
+    options:
+      - 前者是纠缠态，无法写成两个单比特态的乘积
+      - 前者的概率不归一，需要重新归一化
+      - 后者是纠缠态，前者可以分离
+      - 两者只差一个全局相位
+    answer: 0
+    explain: 前者测量第一个比特会完全决定第二个比特的结果，不能拆成乘积形式；后者是 |+⟩ 与 |0⟩ 的张量积，属于可分离态。两者的振幅模平方和都是 1，而且相差的不只是一个全局相位。
+  - q: 用经典计算机完整描述 30 个量子比特的态，大致要存多少个复数？
+    options:
+      - 30 个
+      - 60 个
+      - 约十亿个
+      - 约十万个
+    answer: 2
+    explain: 需要 2 的 30 次方个振幅，约十亿量级，这是维数相乘的直接后果。十万量级只够描述 17 个比特左右，和 30 个比特差得很远。
+sources:
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §1.2 与 §2.1'
+  - 'Einstein, Podolsky & Rosen, 1935, Can Quantum-Mechanical Description of Physical Reality Be Considered Complete?, Physical Review'
+  - 'Feynman, 1982, Simulating Physics with Computers, International Journal of Theoretical Physics'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+两个比特，你会以为状态就是两份「一个比特」。写下来才发现不对劲：一个比特要两个数，两个比特要四个数，四个比特要十六个。数字涨得比比特数快得多，这个加速度就是本节的全部内容。
+
+## 二乘二等于四
+
+单比特有两个基：$|0\rangle$ 与 $|1\rangle$。两个比特的基是把它们并起来，得到 $|00\rangle$、$|01\rangle$、$|10\rangle$、$|11\rangle$ 四个。任意两比特态都能写成
+
+$$
+|\psi\rangle=\alpha_{00}|00\rangle+\alpha_{01}|01\rangle+\alpha_{10}|10\rangle+\alpha_{11}|11\rangle
+$$
+
+这四个系数是 <Term id="amplitude">概率幅</Term>，模平方和为 1。维数是乘出来的：$2\times 2=4$，不是 $2+2$。把子系统拼成一个大系统的运算叫 <Term id="tensor-product">张量积</Term>。
+
+下面这张图就是那四个振幅，四根柱子，不是两根。
+
+<Demo kind="amplitude" props={{ qubits: 2 }} caption="两比特的振幅图有四根柱子。点一次 H₁，第二个比特回到 |0⟩，就只剩两根；再点 CNOT，两根会挪到 |00⟩ 与 |11⟩ 上去。" />
+
+## 可分离，还是纠缠
+
+有些态能拆成两个单比特态的乘积，比如 $|+\rangle\otimes|0\rangle$，这叫可分离态，两个比特各自都有清楚的描述。有些拆不开，比如 $(|00\rangle+|11\rangle)/\sqrt2$：测第一个比特得 0，第二个必定是 0；得 1，第二个必定是 1，而单独看任何一个比特都是彻底随机的。这就是 <Term id="entanglement">纠缠</Term>。
+
+「两个布洛赫球拼不出一个两比特态」说的就是这件事。两个球一共给出 4 个实数（每个球两个角），而一个两比特纯态去掉归一化和全局相位后有 6 个实数。差的这 2 个不在任何一个球上，它们只存在于两个比特之间。
+
+这也是为什么模拟 n 个比特要 $2^n$ 个复数：40 个比特就是一万亿个，存都存不下。这是经典模拟的墙，别把它读成量子计算机的算力。
+
+纠缠还会在测量上留下痕迹。测第一个比特，第二个比特的态会立刻确定下来：结果 0，第二个就是 $|0\rangle$。这个「立刻」不是信号传播，因为你必须拿到第一个结果、再用经典方式告诉远处的人，才知道第二个比特该是什么样。
+
+<Misconception
+  note="参数个数先露了馅：两个球 4 个实数，两比特纯态 6 个，差的那两个就是比特之间的关联。"
+>
+  <Fragment slot="wrong">两比特系统就是两个比特，各自画一个布洛赫球，合起来就描述完了。</Fragment>
+  <Fragment slot="right">两比特态空间是 4 维，纠缠态不能拆成两个单比特态；只看单个球会丢掉比特之间的关联。</Fragment>
+</Misconception>
+
+<Conclusion>
+  张量积让维数相乘：n 个比特对应 $2^n$ 个振幅，而不是 n 支互不相干的箭头。可分离态还能拆回单个比特，纠缠态拆不开——这就是「两个比特」比「两个一比特」多出来的那部分。
+</Conclusion>

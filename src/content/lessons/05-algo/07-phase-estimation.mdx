@@ -1,0 +1,93 @@
+---
+slug: phase-estimation
+title: 相位估计：Shor 的发动机
+thesis: 相位估计把本征相位读成二进制
+part: p-algo
+topic: t-qft
+tag: 深入
+minutes: 9
+order: 503
+demos: ['circuit']
+quiz:
+  - q: '相位估计的第一个寄存器为什么要 n 个比特，而不是 1 个？'
+    options:
+      - '因为 U 本身就作用在 n 个比特上'
+      - '因为精度是 2 的 −n 次方，位数决定能读到小数点后第几位'
+      - '因为要同时并行估计 n 个不同的相位'
+      - '因为这些比特用于纠错'
+    answer: 1
+    explain: '输出精度由控制寄存器的位数决定，多一位就把分辨能力提高一倍。U 作用在辅助寄存器上，与位数无关；相位是同一个，不是 n 个；这里也没有纠错编码。'
+  - q: '相位回踢把什么搬回了控制寄存器？'
+    options:
+      - '把 |ψ⟩ 的振幅复制到控制位'
+      - '把 U 的矩阵元素读出来'
+      - '把本征值的相位写进控制寄存器的相对相位里'
+      - '把辅助比特的能量传给控制位'
+    answer: 2
+    explain: '受控 U 作用在 |+⟩ 上时，目标态不变，只多出因子 e^{2πiφ}，它落在叠加的一支上就是相对相位。振幅没有被复制，矩阵元素也没有被读取，能量同样没有转移——改变的只有相位。'
+  - q: '如果 φ 不是 n 位二进制小数，相位估计会给出什么？'
+    options:
+      - '算法直接失败，什么也读不到'
+      - '精确的 φ，因为 QFT 是酉的'
+      - '以高概率得到最接近的 n 位近似，精度受比特数限制'
+      - '态坍缩到 |0⟩，需要重新制备'
+    answer: 2
+    explain: '逆 QFT 给出的是一个集中在最近值附近的分布，取最可能的读数就是以高概率得到近似值，误差量级 2 的 −n 次方。酉性保证概率守恒，不保证能读出无限精度；也不会一律坍缩到 |0⟩。'
+sources:
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §5.2（相位估计）'
+  - 'Shor, 1994, Algorithms for quantum computation: discrete logarithms and factoring, FOCS 1994'
+  - 'Kitaev, 1995, Quantum measurements and the Abelian stabilizer problem'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+假设你有一个酉算符 $U$，也知道它的一个本征态 $|\psi\rangle$，但本征值 $e^{2\pi i\varphi}$ 里的 $\varphi$ 不知道。这个流程叫<Term id="phase-estimation">相位估计</Term>：把 $\varphi$ 的二进制位一位一位读出来，读几位由你愿意付多少比特决定。
+
+## 先把相位摊到 n 个比特上
+
+准备两个寄存器：上面 n 个比特全在 $|0\rangle$，下面放 $|\psi\rangle$。对上面每个比特加 H，它们变成从 0 到 $2^n-1$ 的均匀叠加。
+
+接着做受控运算：第 j 个比特（j 从 0 数起）控制 $U^{2^j}$。因为 $U|\psi\rangle=e^{2\pi i\varphi}|\psi\rangle$，每作用一次，目标态不变，只把那个相位因子踢回控制位。这个动作叫相位回踢：你没有测量相位，只是让它落进了相对相位。全部做完，上面的寄存器变成
+
+$$
+\frac{1}{\sqrt{2^n}}\sum_{k=0}^{2^n-1}e^{2\pi ik\varphi}|k\rangle
+$$
+
+## 逆 QFT：把相位读成二进制
+
+上面这条式子，正是 <Term id="qft">QFT</Term> 的输出形状：振幅等模，相位随 k 线性增长。对它做一次逆 QFT，这串相位就被整理成二进制小数。
+
+如果 $\varphi$ 恰好是 n 位二进制小数，测量会确定地给出这 n 位。一般情况下它不是，逆 QFT 给出一个集中在最近值附近的分布，测到最接近的 n 位近似的概率很高：
+
+$$
+|\tilde\varphi-\varphi|\lesssim 2^{-n}
+$$
+
+想多读一位，就多一个比特；QFT 部分是 $O(n^2)$ 个门，受控 $U^{2^j}$ 的代价还要另算——那些幂通常靠反复平方构造，越往后越贵。
+
+<Demo
+  kind="circuit"
+  label="相位回踢"
+  caption="选预设「相位回踢」，用 → 单步走：H 之后控制位是 |+⟩；CNOT 作用在 |−⟩ 上，负号被踢回控制位，控制位从 |+⟩ 翻成 |−⟩。相位估计就是把 CNOT 换成受控 U，再用逆 QFT 把这串相位读成二进制。"
+/>
+
+## Shor 拿它做什么
+
+<Term id="shor">Shor 算法</Term> 的量子部分只有一句：取 $U|y\rangle=|ay\bmod N\rangle$，它的本征相位满足 $\varphi\approx s/r$，而 r 正是模幂序列的周期。相位估计给出 $\varphi$ 的 n 位近似，连分数把它还原成 $s/r$，于是 r 有了；剩下的分解交给经典计算机。
+
+所以「发动机」不是夸张：QFT 提供读法，相位估计提供接口，周期查找才是整台机器的用途。也正因为整条链路长，实际运行要靠纠错把每一步的错误压下去，否则读出的位全是噪声。
+
+<Misconception
+  note="把「精度可以任意高」读成「一次就精确」，会低估比特数与重复次数的代价。"
+>
+  <Fragment slot="wrong">相位估计能一次读出 φ 的精确值，所以 Shor 只需要跑一次就得到周期。</Fragment>
+  <Fragment slot="right">它给的是 n 位近似，φ 一般不能精确写成 n 位二进制；要足够多的比特、重复测量和连分数后处理，成功是概率性的。</Fragment>
+</Misconception>
+
+<Conclusion>
+  相位估计用 n 个控制比特、受控 $U^{2^j}$ 和一次逆 QFT，把一个本征相位读成 n 位二进制。精度随比特数指数提高，代价是更深的线路；φ 不能被精确表示时，结果是集中在最近值上的分布。Shor 就是把它套在模幂算符上，读出那个周期。
+</Conclusion>

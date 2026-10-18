@@ -1,0 +1,62 @@
+---
+slug: history
+title: 六个人与一台机器
+thesis: 量子计算史是一连串「这不可能」被推翻
+part: p-sweet
+topic: t-history
+tag: 概念
+minutes: 8
+order: 901
+demos: []
+quiz:
+  - q: Deutsch 1985 年的工作，主要解决了什么问题？
+    options: ['造出了第一台可编程量子计算机', '定义量子图灵机，让「量子计算」有了独立于硬件的模型', '提出了分解大整数的算法', '用实验证明了纠缠存在']
+    answer: 1
+    explain: 他把「物理允许什么计算」这个问题形式化，给出量子图灵机与通用量子计算机的定义。第一台可编程量子计算机是后来的事，分解算法属于 Shor，纠缠的实验检验属于 Aspect，所以另外三项都张冠李戴。
+  - q: Bell 不等式的作用是什么？
+    options: ['证明量子计算机一定能超过经典计算机', '给出无结构搜索的加速倍数', '把「量子力学是否完备」变成可以用实验判决的关联上界', '定义量子比特的布洛赫球表示']
+    answer: 2
+    explain: 它说明：如果存在局域隐变量，两边测量的关联就不能超过某个上界；量子力学的预言会越界，于是实验可以裁决。它与计算加速、搜索算法和布洛赫球都无关，后三项把它当成了别的东西。
+  - q: Shor 算法真正的关键是哪一步？
+    options: ['用 Grover 搜索逐个试因子', '用退火寻找能量最低点', '用纠错码把错误压到零', '把分解归约为周期查找，再用量子傅里叶变换求周期']
+    answer: 3
+    explain: 分解与离散对数都能归约成周期查找，而周期查找正是量子傅里叶变换与相位估计的强项，这才带来指数加速。Grover 只给平方根加速，退火是另一类启发式，纠错是工程前提而不是算法核心。
+sources:
+  - 'Feynman, 1982, Simulating Physics with Computers, International Journal of Theoretical Physics'
+  - 'Deutsch, 1985, Quantum theory, the Church–Turing principle and the universal quantum computer, Proceedings of the Royal Society A'
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §1.1–1.2'
+updated: 2026-10-18
+---
+
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+1935 年，爱因斯坦等人提出 EPR 论证，认为量子力学对物理实在的描述不完备。1964 年，Bell 把这个哲学争论变成了一个不等式；1982 年，Aspect 用实验给出了答案。
+
+## 把「不可能」变成可检验的问题
+
+Bell 1964 的贡献不是站队，而是划了一条线：如果每个粒子都带着事先确定的属性，且不存在超光速影响，那么两边测量的关联就必须满足某个上界。量子力学的预言会越过这条线。于是「量子力学是否完备」不再只是立场问题，而是一个可以做实验的判决。
+
+Aspect 1982 用光子偏振对做这个判决：改变一边的测量方向，看两边的符合计数怎么变。结果与量子力学的预言一致，与局域隐变量不符。后续实验还要闭合探测效率与随机性等漏洞，但<Term id="entanglement">纠缠</Term>作为一种真实资源，从此有了实验基础。
+
+## 把「不可能」变成一台机器
+
+Feynman 1982 问的是：经典计算机模拟量子系统，资源随粒子数指数增长；能不能反过来，用一台受控的量子系统去模拟另一个量子系统？这不是「造更快的计算机」，而是把模拟从数值计算换成物理实验。
+
+Deutsch 1985 把问题推到底：图灵机描述的是经典物理允许的计算；如果物理是量子的，计算模型就该是量子的。他定义了量子图灵机，并说明通用量子计算机能模拟任意有限步的量子演化。量子计算从此有了独立于具体硬件的定义。
+
+Shor 1994 找到了一个足够有说服力的任务：大整数分解可以归约成周期查找，而周期查找可以用 <Term id="qft">量子傅里叶变换</Term>加速。密码学家开始认真对待这台机器。
+
+Grover 1996 补上另一半：无结构搜索从 N 次查询降到约 $\sqrt{N}$ 次。它没有指数加速，却足够说明「平方根」也能改变实践。
+
+<Misconception
+  note="硬件是新的，问题不是。今天讨论的「能不能模拟量子系统」「能不能加速搜索」，四十年前就已经被问出来了。"
+>
+  <Fragment slot="wrong">量子计算是最近十年才冒出来的新想法。</Fragment>
+  <Fragment slot="right">问题与模型在 1980 年代已经成形：Feynman 提出量子模拟，Deutsch 给出通用模型；之后才是算法与实验的推进。</Fragment>
+</Misconception>
+
+<Conclusion>
+  量子计算史是一连串「这不可能」被重新划线：局域隐变量确实不可能复现所有量子关联（已被实验判定）；一般认为经典计算机难以高效模拟一般量子系统，但这是复杂度假设，不是定理；量子图灵机与经典图灵机可计算的函数相同，差别在效率，不在能不能算。每一次推进都不是靠口号，而是靠一个可检验的命题。
+</Conclusion>

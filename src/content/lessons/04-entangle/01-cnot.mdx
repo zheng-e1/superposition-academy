@@ -1,0 +1,77 @@
+---
+slug: cnot
+title: CNOT：第一个「如果」
+thesis: 控制位让两个比特第一次真正相关
+part: p-entangle
+topic: t-two
+tag: 交互
+minutes: 6
+order: 401
+demos: ['circuit']
+quiz:
+  - q: '$|10\rangle$ 经过 CNOT（第一个比特控制，第二个比特翻转）之后是什么？'
+    options: ['$|10\rangle$', '$|11\rangle$', '$|01\rangle$', '$|00\rangle$']
+    answer: 1
+    explain: '控制位是 1，目标位翻转，0 变 1，所以结果是 $|11\rangle$。$|10\rangle$ 只在控制位为 0 时才保持不变；$|01\rangle$ 是把两个比特的读写顺序弄反了。'
+  - q: '对同一个 CNOT 连续施加两次，结果是什么？'
+    options: ['回到原态', '变成 Bell 态', '把所有比特翻一遍', '取决于控制位是 0 还是 1']
+    answer: 0
+    explain: 'CNOT 是酉的，而且它的逆就是自己：$(a,b)\to(a,b\oplus a)$ 再做一次，$b\oplus a\oplus a=b$。Bell 态需要 H 与 CNOT 配合，单靠两次 CNOT 造不出来。'
+  - q: 'Alice 与 Bob 共享 Bell 态，Bob 只在自己那一半上做本地门，Alice 测自己那一半的统计会怎样？'
+    options: ['立刻改变，所以能超光速通信', '不变，仍是各一半', '变成确定的 0', '取决于 Bob 用哪个门，但不需要经典信息']
+    answer: 1
+    explain: '本地操作只改变联合态，不改变另一端的约化态；Alice 的边缘分布仍是各一半。要看出 Bob 的操作，Alice 必须等到 Bob 的经典消息，因此不能超光速。'
+sources:
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §4.3（受控操作）'
+  - 'IBM Quantum 文档，CNOT 门与 Bell 态制备'
+  - 'Preskill, 2015, Lecture Notes for Physics 219, 关于量子线路与纠缠的章节'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+经典线路里，「如果」是一个需要时间、需要分支的结构；在量子线路里，它被写成了一个门：控制位是 1，就翻转目标位，否则什么都不做。两个比特从此不再各过各的。
+
+## 真值表只有四行
+
+把控制位记作 $a$、目标位记作 $b$，CNOT 做的事是
+
+$$
+(a,b)\ \longmapsto\ (a,\ b\oplus a)
+$$
+
+四行写出来：$|00\rangle\to|00\rangle$、$|01\rangle\to|01\rangle$、$|10\rangle\to|11\rangle$、$|11\rangle\to|10\rangle$。
+
+它和经典 XOR 的关系很近：目标位得到的是两者的异或。区别在于，经典 XOR 通常把 $b$ 覆盖掉，输入 $b$ 就找不回来了；CNOT 保留了 $a$，而且作用两次就回到原样——它是可逆的。可逆不是附加的美德，而是量子门必须满足的条件：演化由<Term id="unitary">酉矩阵</Term>描述，信息不能凭空消失。
+
+还有一件事值得盯住：当控制位处于叠加时，CNOT 不是「选一条分支执行」，而是同时作用在两条分支上，把「如果」变成相关性。
+
+## H 加 CNOT，造出 Bell 态
+
+从 $|00\rangle$ 开始，先给控制位加 H：$(|0\rangle+|1\rangle)|0\rangle/\sqrt2$。再上 CNOT，$|10\rangle$ 那一项的目标位被翻转，整个态变成 $(|00\rangle+|11\rangle)/\sqrt2$。
+
+这时单看任何一个比特，都是各一半；可两个比特一起看，它们永远同号。相关性不在单个比特里，而在联合态里——这就是<Term id="entanglement">纠缠</Term>。
+
+这个相关性不能用来超光速通信。Bob 在自己那头无论施加什么本地门，Alice 那一端的边缘分布都还是各一半；要让 Alice 看出差别，Bob 必须把「我做了什么」用经典信道告诉她。
+
+演示默认是 Bell 态线路，停在起点。用「下一步」走两格，看直方图怎么从 |00⟩ 一根，变成 |00⟩ 与 |10⟩ 两根，再变成 |00⟩ 与 |11⟩。
+
+<Demo
+  kind="circuit"
+  label="单步看 CNOT"
+  caption="默认是 Bell 态线路，停在起点。按「下一步」：第一步 H 之后是 |00⟩ 与 |10⟩ 各一半；再按一次「下一步」，CNOT 把 |10⟩ 搬到 |11⟩，只剩 |00⟩ 与 |11⟩。"
+/>
+
+<Misconception
+  note="「复制」只在你已经知道控制位是 0 或 1 时才像；一旦控制位在叠加，结果就不是复印，而是相关。"
+>
+  <Fragment slot="wrong">CNOT 把控制位的值复制到目标位，所以它是一个量子复印机。</Fragment>
+  <Fragment slot="right">控制位是叠加时，CNOT 造出的是纠缠态；单看目标位是混态，没有得到一个独立的副本。任意未知量子态不能被复制，这正是不可克隆定理。</Fragment>
+</Misconception>
+
+<Conclusion>
+  <Term id="cnot">CNOT</Term> 是第一个真正的两比特门：它用控制位决定要不要翻转，用一次酉操作把「如果」写进了联合态。它和 H 一起能把乘积态变成 <Term id="bell-state">Bell 态</Term>，也能把 XOR 做得可逆；但它只建立相关性，不传递信息，更不能复制未知的量子态。
+</Conclusion>

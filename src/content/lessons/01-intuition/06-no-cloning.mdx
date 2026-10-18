@@ -1,0 +1,76 @@
+---
+slug: no-cloning
+title: 不可克隆：量子态不能复印
+thesis: 未知量子态无法复制，这是定理不是技术限制
+part: p-intuition
+topic: t-odd
+tag: 概念
+minutes: 5
+order: 121
+demos: []
+quiz:
+  - q: 有人提议：先测量量子比特，再照着测量结果制备一个副本。这算不算克隆？
+    options: ['算，只要副本和测量结果一致', '不算，测量已经改变原态，副本只对应一次测量结果，原来的叠加态没有被复制', '算，但只对 |0⟩ 和 |1⟩ 有效', '不算，因为测量速度太慢，来不及复制']
+    answer: 1
+    explain: '测量把态投影到某一个基上，原态在测量后已经变成对应本征态，相对相位丢失；副本只是那一次结果的产物，不是原来那个态的副本。A 只盯着「结果一致」，忘了原态已被改写；C 把「对基矢有效」当成了克隆，其实那是制备已知态；D 把定理读成了工程速度问题。'
+  - q: 「不可克隆定理说任何量子态都不能复制。」这句话需要怎么修正？
+    options: ['完全正确，一个量子态也复制不了，包括 |0⟩', '它禁的是复制未知态；已知的固定态可以反复制备，那不属于克隆', '只有纠缠态不能复制，单比特可以', '只有纯态不能复制，混态可以']
+    answer: 1
+    explain: '定理管的是「对任意未知输入都成立」的通用复印机。一个已知的 |0⟩ 你想要多少份都行，那叫制备。A 把定理的适用范围放大了；C 与「单比特叠加态也不能复制」直接矛盾；D 把纯态与混态的区别当成可复制与否的分界，实际两者都不能被通用复制。'
+  - q: BB84 里，窃听者拦截光子、测量后按结果重发一份，为什么会被发现？
+    options: ['因为她的探测器反应不够快，会漏掉一部分光子', '因为她重发的是自己测出的态，与原态不一定相同，误码率会上升；她也无法先复制原态再原样放行', '因为 BB84 用了纠缠态，窃听会破坏纠缠', '因为光子会被吸收，接收方根本收不到信号']
+    answer: 1
+    explain: '她测得的结果只在某一个基下有效，重发出去的态与原态常常不同，合法双方比对时就会看到升高的误码率。不可克隆又堵住了另一条路：先复制一份未知态带走、再把原件放行。A 是工程细节，不是安全性来源；C 与 BB84 不符，它用的是四种单光子态而非纠缠；D 会直接导致丢失计数，那是另一类异常。'
+sources:
+  - 'Wootters & Zurek, 1982, A single quantum cannot be cloned, Nature'
+  - 'Dieks, 1982, Communication by EPR devices, Physics Letters A'
+  - 'Bennett & Brassard, 1984, Quantum cryptography: public key distribution and coin tossing'
+updated: 2026-10-18
+---
+
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+纸上的字可以复印，硬盘里的文件可以复制粘贴，一个经典比特是 0 还是 1，抄一万份都不费劲。同样的事对量子比特做不到，而且原因不是复印机还不够好——是根本不存在这样一台机器。
+
+## 先假设它存在
+
+设这台复印机是一个酉操作，对任何输入态都成立：原态保留，旁边多出一份一模一样的。先喂 $\left|0\right\rangle$，得到两个 $\left|0\right\rangle$；再喂 $\left|1\right\rangle$，得到两个 $\left|1\right\rangle$。
+
+现在喂一个叠加态 $(\left|0\right\rangle+\left|1\right\rangle)/\sqrt2$。酉操作是线性的，它没有别的选择，只能照着系数把上面两个结果加起来：
+
+$$
+U\left( (\left|0\right\rangle+\left|1\right\rangle)/\sqrt2 \otimes \left|0\right\rangle \right) = (\left|00\right\rangle+\left|11\right\rangle)/\sqrt2
+$$
+
+而「克隆」要求的结果是两份完全相同的态，展开来是四项：
+
+$$
+(\left|0\right\rangle+\left|1\right\rangle)/\sqrt2 \otimes (\left|0\right\rangle+\left|1\right\rangle)/\sqrt2 = (\left|00\right\rangle+\left|01\right\rangle+\left|10\right\rangle+\left|11\right\rangle)/2
+$$
+
+前者只有 $\left|00\right\rangle$ 和 $\left|11\right\rangle$，后者四项俱全，两者不相等。于是那台「对 $\left|0\right\rangle$ 和 $\left|1\right\rangle$ 都好用」的复印机，在叠加态上必然失手。这就是 <Term id="no-cloning">不可克隆定理</Term>：两行线性性，结束。
+
+## 和「不能测量」是两件事
+
+测量难，是因为它会改变态，而且一次只给一个基下的一个结果。克隆不需要知道态是什么，它只想复制——定理连这个都不许。所以「先测出来，再照着做一个」不算克隆：测完原态已变，副本只是某一次结果的产物，原来的相对相位没被搬过去。
+
+经典比特之所以能随便复制，是因为读它不改变它，读到的就是全部信息。量子比特能读出的信息被一个基限制住，剩下的相对相位读一次就没了。
+
+工程上也绕不过去：不是相干时间不够长，也不是门不够准。**只要演化是线性的酉操作，通用量子复印机就不存在。** 这是定理，不是待攻克的技术指标。
+
+定理还有一个用处。<Term id="qkd">量子密钥分发</Term> 的安全性有一部分就压在这上面：窃听者想不留痕迹地拿走一份密钥，就得先复制未知态，而复制不成立；任何测量都会扰动态，在误码率上留下痕迹。<Term id="bb84">BB84</Term> 能发现窃听，靠的正是这个——不是算力问题，是物理上做不到。
+
+边界也要说清：不可克隆禁的是复制未知态。一个已知的 $\left|0\right\rangle$，想制备多少份都行，那叫制备，不叫克隆。
+
+<Misconception
+  note="把定理当成技术瓶颈，会让人以为砸钱就能解决。它是结构性的约束，不随设备升级而松动。"
+>
+  <Fragment slot="wrong">等设备变好、相干时间变长，总有一天能造出复制未知量子态的机器。</Fragment>
+  <Fragment slot="right">这不是工程指标问题。只要演化是线性的酉操作，任何通用复印机都会在叠加态上与线性性冲突。</Fragment>
+</Misconception>
+
+<Conclusion>
+  不可克隆定理只有两行证明，代价却贯穿整个领域：量子密钥分发要靠它挡住窃听，隐形传态要靠它把「复制」换成「搬移」，纠错也只能编码而不能拷贝。它说的不是我们无能，是量子信息不能被复印。
+</Conclusion>

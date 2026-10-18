@@ -1,0 +1,95 @@
+---
+slug: qft
+title: QFT：把相位摊成可读的刻度
+thesis: QFT 不做「傅里叶分析」，它重排振幅
+part: p-algo
+topic: t-qft
+tag: 深入
+minutes: 9
+order: 502
+demos: ['circuit']
+quiz:
+  - q: '一比特的 QFT 作用在 |1⟩ 上，结果是哪个态？'
+    options:
+      - '|0⟩'
+      - '|1⟩'
+      - '|+⟩'
+      - '|−⟩'
+    answer: 3
+    explain: '一比特 QFT 就是 H，而 H|1⟩=|−⟩，两个分支差一个负号，正是 2 点 DFT 里 (−1)^{xy} 给的符号。|+⟩ 是 H|0⟩ 的结果；|0⟩ 与 |1⟩ 都不会被 H 变成单个基态。'
+  - q: 'QFT 只用 O(n²) 个门，却不像经典 FFT 那样一次给出 N 个系数，原因是？'
+    options:
+      - '因为 QFT 只能处理周期性输入'
+      - '因为量子态装不下 N 个振幅'
+      - '因为 N 个振幅确实都在态里，但一次测量只读出一个 y，要靠后续干涉把需要的量集中到少数结果上'
+      - '因为 QFT 是近似算法，算不准'
+    answer: 2
+    explain: '输出态里确实编码了全部 N 个振幅，问题在于读不出来：测量只给一个 y。加速来自前后线路的配合，让想看的结果振幅变大、其余相消。QFT 不要求输入有周期，也不是近似算法。'
+  - q: '若输入态只在 x 等于 r 的整数倍处有振幅，QFT 之后概率峰落在哪里？'
+    options:
+      - '所有结果的概率仍然相同'
+      - 'N/r 的整数倍处'
+      - 'r 的整数倍处'
+      - '全部集中到 y=0'
+    answer: 1
+    explain: '周期为 r 的梳状振幅，其傅里叶变换的峰落在频率 N/r 的整数倍上，这也正是相位估计读出分母的根据。峰不会落在 r 的整数倍，那是把周期与频率弄反了；也不会保持平坦或全落到 0。'
+sources:
+  - 'Coppersmith, 1994, An approximate Fourier transform useful in quantum factoring, IBM Research Report'
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §5.1（量子傅里叶变换）'
+  - 'Shor, 1994, Algorithms for quantum computation: discrete logarithms and factoring, FOCS 1994'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+「量子傅里叶变换」这个名字容易让人以为，它能在指数大的数据上做频谱分析。它做的事其实很朴素：把 $2^n$ 个振幅按相位重新排一遍，而且排得极省门。
+
+## 定义：离散傅里叶变换的量子版
+
+对 $N=2^n$ 维的计算基：
+
+$$
+|x\rangle\longmapsto\frac{1}{\sqrt N}\sum_{y=0}^{N-1}e^{2\pi ixy/N}|y\rangle
+$$
+
+逐项和经典离散傅里叶变换一样，只是它作用在振幅上。经典 FFT 要在 N 个数上做 $O(N\log N)$ 次运算；<Term id="qft">QFT</Term> 只用 $O(n^2)$ 个门——因为 $N=2^n$，门数随比特数平方增长，随 N 只对数增长。
+
+便宜的原因不神秘：它没有把 N 个系数写出来给你看，只是把这个态旋转了一下。
+
+## 一比特就是 H
+
+取 $n=1$：$H|0\rangle=|+\rangle$，$H|1\rangle=|-\rangle$，正好是两点 DFT 的两个输出，那个负号就是 $(-1)^{xy}$。
+
+多比特的线路是同一件事的递归：对每个比特加 <Term id="hadamard">H</Term>，再用<Term id="cphase">受控相位门</Term>把低位的信息累积到高位，最后用交换把顺序倒过来。写成乘积形式就是：
+
+$$
+|x_1\cdots x_n\rangle\longmapsto\frac{1}{\sqrt{2^n}}\bigotimes_{k=1}^{n}\left(|0\rangle+e^{2\pi i\,0.x_k x_{k+1}\cdots x_n}|1\rangle\right)
+$$
+
+每个因子只由一个 H 和若干受控相位构成，$O(n^2)$ 的门数就是从这里来的。线路里没有一步在做「求和」，求和是干涉自动完成的。
+
+<Demo
+  kind="circuit"
+  label="两点 QFT"
+  caption="选一比特，只按一个 H：直方图从 |0⟩ 变成 |0⟩ 与 |1⟩ 各一半，这就是两点 QFT。切到两比特，按 H、CZ、再按 H，读数的变化就是相位被翻译成概率的样子。"
+/>
+
+## 它把周期变成峰，但不解决问题
+
+如果输入振幅带着周期 r 的相位，QFT 之后相长与相消会把概率挤到少数几个 y 上，位置由 N/r 决定。相位估计和 Shor 用的就是这一点：周期藏在相位里，QFT 把周期翻译成频率。
+
+但 QFT 单独跑一次几乎不给你可读的答案：它没有读出 N 个系数，一次测量只给一个 y。要让答案浮现，得靠前后的线路把信息组织成「答案对应的振幅很大、其余相消」的形状。这就是为什么它通常作为子程序出现，而不是一个能直接输出结果的算法。
+
+<Misconception
+  note="把「态里含有全部信息」当成「能读出全部信息」，是量子算法科普里最普遍的一处越界。"
+>
+  <Fragment slot="wrong">QFT 一次算出全部 N 个傅里叶系数，所以能指数加速任何频谱分析。</Fragment>
+  <Fragment slot="right">N 个振幅确实都在态里，但一次测量只读出一个 y；加速来自后续干涉把需要的答案集中到少数结果上，而不是把系数列出来。</Fragment>
+</Misconception>
+
+<Conclusion>
+  QFT 是离散傅里叶变换的量子版本：$O(n^2)$ 个门把振幅按 $e^{2\pi ixy/N}$ 重排。一比特时它就是 H；多比特时是 H 加受控相位加交换。它把周期变成峰，但峰要被读出来，还得靠前后的线路——所以它永远是子程序。
+</Conclusion>

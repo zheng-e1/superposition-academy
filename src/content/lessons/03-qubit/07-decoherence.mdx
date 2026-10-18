@@ -1,0 +1,77 @@
+---
+slug: decoherence
+title: 退相干：量子性是怎么没的
+thesis: 环境偷走的是相位，不是能量
+part: p-qubit
+topic: t-measure
+tag: 概念
+minutes: 7
+order: 322
+demos: ['noise']
+quiz:
+  - q: '某个比特的布居数几乎不变，但干涉条纹越来越浅，最可能发生了什么？'
+    options: ['能量弛豫', '纯相位退相干', '比特被重置为 $|0\rangle$', '门保真度突然变成 0']
+    answer: 1
+    explain: '布居数不变说明能量通道不是主因；条纹变浅对应密度矩阵非对角元衰减，也就是相位信息泄漏。重置会改变布居数，门保真度归零也不会只表现为条纹变浅。'
+  - q: '单门保真度是 99.9%，线路深度是 1000，整条线路的成功率最接近下面哪一个？'
+    options: ['99.9%', '约 90%', '约 37%', '约 0.1%']
+    answer: 2
+    explain: '成功率约为 $0.999^{1000}$，即三成七左右。90% 对应的是深度约 100；0.1% 是把单门错误率直接当成了整条线路的失败率。'
+  - q: '为什么退相干难以靠「把仪器做得更准」解决？'
+    options: ['因为相位信息已经泄漏到大量环境自由度里', '因为能量守恒禁止恢复相位', '因为量子门本身一定出错', '因为测量仪器精度有物理上限']
+    answer: 0
+    explain: '退相干的根源是系统与环境的纠缠，环境自由度极多且不可控，相位一旦扩散就收不回来。能量守恒并不禁止相位恢复；门出错是另一个问题；仪器精度也不是这里的瓶颈。'
+sources:
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §8.3（量子噪声与退相干）'
+  - 'Zurek, 2003, Decoherence, einselection, and the quantum origins of the classical, Reviews of Modern Physics'
+  - 'Schlosshauer, 2007, Decoherence and the Quantum-to-Classical Transition'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+一个量子比特不会因为「放着」就少一个能级，它的能量可以几乎不变；但它能做的干涉却会一点点消失。偷走量子性的通常不是能量，而是相位信息漏进了环境。
+
+## 环境一插手，纯态就变混态
+
+把系统 $S$ 和环境 $E$ 放在一起看，演化仍是酉的、可逆的。可你只观测 $S$，就要对 $E$ 求偏迹：
+
+$$
+\rho_S=\mathrm{Tr}_E\left(|\Psi\rangle\langle\Psi|\right)
+$$
+
+只要联合态不是简单的张量积，$\rho_S$ 就是混态，<Term id="purity">纯度</Term> $\mathrm{Tr}(\rho_S^2)$ 小于 1。
+
+混态差在哪里？差在<Term id="density-matrix">密度矩阵</Term>的非对角元。它们记录两个基态之间的相位关系；<Term id="decoherence">退相干</Term>主要就是把非对角元压向 0，而对角元可以几乎不动。所以「相位没了」和「能量没了」是两条不同的路。
+
+$T_1$ 描述能量弛豫，布居数向基态回落；$T_2$ 描述相位弛豫，非对角元按 $e^{-t/T_2}$ 衰减。只考虑能量弛豫时，$T_2$ 最多是 $T_1$ 的两倍；实际系统还有纯相位噪声，通常达不到这个上限。
+
+保真度和深度必须一起看。单门 99.9% 听起来只差一点点，可错误会累积。
+
+<Demo
+  kind="noise"
+  label="保真度 × 深度"
+  caption="先把单门保真度设为 99.9%，把深度从 100 拖到 1000：整条线路的成功率从约九成掉到约三成七。再拖动保真度滑块，看整条曲线一起下沉。"
+/>
+
+这条曲线就是 $f^d$，每一门都乘一次保真度。它不区分能量型还是相位型错误，只问还剩多少。
+
+## 为什么难挡
+
+环境不是一台可以关掉的仪器。它有极多自由度，每一个都可能与比特发生一点纠缠；你读不到它们，也没法把相位拿回来。说环境「偷」走相位，只是说信息转移到了追不回来的地方，并没有一只手真的把它拿走。
+
+退相干之所以是主要敌人，不是因为它让某个门变慢，而是因为它削弱「还能不能干涉」这件事本身。纠错要用很多物理比特编码一个逻辑比特，前提是错误率低于阈值；测量综合征时，又不能把编码态毁掉。
+
+<Misconception
+  note="只盯着 T₁ 会低估退相干；T₂ 才直接对应干涉能力的存亡。"
+>
+  <Fragment slot="wrong">退相干就是比特丢失能量、从 |1⟩ 掉回 |0⟩。</Fragment>
+  <Fragment slot="right">能量弛豫只是其中一条通道；即使布居数不变，相位关系也会因与环境纠缠而泄漏，这就是纯相位退相干。</Fragment>
+</Misconception>
+
+<Conclusion>
+  环境偷走的是相位，不一定是能量。系统与环境的纠缠让约化态从纯变混，非对角元衰减，干涉随之消失；<Term id="coherence-time">相干时间</Term> $T_1$ 与 $T_2$ 分别盯住能量与相位两条通道。评估一台机器，不能只看单门保真度，还要看它能把这个保真度维持多深。
+</Conclusion>

@@ -1,0 +1,75 @@
+---
+slug: error-correction
+title: 纠错：量子计算的生死线
+thesis: 不纠错，规模越大错得越快
+part: p-hw
+topic: t-ec
+tag: 交互
+minutes: 9
+order: 621
+demos: ['bitflip']
+quiz:
+  - q: 3 比特重复码能纠正下面哪一种错误？
+    options: ['任意一位上的 Z 相位翻转', '任意一位上的 X 翻转', '两位同时发生的翻转', '读出时把 0 判成 1 的错误']
+    answer: 1
+    explain: 它比较的是 Z₀Z₁ 与 Z₁Z₂ 的奇偶性，能定位一位 X 翻转。Z 错误不改变计算基下的取值，它看不见；两位同时翻转会让综合征指向第三位，纠正反而改错；读出错误也不在编码的保护范围内，所以另外三项都不行。
+  - q: 为什么不把三个比特逐一测量，看看到底谁翻了？
+    options: ['逐位测量太慢，来不及纠正', '三个比特会互相干扰，读数不准', '逐位测量会投影掉 α 与 β，逻辑态当场被破坏', '经典计算机读不了量子比特的结果']
+    answer: 2
+    explain: 逐位测量得到的是 0 或 1 的具体取值，叠加态随之坍缩，α 与 β 就丢了。综合征测量只问「两位是否相同」，答案与 α、β 无关，所以能在不破坏逻辑信息的前提下定位错误；速度与读数都不是根本障碍。
+  - q: 物理错误率高于容错阈值时，把码距从 3 加到 5 会发生什么？
+    options: ['逻辑错误率稳定下降', '逻辑错误率可能反而上升', '逻辑错误率基本不变', '无法再完成编码']
+    answer: 1
+    explain: 低于阈值时，增加距离带来指数下降；高于阈值时，更多的比特与更多的门把错误一起放大，逻辑错误率反而可能上升。阈值两侧的行为完全相反，这正是「生死线」的含义，所以其余三项都不对。
+sources:
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §10'
+  - 'Fowler et al., 2012, Surface codes: Towards practical large-scale quantum computation, Physical Review A'
+  - 'Google Quantum AI, 2023, Suppressing quantum errors by scaling a surface code logical qubit, Nature'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+一个物理比特每一千次操作错一次，听上去还能忍。可真正有用的算法需要多得多的操作：错误不是「偶尔出一次」，而是「迟早出一次」。规模越大，出得越早。
+
+## 三个比特守一个比特
+
+3 比特重复码把 α|0⟩+β|1⟩ 编成 α|000⟩+β|111⟩：两个 CNOT 把 q0 与 q1、q2 关联起来。一个 X 落在 q1 上，态变成 α|010⟩+β|101⟩。
+
+如果逐一测量三个比特，你会得到 0 或 1 的具体值，叠加态当场坍缩，α 与 β 就没了——这条路走不通。
+
+换一种测法：只测 Z₀Z₁ 与 Z₁Z₂ 两个联合观测量。无错时两者都是 +1；q1 翻转时两者都是 −1；q0 翻转时只有 Z₀Z₁ 是 −1。两个综合征一组合，就定位到出错的那一位，再补一个 X。整个过程从没问过「α 和 β 是多少」。
+
+这就是 <Term id="error-correction">量子纠错</Term>的核心：把逻辑信息藏进比特之间的联合性质，测量联合性质碰不到它。
+
+亲手注入一个 X，看两个 ZZ 读数怎么变，而逻辑态那一行怎么不动。
+
+<Demo
+  kind="bitflip"
+  label="3 比特重复码"
+  caption="先点 X on q1，两个综合征都翻成 −1；再点「纠正」。α 与 β 从头到尾没有变。"
+/>
+
+## 从重复码到表面码
+
+重复码只挡 X 错误，挡不住相位（Z）错误，也挡不住两位同时出错。真正要用的是能同时处理两类错误的码，比如 <Term id="surface-code">表面码</Term>：数据比特与辅助比特交替摆在二维格点上，用近邻的辅助比特反复测稳定子。物理错误率低于 <Term id="threshold">容错阈值</Term> 时，码距 d 越大，逻辑错误率越低：
+
+$$
+p_L \sim \left(\frac{p}{p_{\mathrm{th}}}\right)^{(d+1)/2}
+$$
+
+高于阈值时，加比特只会错得更快——「生死线」就是这个意思。物理比特与<Term id="logical-qubit">逻辑比特</Term>的比值，是当下工程的核心数字。截至 2026 年公开报道的量级，一个逻辑比特仍要几十到上千个物理比特，离「用很小的开销跑长算法」还有距离。
+
+<Misconception
+  note="3 比特码能纠一位翻转，代价是三个物理比特换一个逻辑比特。这笔账正是容错工程每天要算的。"
+>
+  <Fragment slot="wrong">测量会破坏量子态，所以量子纠错在原理上不可能。</Fragment>
+  <Fragment slot="right">纠错从不测单个比特的振幅，只测比特之间的联合量；逻辑信息藏在联合性质里，测量碰不到它。</Fragment>
+</Misconception>
+
+<Conclusion>
+  不纠错，规模越大错得越快。重复码用两个联合测量定位一位翻转，表面码把同一套思路扩展到两类错误。阈值之下，加比特才划算；阈值之上，加比特只是加速失败。
+</Conclusion>

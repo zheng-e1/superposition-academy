@@ -1,0 +1,75 @@
+---
+slug: phase
+title: 相位：看不见的那个数
+thesis: 概率只看模，结果却由相位决定
+part: p-math
+topic: t-complex
+tag: 概念
+minutes: 6
+order: 201
+demos: ['amplitude']
+quiz:
+  - q: 把 |+⟩ 中 |1⟩ 分量的符号翻掉，得到 |−⟩。不做任何后续操作，直接用 Z 基测量，结果会变吗？
+    options: ['会，变成 100% 的 |1⟩', '不会，仍是各 50%；差别要等后续的干涉或换基测量才显现', '会，概率变成 25% 与 75%', '不会，因为 |−⟩ 与 |+⟩ 是同一个态']
+    answer: 1
+    explain: 'Z 基测量只问模，两个态在 Z 基下的概率分布完全一样。A 描述的是再按一次 H 之后的结果，把顺序弄反了；C 没有依据，单比特只有两个结果；D 错在这两个态并不相同，它们只差一个相对相位，再做一次 H 就会一个落 |0⟩、一个落 |1⟩。'
+  - q: 把全局相位乘到整条线路上，能靠测量发现吗？
+    options: ['能，只要采样次数足够多', '不能，所有振幅同乘一个模为 1 的因子，任何概率都不变', '能，但只在两比特系统上出现', '不能，因为相位在任何情况下都不可观测']
+    answer: 1
+    explain: '全局相位给每个振幅乘同一个因子，取模平方后完全消失，任何测量统计都一样。A 把采样误差当成了信号；C 与比特数无关；D 说得太绝对——相对相位可以通过干涉观测，H-Z-H 正是把它变成概率差的做法。'
+  - q: 把 H-Z-H 里的 Z 去掉，变成 H-H，从 |0⟩ 出发结果是什么？
+    options: ['|0⟩，因为两个 H 抵消', '|1⟩，因为两个 H 合成 X 门', '(|0⟩−|1⟩)/√2', '仍是各 50%，无法确定']
+    answer: 0
+    explain: 'H 是自逆的，连着作用两次等于恒等，态原样回到 |0⟩。B 把 H·H 当成了 X；C 描述的是「做一次 H 再加 Z」的中间态；D 把「处于叠加态」与「测量结果不确定」混为一谈，|0⟩ 是确定的。'
+sources:
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §4.2（单比特门）'
+  - 'Feynman, 1985, QED: The Strange Theory of Light and Matter, 第 1 讲'
+  - 'IBM Quantum / Qiskit 官方文档：Single-qubit gates（H、Z、S、T 与相位）'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+同一个量子比特的两个振幅，模都是 1/√2，测出来的概率永远是一半一半。可把其中一个的符号翻掉，再接上一步操作，结果就变成 100% 落在另一头。概率只看模，结局却由那个看不见的角度决定。
+
+## 一个复数，两样东西
+
+复数 $z = a + bi$ 有两样好读的东西：模 $|z| = \sqrt{a^2+b^2}$，和辐角——它在复平面上与实轴的夹角。量子比特写成 $\alpha\left|0\right\rangle + \beta\left|1\right\rangle$，α、β 都是复数，模平方给概率，归一化要求 $|\alpha|^2 + |\beta|^2 = 1$。相位不参与概率，它参与别的事。
+
+两种相位要分开。所有振幅同时乘一个 $e^{i\theta}$，任何测量结果都不变：这叫全局相位，没有物理后果。真正有后果的是<Term id="phase">相对相位</Term>，也就是 $\left|0\right\rangle$ 与 $\left|1\right\rangle$ 两个振幅之间的角度差。门能改的，恰好就是这个差。
+
+演示里每根柱子顶端的小圆盘就是辐角：柱高是模，指针方向是相位。H 之后两根柱子各占一半，两个指针同向，相位差为零。
+
+<Demo
+  kind="amplitude"
+  label="振幅与相位指针"
+  caption="点「重置」，依次按 H、Z：两根柱子一样高，只有 |1⟩ 的指针转了 180°；再按一次 H，|1⟩ 长满，|0⟩ 归零。"
+/>
+
+按完 H 和 Z 再看读数：模一点没变，概率仍是各 50%。变的只有指针。
+
+## H-Z-H：把相位换算成概率
+
+从 $\left|0\right\rangle$ 出发。H 先把它摊成两份相等的振幅。Z 门不改模，只在 $\left|1\right\rangle$ 前面添一个负号——那是相位差 π，因为 $e^{i\pi} = -1$。这一步的概率分布毫无变化。再按一次 H，同号的项相加、反号的项相消，最后只剩 $\left|1\right\rangle$：
+
+$$
+|0\rangle \xrightarrow{H} (|0\rangle+|1\rangle)/\sqrt2 \xrightarrow{Z} (|0\rangle-|1\rangle)/\sqrt2 \xrightarrow{H} |1\rangle
+$$
+
+H 在这里的角色，是一台把相位差换算成概率差的机器。它并不知道答案，只是把「两个振幅相对朝哪」翻译成「落在哪一头」。所有干涉实验都在做这个换算：先让两条路径带上不同的相位，再用一个能混合它们的操作，把角度差摊到概率上。
+
+这也解释了相位为什么在本地测不到：单个振幅的相位可以重新定义，只有两个以上的振幅凑在一起，角度差才有意义。相对相位不是「还没测出来的信息」，它只在汇合处才成为信息。所以 <Term id="decoherence">退相干</Term> 偷走的几乎总是相位——被抹掉的是角度，不是高度。
+
+<Misconception
+  note="「看不见」不等于「没用」。相位在本地没有读数，只在两条路径汇合时才现身，这也是它容易被当成数学装饰的原因。"
+>
+  <Fragment slot="wrong">相位是数学上的装饰，测量只看概率，所以改相位不会影响任何结果。</Fragment>
+  <Fragment slot="right">全局相位确实不影响测量，但相对相位会通过干涉改变结果。H-Z-H 就是把 π 的相对相位变成确定结果的最短例子。</Fragment>
+</Misconception>
+
+<Conclusion>
+  模决定你会看到什么，相位决定你会不会看到。相位不能被单独读出来，它只通过干涉改写概率——所以线路里那些看起来只是「加个相位」的门，往往才是决定结果的那一步。
+</Conclusion>

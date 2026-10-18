@@ -1,0 +1,70 @@
+---
+slug: read-circuit
+title: 怎么读一张线路图
+thesis: 横线是比特，从左到右是时间
+part: p-algo
+topic: t-read
+tag: 交互
+minutes: 6
+order: 501
+demos: ['circuit']
+quiz:
+  - q: 一张线路图中，q0 上先画 H，再用一条竖线连到 q1 上的 ⊕。这个组合做什么？
+    options: ['把 q0 测量成 0 或 1', '当 q0 为 1 时翻转 q1，这是 CNOT', '当 q1 为 1 时翻转 q0', '同时给两个比特加 H']
+    answer: 1
+    explain: 实心点是控制位，⊕ 是目标位；控制位为 1 时目标位被 X 翻转。若把两者读反，就会得到相反的控制方向。
+  - q: 图中的门从左到右依次是 H、CNOT、Z。写成矩阵乘积作用在初始态上，应该是哪一种顺序？
+    options: ['H · CNOT · Z', 'Z · CNOT · H', 'CNOT · H · Z', 'H · Z · CNOT']
+    answer: 1
+    explain: 线路图从左往右读，但矩阵乘法要从右往左乘，最右边的门最先作用。所以是 Z 先、CNOT 次之、H 最后，写成 Z·CNOT·H 才对。
+  - q: 为什么工程师宁愿读线路图，也不愿把整个演化写成一个大矩阵？
+    options: ['因为矩阵乘法在量子计算里不成立', '因为 n 个比特的矩阵有 2^n × 2^n 个元素，线路只需要列出实际用到的门', '因为线路图能直接给出测量结果', '因为矩阵不能表示 CNOT']
+    answer: 1
+    explain: 50 个比特的酉矩阵元素数是 2^100 量级，写不下也算不动；线路图的门数只随线路长度增长。线路图省略了矩阵里绝大多数结构，只留下真正发生作用的那些门。
+sources:
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §1.3.3 与 §4.2'
+  - 'IBM Quantum, Qiskit 文档：Circuit construction（线路构建与门）'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+线路图看上去像一张五线谱：几根横线，上面摆着方块、圆点和加号。五线谱的横轴是时间，线路图也是——**横线是比特，从左到右是时间**。只是五线谱的线代表音高，线路图的线代表比特，别把它当成粒子飞过的轨迹。
+
+## 先把符号认全
+
+一根横线是一个 <Term id="qubit">量子比特</Term> 的时间线。线上的方块是单比特门，压在哪根线上就只动哪个比特，比如 <Term id="hadamard">H 门</Term>、X、Z。方块里的字母就是门名。
+
+两个比特的门用竖线连起来：实心点是控制，圆圈加号是目标。控制位为 1 时，目标位才翻转，这就是 <Term id="cnot">CNOT</Term>。如果控制位处在叠加里，翻转也叠加着发生，<Term id="entanglement">纠缠</Term> 就是这样造出来的。
+
+真机线路的末尾通常还有一个像仪表盘的符号，那是 <Term id="measurement">测量</Term>：它把量子态变成一个经典比特 0 或 1。一旦测量，这一支的相位就没了。
+
+还有一条容易读反的规则：图从左往右，矩阵从右往左。图上先出现的门，写在乘积的最右边。
+
+下面这张是默认的 Bell 态线路，起点停在第一个门之前。按「下一步」一格一格走，看直方图怎么变。
+
+<Demo
+  kind="circuit"
+  label="单步读线路"
+  caption="默认是 H 加 CNOT 的 Bell 态线路，停在起点。按一次「下一步」：H 之后 |00⟩ 与 |10⟩ 各半；再按一次：CNOT 之后变成 |00⟩ 与 |11⟩ 各半。切到「采样 1000 次」，柱高变成计数，多切几次计数会抖动。"
+/>
+
+## 为什么图比矩阵好读
+
+$n$ 个比特的酉矩阵有 $2^n \times 2^n$ 个元素；50 个比特就是 $2^{50}\times 2^{50}$ 个，写不下也存不下。线路图只画真正用到的门，数量跟门数成正比，而不是跟 $2^n$ 成正比。**读线路之所以快，是因为它省略了矩阵里绝大多数结构。**
+
+图还直接告诉你两件事：谁和谁耦合（竖线跨了哪几根线），哪些门可以同时做（同一列、作用在不同比特上的门互不依赖）。这两件事决定程序能不能跑在真实芯片上，而大矩阵把它们全抹平了。
+
+<Misconception
+  note="把两个方向混在一起，就会把门的先后读反。记法：图上越靠左，作用越早；写进乘积时越靠右。"
+>
+  <Fragment slot="wrong">线路图要从右往左读，因为矩阵乘法是从右往左。</Fragment>
+  <Fragment slot="right">图从左往右读，矩阵才从右往左乘；两者方向相反，不是同一条规则。</Fragment>
+</Misconception>
+
+<Conclusion>
+  横线是比特，从左到右是时间；方块是门，实心点控制，⊕ 是目标，仪表盘是测量。线路图之所以比矩阵好读，不是因为它画得简略，而是因为它只写真正发生的事。
+</Conclusion>

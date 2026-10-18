@@ -1,0 +1,209 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { loadCourse, formatMinutes, partOf } from '../lib/course';
+import { PART_BY_ID } from '../data/course';
+import { routes, site } from '../config';
+import { courseJsonLd, websiteJsonLd } from '../lib/seo';
+import '../styles/portal.css';
+
+const course = await loadCourse();
+const first = course.flat[0];
+const latest = [...course.flat].slice(-6).reverse();
+const totalLessons = course.flat.length;
+const totalHours = Math.round(course.totalMinutes / 60);
+
+const partLink = (id: string) => `/learn#${id}`;
+---
+
+<BaseLayout
+  title={`${site.name}｜量子计算，从一块偏振片开始`}
+  description={site.description}
+  path="/"
+  jsonLd={[websiteJsonLd(), courseJsonLd(course)]}
+>
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <div class="hero-copy">
+        <span class="eyebrow">免费开放 · {totalLessons} 节 · 浏览器里可运行</span>
+        <h1>量子计算，<br />从<em>一块偏振片</em>开始</h1>
+        <p class="hero-lede">
+          不用装软件，不用先啃线性代数。每个概念都配一个能拖、能按、能反悔重来的演示；
+          讲不清的地方，我们直接说讲不清。
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href={first ? `/learn/${first.slug}` : '/learn'}>
+            从第一节开始 <span class="arrow">→</span>
+          </a>
+          <a class="btn btn-ghost" href="/roadmap">看看该走哪条路</a>
+        </div>
+        <div class="hero-meta">
+          <span>{course.parts.length} 个篇章</span>
+          <span>{totalLessons} 节正文</span>
+          <span>约 {totalHours} 小时读完</span>
+          <span>11 个可交互演示</span>
+        </div>
+      </div>
+
+      <div class="hero-demo">
+        <div class="hero-demo-label">
+          <span class="demo-dot"></span>
+          一个量子比特 · 拖动球面试试
+        </div>
+        <figure data-demo="bloch" data-props={JSON.stringify({ compact: true })} style="margin:0">
+          <div class="demo-body" style="padding:0"></div>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">这个站和别处不太一样</h2>
+          <p class="section-sub">量子科普最缺的不是更多比喻，而是能自己动手验证的最小实验。</p>
+        </div>
+      </div>
+      <div class="feature-grid">
+        <article class="feature">
+          <div class="feature-num">01 / 能跑</div>
+          <h3>每个概念都能跑一遍</h3>
+          <p>
+            偏振片、双缝、布洛赫球、线路实验室、Grover、BB84、三比特纠错——全部在浏览器里，
+            不装任何东西。状态向量引擎自己算，结果还能导出成 OpenQASM 拿去真机跑。
+          </p>
+          <div class="feature-tags">
+            <span class="pill pill-interactive">交互</span>
+            <span class="pill pill-ghost">零安装</span>
+            <span class="pill pill-ghost">可导出</span>
+          </div>
+        </article>
+        <article class="feature">
+          <div class="feature-num">02 / 敢说</div>
+          <h3>敢说「这里量子没用」</h3>
+          <p>
+            专设「祛魅」一节：哪些任务量子确实有优势、哪些只是把难题换了个说法、
+            现在离实用还差几个数量级。不吹不黑，也不预测哪家公司会赢。
+          </p>
+          <div class="feature-tags">
+            <span class="pill pill-counter">反例</span>
+            <span class="pill pill-ghost">有边界</span>
+          </div>
+        </article>
+        <article class="feature">
+          <div class="feature-num">03 / 够用</div>
+          <h3>只讲用得上的数学</h3>
+          <p>
+            复数、内积、酉矩阵、张量积，各一节，配图配演示。不讲完线性代数才准进门，
+            也不假装没有数学——第三种做法是骗人。
+          </p>
+          <div class="feature-tags">
+            <span class="pill pill-concept">概念</span>
+            <span class="pill pill-ghost">最小必要</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="parts">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">课程地图</h2>
+          <p class="section-sub">
+            从偏振片一路走到量子纠错。每一节 5–10 分钟，一条主张，一个演示，三道题。
+          </p>
+        </div>
+        <a class="section-link" href="/learn">完整目录 →</a>
+      </div>
+      <div class="part-grid">
+        {
+          course.parts.map((part) => (
+            <a class="part-card" href={partLink(part.def.id)}>
+              <div class="part-card-top">
+                <span class="part-num">{part.def.num}</span>
+                <h3>{part.def.title}</h3>
+              </div>
+              <p>{part.def.desc}</p>
+              <div class="part-card-foot">
+                <span>{part.count} 节</span>
+                <span>·</span>
+                <span>{formatMinutes(part.minutes)}</span>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">四条路，各走各的</h2>
+          <p class="section-sub">先选目标，再决定读到哪。随时可以换，目录会自动裁剪。</p>
+        </div>
+        <a class="section-link" href="/roadmap">路线详情 →</a>
+      </div>
+      <div class="route-grid">
+        {
+          routes.map((route) => (
+            <div class="route-card">
+              <h3>{route.name}</h3>
+              <p class="desc">{route.desc}</p>
+              <div class="route-parts">
+                {route.parts.map((id) => {
+                  const p = PART_BY_ID.get(id);
+                  return p ? <span class="pill pill-ghost">{p.short}</span> : null;
+                })}
+              </div>
+              <div class="route-foot">
+                <span>约 {route.weeks} 周</span>
+                <span>{(route.parts as readonly string[]).filter((id) => PART_BY_ID.has(id as any)).length} 个篇章</span>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    {
+      latest.length > 0 && (
+        <section class="section">
+          <div class="section-head">
+            <div>
+              <h2 class="section-title">最近更新</h2>
+              <p class="section-sub">新写的和刚改过的课节，按写作顺序倒序。</p>
+            </div>
+            <a class="section-link" href="/learn">全部 {totalLessons} 节 →</a>
+          </div>
+          <div class="update-list">
+            {latest.map((lesson) => {
+              const p = partOf(lesson);
+              return (
+                <a class="update-row" href={`/learn/${lesson.slug}`}>
+                  <span class="update-part">{p.num} {p.short}</span>
+                  <span>
+                    <span class="update-title">{lesson.title}</span>
+                    <span class="update-thesis">{lesson.thesis}</span>
+                  </span>
+                  <span class="update-min">{lesson.minutes} 分钟</span>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+      )
+    }
+
+    <section class="section">
+      <div class="cta">
+        <div>
+          <h2>第一节课只要六分钟</h2>
+          <p>三片偏振片，一个反直觉的结果。看完你就知道这个站怎么讲东西。</p>
+        </div>
+        <a class="btn btn-primary" href={first ? `/learn/${first.slug}` : '/learn'}>
+          开始 <span class="arrow">→</span>
+        </a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>

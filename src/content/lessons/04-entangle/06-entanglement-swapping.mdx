@@ -1,0 +1,87 @@
+---
+slug: entanglement-swapping
+title: 纠缠交换：让从未相遇的比特纠缠
+thesis: 用一次 Bell 测量把纠缠接力下去
+part: p-entangle
+topic: t-teleport
+tag: 深入
+minutes: 8
+order: 423
+demos: ['circuit']
+quiz:
+  - q: '交换完成后，比特 2 与 3 处于什么状态？'
+    options:
+      - '仍然与 1、4 纠缠，只是关联变弱了'
+      - '在 Bell 测量中被投影到某个 Bell 态，不再与 1、4 纠缠'
+      - '变成确定的 |00⟩'
+      - '变成混态，但仍与 1、4 保持纠缠'
+    answer: 1
+    explain: 'Bell 测量把 2、3 投影到一个确定的两比特态上，它们与 1、4 的纠缠在测量中被消耗。若它们仍然参与纠缠，1、4 就不可能单独落在一个 Bell 态上；测量也不是把态复位成 |00⟩。'
+  - q: '如果对 2、3 的 Bell 测量读到了 |Ψ−⟩，此时 1、4 处于什么态？'
+    options:
+      - '一定是 |Φ+⟩，与测量结果无关'
+      - '与 2、3 相同编号的 |Ψ−⟩，需要按结果做本地修正才能变成 |Φ+⟩'
+      - '一个乘积态，尚未纠缠'
+      - '无法确定，必须再测一次 1、4'
+    answer: 1
+    explain: '两对 Bell 态展开后，2、3 与 1、4 落在同一个编号的态上，所以读 |Ψ−⟩ 时 1、4 也是 |Ψ−⟩。差别只是一个本地操作，但修正指令必须来自那两次测量结果，不能凭空假定 |Φ+⟩；此时 1、4 确实已经纠缠。'
+  - q: '为什么长距离分发纠缠要用交换和中继，而不是直接一路送到底？'
+    options:
+      - '因为纠缠无法穿过光纤'
+      - '因为交换能提高光速，让信号走得更快'
+      - '因为直接分发的成功概率随距离指数下降，分段建立再交换能把代价从指数级压成多项式级'
+      - '因为交换不需要任何经典通信'
+    answer: 2
+    explain: '光纤损耗让长链路的成功率指数衰减，分段之后每段各自尝试，再用交换把段接起来。纠缠当然可以走光纤，只是走不远；交换也不改变光速，而且每一步都必须广播测量结果，所以最后一项也错。'
+sources:
+  - 'Zukowski, Zeilinger, Horne & Ekert, 1993, Event-ready-detectors Bell experiment via entanglement swapping, Physical Review Letters'
+  - 'Briegel, Dür, Cirac & Zoller, 1998, Quantum repeaters: The role of imperfect local operations in quantum communication, Physical Review Letters'
+  - 'Preskill, Quantum Computation 讲义（Caltech Ph219），纠缠交换与量子中继部分'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+比特 1 和 2 纠缠，比特 3 和 4 纠缠。让 2 和 3 碰一次面、做一次 Bell 测量，1 和 4 就纠缠上了——它们从没靠近过，中间也没有任何量子信息直接飞过去。
+
+## 接力
+
+初始态是两对独立的 Bell 态。把 2、3 这一对换成 Bell 基来写：
+
+$$
+|\Phi^+\rangle_{12}\otimes|\Phi^+\rangle_{34}=\frac12\sum_{k=0}^{3}|\Phi_k\rangle_{23}\otimes|\Phi_k\rangle_{14}
+$$
+
+右边是四项等权重的和，每一项里 2、3 与 1、4 挂着同一个编号。对 2、3 做 Bell 测量，会等概率读出四个结果之一；一旦读到第 k 个，1 与 4 就落在同一个编号的 Bell 态上。
+
+这时 1 与 4 已经<Term id="entanglement">纠缠</Term>了，只是不知道是四种里的哪一种。把 2、3 的测量结果用经典信道广播出去，1、4 两端按编号做一次本地修正，就得到标准的 |Φ+⟩。
+
+关键在于：1 与 4 之间不需要量子信道，也不需要任何直接相互作用。纠缠是接力出来的，不是搬运过去的。
+
+<Demo
+  kind="circuit"
+  label="GHZ 的关联"
+  caption="选预设「GHZ 三比特」，用 → 单步走到最后：一个 H 加两个 CNOT，直方图只剩 |000⟩ 与 |111⟩。首尾两个比特之间根本没有门，却完全相关——交换就是把这件事分段做出来。"
+/>
+
+## 为什么长距离需要它
+
+光纤里的光子会丢，概率随距离指数下降。想在上千公里外直接分发一对纠缠，成功率的量级低到不可用，而且你还得知道它什么时候成功。
+
+量子中继把长链路切成段：每段几十到上百公里，段内先建立纠缠；相邻两段之间做一次交换，把纠缠接到下一段去。段内的成功概率不必很高，反复尝试即可，整体代价从随距离指数增长变成随段数多项式增长。这是量子中继能被认真讨论的原因，也是交换被称为「基本操作」的原因。
+
+代价是每一段都要能存储纠缠、都要能做 Bell 测量，还要把结果及时告诉相关节点。工程上难的不是那条展开式，而是让这些步骤同时足够快、足够准。
+
+<Misconception
+  note="「交换」这个词容易让人以为中间有个中转包裹；实际上被传递的只有两个经典比特。"
+>
+  <Fragment slot="wrong">纠缠交换把 2、3 之间的纠缠搬到了 1、4 之间，所以纠缠像一种可以转移的物体。</Fragment>
+  <Fragment slot="right">2、3 的纠缠在 Bell 测量中被消耗，1、4 的相关性由测量结果重新指定；没有东西被搬运，只有关系被重建。</Fragment>
+</Misconception>
+
+<Conclusion>
+  纠缠交换用一次 Bell 测量把两段纠缠接成一段：2、3 被投影，1、4 落到同一个编号的 Bell 态，广播结果后即可修正。它是量子中继的基本操作，也是长距离分发绕开指数损耗的办法。
+</Conclusion>

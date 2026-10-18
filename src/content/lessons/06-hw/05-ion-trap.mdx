@@ -1,0 +1,67 @@
+---
+slug: ion-trap
+title: 离子阱：最干净的比特
+thesis: 保真度最高，但门最慢
+part: p-hw
+topic: t-modality
+tag: 概念
+minutes: 8
+order: 603
+demos: ['hardware']
+quiz:
+  - q: '离子阱「最干净」与「门最慢」其实来自同一个原因，是哪个？'
+    options: ['离子带同种电荷，互相排斥', '离子与外界耦合弱，内部能级对噪声不敏感，耦合弱也让门慢', '真空度太高，激光穿不过去', '离子数量太少，没法并行']
+    answer: 1
+    explain: '好保真度与慢门是同一枚硬币的两面：耦合弱，环境扰动小，但两比特之间的相互作用也只能靠共享的声子慢慢交换。电荷排斥是囚禁与排成链的原因，并不解释门速度；真空与并行度也不是根源。'
+  - q: '离子链越做越长，最先遇到的困难是什么？'
+    options: ['库仑力会消失，离子会散开', '振动模式越来越密，模式之间难以分辨，寻址与冷却变慢', '离子会衰变成中性原子', '激光无法再激发任何跃迁']
+    answer: 1
+    explain: '链变长，集体振动模式的频率间隔变小，激光要选中的那个模式越来越难单独驱动，冷却与门速度一起变差。库仑排斥仍然在，离子不会因此变成原子，激光也照旧能激发跃迁，所以其余三项都不对。'
+  - q: '一台离子阱设备的相干时间到秒量级，为什么门错误率仍不能忽略？'
+    options: ['因为相干时间只描述能量，不描述相位', '因为门时间里还有激光散射、模式加热与串扰，它们都会引入错误', '因为离子阱其实没有相干时间', '因为测量会摧毁离子']
+    answer: 1
+    explain: '相干时间只是上限，门错误还取决于门有多快、激光相位有多稳、声子模式被加热到什么程度。相干时间本来同时描述 T₁ 与 T₂，测量也只是让态坍缩而不是摧毁离子，所以另外三项都不对。'
+sources:
+  - 'Cirac & Zoller, 1995, Quantum Computations with Cold Trapped Ions, Physical Review Letters'
+  - 'Bruzewicz, Chiaverini, McConnell & Sage, 2019, Trapped-ion quantum computing: Progress and challenges, Applied Physics Reviews'
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, 第 7 章'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+把一颗离子放进真空，用电磁场悬住。它几乎不碰任何东西——没有晶格振动，没有杂质，只有电磁场和激光。这让它成为目前最干净的量子比特之一。
+
+## 用电磁场把离子挂起来
+
+恩绍定理说，只靠静电场做不出三维稳定的势阱，所以保罗阱用射频场：离子在快速振荡的场里感受到一个有效势，总被推回中心。几个离子一起囚禁时，库仑排斥把它们排成一列，间距在微米量级。
+
+比特编码在离子的内部能级上：基态超精细能级，或一条光学跃迁。内部能级对电场噪声不敏感，<Term id="coherence-time">相干时间</Term> 可以到秒量级——「干净」指的就是这个。
+
+<Demo
+  kind="hardware"
+  label="五条路线对照"
+  caption="按双门保真度排序，离子阱在最上面；改成按比特数排序，它掉到后面。两列数字说的不是同一件事。"
+/>
+
+## 门慢，但任意两个都能直接耦合
+
+单比特门用激光或微波驱动内部能级。双比特门借共享的振动模式：两个离子的运动通过库仑耦合连在一起，用激光把内部状态与声子纠缠起来，就得到一个等效的双比特门。
+
+代价是速度。靠声子模式的门在微秒量级，比超导的几十纳秒慢约两个量级；换来的是双门 <Term id="fidelity">保真度</Term> 普遍在 99.5% 以上、最好的报道接近 99.9%，而且全连通——任意两个离子都能在不插 SWAP 的情况下做门（仍通过共享声子模式），编译时省掉搬态开销。全连通在深线路上很值钱：省下的每个 SWAP 都是三个双门和三次错误。
+
+扩展难在链变长。离子越多，振动模式的频率越挤，模式之间越难分辨，寻址和冷却都变慢；激光系统的体积与稳定性也是实打实的工程负担。
+
+<Misconception
+  note="「最干净」是相对同行的说法，不是绝对的安全。保真度再高，也还是有限的小数。"
+>
+  <Fragment slot="wrong">离子阱保真度最高，所以可以先不纠错，直接跑长算法。</Fragment>
+  <Fragment slot="right">即使按最好的 99.9% 算，也是每千次门错一次，长线路照旧累积；而且门慢，深线路还要跟相干时间赛跑。</Fragment>
+</Misconception>
+
+<Conclusion>
+  离子阱用电磁场囚禁离子，把比特放在内部能级上：耦合弱带来长相干与高保真度，也带来慢门。全连通省掉了搬态的 SWAP，代价是扩展时模式拥挤、速度下降。它最适合的场景，是门数不多但对精度要求极高的任务。
+</Conclusion>

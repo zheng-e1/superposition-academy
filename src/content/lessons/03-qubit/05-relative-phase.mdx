@@ -1,0 +1,78 @@
+---
+slug: relative-phase
+title: 相对相位：为什么 HZH=X
+thesis: 改变相对相位，等于改变干涉结果
+part: p-qubit
+topic: t-gates
+tag: 深入
+minutes: 7
+order: 313
+demos: ['amplitude']
+quiz:
+  - q: '在 $|+\rangle$ 上施加 Z 门，然后立刻在 Z 基测量，结果是什么？'
+    options: ['恒为 0', '恒为 1', '0 与 1 各一半，和没加 Z 时一样', '取决于 Z 门的全局相位']
+    answer: 2
+    explain: 'Z 只把 $|1\rangle$ 的系数乘 $-1$，模平方不变，所以两个结果仍是各一半。要看到确定结果，还得再施加一次 H，把相位差变成概率差；全局相位不进入任何概率。'
+  - q: '在 $|0\rangle$ 上依次施加 H、Z、H，最后在 Z 基测量，得到 1 的概率是多少？'
+    options: ['0%', '25%', '50%', '100%']
+    answer: 3
+    explain: '$HZH|0\rangle=X|0\rangle=|1\rangle$，最后一次 H 让两段振幅完全相长到 $|1\rangle$。0% 是漏掉 Z、把 HZH 当成 $H^2$ 的结果；50% 是以为 Z 只会把相位随机化。'
+  - q: '把整个态 $|\psi\rangle$ 乘上 $e^{i\pi/3}$，下面哪一项会变？'
+    options: ['在 Z 基测到 0 的概率', '之后与另一条路径干涉的结果', '都不变', '只有 $|0\rangle$ 的振幅大小']
+    answer: 2
+    explain: '整体乘 $e^{i\pi/3}$ 等于给每个振幅加同一个相位，模平方不变，任意两条路径的相对相位也不变。相对相位改变时干涉才会变；振幅大小同样不受影响。'
+sources:
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §2.2.7（相位）与 §4.2（单比特门）'
+  - 'IBM Quantum 文档，Quantum gates 一节（X、Z、S、T 与全局相位）'
+  - 'Feynman, 1985, QED: The Strange Theory of Light and Matter, 第 1 讲'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+同一个态，整体乘上一个复数，测量结果一点不变；只改两个系数之间的相对相位，干涉条纹却可能整个翻过来。相位常被当成公式里的装饰，可量子门真正动手改的，往往正是这点看不见的差别。
+
+## Z 只做一件事：给 |1⟩ 加符号
+
+从最简单的态开始。$H|0\rangle=|+\rangle$，两个系数都是 $1/\sqrt2$，符号相同。接一个 Z 门，它只给 $|1\rangle$ 的系数乘 $-1$，于是 $Z|+\rangle=|-\rangle$。柱子的高度没变，变的只是第二根柱子顶上指针的方向。
+
+如果就在这一步测量，Z 做了什么完全看不出来：两个结果的概率还是各一半。差别要等到下一次干涉才变成概率差。
+
+演示一打开就停在 H 之后的 $|+\rangle$：两根柱子等高、指针同向。按 Z，高度不动，$|1\rangle$ 的指针转半圈。
+
+<Demo
+  kind="amplitude"
+  label="相位指针"
+  caption="打开时已经是 H 之后的 |+⟩：两根柱子各 50%、指针同向。按 Z，柱高不变、|1⟩ 的指针转半圈；再按 H，两段振幅相消，全部落到 |1⟩。"
+/>
+
+最后这次 H 才是关键：没有 Z 时它会回到 $|0\rangle$，有了 Z，同一段线路把结果换成了 $|1\rangle$。
+
+## 两行代数，两种相位
+
+$$
+\begin{aligned}
+HZH|0\rangle &= HZ|+\rangle = H|-\rangle = |1\rangle,\\
+HZH|1\rangle &= HZ|-\rangle = H|+\rangle = |0\rangle.
+\end{aligned}
+$$
+
+它对两个基态的作用与 X 完全一样，因此 $HZH=X$。这里没有「差一个全局相位」的余地：H 是实矩阵且 $H^\dagger=H$，Z 的 $-1$ 只落在 $|1\rangle$ 上，不会被整体提出来。
+
+全局相位是每个<Term id="amplitude">概率幅</Term>都乘同一个 $e^{i\theta}$，它可以从式子里直接划掉；<Term id="phase">相对相位</Term>只改其中一部分振幅，划不掉。S 门给 $|1\rangle$ 乘 $i$，也就是 $e^{i\pi/2}$；T 门乘 $e^{i\pi/4}$，两个 T 正好是一个 S。它们都不动 $|0\rangle$、$|1\rangle$ 的测量概率，却能改变 $|+\rangle$ 下一步变成什么。
+
+所以「相位看不见」只对单个振幅成立。把两个振幅放在一起做加减，相对相位立刻变成概率上的差别——<Term id="interference">干涉</Term>就是把相对相位变成概率的地方。
+
+<Misconception
+  note="「看不见」指的是单个振幅的绝对相位；把两个振幅放在一起，差别就变成概率。"
+>
+  <Fragment slot="wrong">相位只是写在纸上的数学符号，实验里没有对应物。</Fragment>
+  <Fragment slot="right">全局相位确实不可观测，但两个振幅之间的相对相位会改变干涉结果，因此是可测的。</Fragment>
+</Misconception>
+
+<Conclusion>
+  Z 不改概率，只改符号；可这个符号一旦进入下一次 H，就会把「各一半」变成「必然是一个结果」。$HZH=X$ 说的正是这件事：绕一圈回来，相对相位已经替 X 完成了翻转。全局相位可以丢，相对相位不能丢。
+</Conclusion>

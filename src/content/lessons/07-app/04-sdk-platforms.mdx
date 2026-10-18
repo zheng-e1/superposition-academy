@@ -1,0 +1,60 @@
+---
+slug: sdk-platforms
+title: 从浏览器到真机：工具与平台
+thesis: 先在本站把线路跑通，再上真机验证
+part: p-app
+topic: t-tools
+tag: 实战
+minutes: 7
+order: 731
+demos: []
+quiz:
+  - q: OpenQASM 在工具链里扮演什么角色？
+    options: ['一种量子编程语言，可以直接输出脉冲波形', '一种文本中间表示，描述门与比特，不绑定语言或硬件', '一个云端排队系统', '一种纠错码的编码格式']
+    answer: 1
+    explain: 它只记录「哪个门作用在哪个比特上」，可以被不同框架生成、被不同平台读入。它不描述脉冲，也不是排队或纠错的一部分，所以另外三项都把它当成了别的东西。
+  - q: 同一条线路，真机结果为什么比模拟器更「脏」？
+    options: ['真机的比特数一定更多', '模拟器算错了概率', '转译增加了门数，门与读出又各有错误', '网络延迟改变了测量结果']
+    answer: 2
+    explain: 平台先把线路转译到原生门集与耦合图上，远处的双门要用 SWAP 搬近，每一步都多出错误；再叠加门错误、读出错误与串扰。网络延迟影响的是等待时间，不会改写测量分布，模拟器在理想模型下也没有算错。
+  - q: 免费额度有限时，最合理的做法是？
+    options: ['直接挑比特最多的机器提交', '把采样次数拉到平台允许的最大值', '同时提交一百个相同任务碰运气', '先在本地模拟器验证逻辑，再排队上真机']
+    answer: 3
+    explain: 模拟器能先排掉逻辑错误与语法错误，真机额度只用来验证噪声下的行为。比特最多的机器不代表结果最可信，采样次数要匹配统计需求，重复提交只会挤占队列，所以另外三项都在浪费额度。
+sources:
+  - 'Qiskit 官方文档：Transpiler 与 Primitives'
+  - 'Cross et al., 2022, OpenQASM 3: A broader and deeper quantum assembly language, ACM Transactions on Quantum Computing'
+  - 'Cirq 官方文档：Circuits 与 Devices'
+updated: 2026-10-18
+---
+
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+你在这站里搭好一条 Bell 态线路，点「复制 QASM」，粘进云端控制台，排队等上一阵，跑出来一串 00 和 11——中间还夹着几个 01。从浏览器到真机，中间隔着好几层。
+
+## 三样东西，三种角色
+
+Qiskit 是 Python 的 SDK：建线路、转译、提交、取结果，一整套。Cirq 是 Google 那一支的 Python 框架，更贴近底层门与具体设备。OpenQASM 是文本中间表示，只描述「哪个门作用在哪个比特上」，不绑定语言，也不绑定硬件。
+
+三者不是替代关系。你可以用 Qiskit 或 Cirq 建线路，导出 QASM，再让另一个平台读进去。本站实验室的线路可以展开 OpenQASM 2.0 面板直接复制，粘到任何支持它的平台都能解析。
+
+## 真机之前，还有一次转译
+
+真机只支持特定门集与近邻耦合。平台会先转译：把 H、T 这些门拆成硬件原生的门，把相隔较远的双门用 SWAP 搬近——每一次 SWAP 都是三个 CNOT，都是额外的错误。所以线路深度在转译后会变长，模拟器上漂亮的分布，到真机上会变宽、变斜。
+
+云平台的免费额度通常按任务数与采样次数算，热门机器要排队。先用模拟器或平台提供的模拟后端把逻辑跑对，再花额度上真机，是更划算的顺序。截至 2026 年公开报道的量级，免费额度仍只够教学与小规模验证。
+
+选哪个平台？生态、文档与你能拿到的设备类型，比「谁更量子」更值得比较。
+
+<Misconception
+  note="QASM 描述的是逻辑线路，不是脉冲序列。从「写对门」到「让硬件执行」，中间隔着一整套编译。"
+>
+  <Fragment slot="wrong">导出的 QASM 会在真机上原样执行，结果和模拟器一样。</Fragment>
+  <Fragment slot="right">平台先把它转译成原生门与耦合图上的线路，再叠加门错误、读出错误与串扰，结果通常更宽、更斜。</Fragment>
+</Misconception>
+
+<Conclusion>
+  先在本站把线路跑通，再上真机验证。Qiskit 与 Cirq 负责建与跑，OpenQASM 负责搬运；真机前的转译会改变线路，真机上的噪声会改变分布。把 <Term id="shot">采样次数</Term> 与排队成本算进去，才是完整的实验设计。
+</Conclusion>

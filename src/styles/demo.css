@@ -1,0 +1,556 @@
+/* ─────────────────────────────────────────────────────────────
+   演示组件内部样式（由 JS 生成的 DOM 使用）
+   ───────────────────────────────────────────────────────────── */
+
+.demo-stage {
+  position: relative;
+}
+
+.readout-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.readout {
+  flex: 1 1 118px;
+  min-width: 0;
+  padding: 8px 11px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--card-2);
+}
+
+.readout-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.readout-value {
+  font-size: 14.5px;
+  color: var(--ink);
+  line-height: 1.35;
+}
+
+/* ── 线路实验室 ─────────────────────────────────────────── */
+.cj-wrap {
+  overflow-x: auto;
+  padding: 4px 0 2px;
+}
+
+.cj-board {
+  position: relative;
+  margin: 0 auto;
+  min-width: 220px;
+}
+
+.cj-wire {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--line-strong);
+}
+
+.cj-wire-label {
+  position: absolute;
+  left: 4px;
+  top: -8px;
+  padding: 0 4px;
+  font-size: 9.5px;
+  color: var(--faint);
+  background: var(--card);
+  line-height: 1.4;
+}
+
+.cj-gate {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--card);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  transition: all 0.2s var(--ease);
+}
+
+.cj-gate[data-active='true'] {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 0 2.5px var(--accent-soft);
+}
+
+.cj-target {
+  border-radius: 50%;
+}
+
+.cj-dot {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.cj-link {
+  position: absolute;
+  width: 1.5px;
+  background: var(--line-strong);
+}
+
+.cj-hist {
+  display: grid;
+  gap: 5px;
+  align-items: end;
+  height: 108px;
+  margin-top: 16px;
+}
+
+.cj-bar {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  height: 100%;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cj-bar-fill {
+  width: 100%;
+  background: var(--accent);
+  opacity: 0.5;
+  border-radius: 3px 3px 0 0;
+  min-height: 2px;
+  transition: height 0.3s var(--ease);
+}
+
+.cj-bar-val {
+  font-size: 9px;
+  color: var(--faint);
+  white-space: nowrap;
+}
+
+.cj-bar-label {
+  font-size: 9.5px;
+  color: var(--sub);
+  white-space: nowrap;
+}
+
+.cj-curve {
+  display: block;
+  width: 100%;
+  height: 54px;
+  margin-top: 12px;
+}
+
+.cj-qasm-wrap {
+  margin-top: 12px;
+  font-size: 12px;
+}
+
+.cj-qasm-wrap summary {
+  cursor: pointer;
+  color: var(--sub);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  padding: 3px 0;
+}
+
+.cj-qasm {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  max-height: 210px;
+  overflow: auto;
+  border-radius: 8px;
+  background: var(--code-bg);
+  font-size: 11.5px;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+.cj-mini-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  color: var(--faint);
+  align-self: center;
+  margin-right: 2px;
+}
+
+/* ── Bell 两端测量 ──────────────────────────────────────── */
+.bell-shared {
+  margin-bottom: 10px;
+  font-size: 11px;
+  color: var(--faint);
+  text-align: center;
+}
+
+.bell-board {
+  display: grid;
+  grid-template-columns: 1fr 46px 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.bell-station {
+  padding: 12px 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card-2);
+  text-align: center;
+}
+
+.bell-station-name {
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+}
+
+.bell-bit {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--ink);
+  transition: color 0.2s;
+}
+
+.bell-bit[data-match='true'] {
+  color: var(--accent);
+}
+
+.bell-bit[data-match='false'] {
+  color: var(--phase);
+}
+
+.bell-link {
+  position: relative;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--line-strong);
+  transition: background 0.2s;
+}
+
+.bell-link[data-match='true'] {
+  background: var(--accent);
+}
+
+.bell-link[data-match='false'] {
+  background: var(--phase);
+}
+
+.bell-stats {
+  margin-top: 14px;
+}
+
+.bell-bar {
+  height: 8px;
+  border-radius: 5px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.bell-bar-fill {
+  height: 100%;
+  width: 100%;
+  border-radius: 5px;
+  background: var(--accent);
+  transition: width 0.3s var(--ease);
+}
+
+.bell-stats-text {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--sub);
+}
+
+/* ── BB84 ───────────────────────────────────────────────── */
+.bb-table {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 12.5px;
+}
+
+.bb-row {
+  display: grid;
+  grid-template-columns: 30px 1fr 0.9fr 0.9fr 1fr 1fr;
+  gap: 4px;
+  padding: 6px 10px;
+  align-items: center;
+}
+
+.bb-row + .bb-row {
+  border-top: 1px solid var(--line);
+}
+
+.bb-head {
+  background: var(--card-2);
+  color: var(--faint);
+  font-size: 9.5px;
+  letter-spacing: 0.05em;
+}
+
+.bb-good {
+  background: color-mix(in srgb, var(--success) 7%, transparent);
+}
+
+.bb-bad {
+  background: color-mix(in srgb, var(--danger) 9%, transparent);
+  color: var(--danger);
+}
+
+.bb-skip {
+  color: var(--faint);
+}
+
+.bb-verdict {
+  margin-top: 12px;
+  padding: 10px 13px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  background: var(--card-2);
+  color: var(--sub);
+}
+
+.bb-verdict[data-tone='good'] {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.bb-verdict[data-tone='bad'] {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+/* ── 3 比特重复码 ───────────────────────────────────────── */
+.bf-board {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 8px 0 4px;
+}
+
+.bf-qubit {
+  width: 72px;
+  padding: 9px 6px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card-2);
+  text-align: center;
+  transition: all 0.2s var(--ease);
+}
+
+.bf-qubit[data-error='true'] {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.bf-qubit-name {
+  font-size: 9.5px;
+  color: var(--faint);
+}
+
+.bf-qubit-state {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--ink);
+}
+
+.bf-qubit[data-error='true'] .bf-qubit-state {
+  color: var(--danger);
+}
+
+.bf-plus {
+  font-size: 17px;
+  color: var(--faint);
+}
+
+.bf-banner {
+  margin-top: 6px;
+  padding: 10px 13px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  background: var(--card-2);
+  color: var(--sub);
+}
+
+.bf-banner[data-tone='good'] {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.bf-banner[data-tone='bad'] {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+/* ── 硬件对比 ───────────────────────────────────────────── */
+.hw-wrap {
+  overflow-x: auto;
+}
+
+.hw-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.hw-table th {
+  text-align: left;
+  padding: 0;
+  border-bottom: 1px solid var(--line-strong);
+  white-space: nowrap;
+}
+
+.hw-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  padding: 8px 8px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--sub);
+  text-align: left;
+  border-radius: 6px;
+}
+
+.hw-sort:hover {
+  background: var(--hover);
+  color: var(--ink);
+}
+
+.hw-arrow {
+  color: var(--accent);
+  font-size: 10px;
+}
+
+.hw-table td {
+  padding: 9px 8px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  line-height: 1.55;
+  color: var(--sub);
+}
+
+.hw-table tbody tr:hover {
+  background: var(--hover);
+}
+
+.hw-name {
+  color: var(--ink);
+  font-weight: 640;
+  white-space: nowrap;
+}
+
+.hw-note {
+  margin-top: 9px;
+  line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+  .bb-row {
+    grid-template-columns: 24px 1fr 0.8fr 0.8fr 0.9fr 0.9fr;
+    font-size: 11.5px;
+    padding: 6px 8px;
+  }
+
+  .bell-bit {
+    font-size: 30px;
+  }
+}
+
+/* 插入位：列与列之间的细条 */
+.cj-insert {
+  position: absolute;
+  top: 0;
+  width: 28px;
+  background: transparent;
+  border: 0;
+  border-radius: 7px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.14s var(--ease);
+}
+
+.cj-insert::before {
+  content: '+';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  line-height: 18px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent);
+  background: var(--card);
+  border: 1px dashed var(--accent-line);
+  border-radius: 50%;
+}
+
+.cj-insert:hover,
+.cj-insert:focus-visible,
+.cj-insert[data-drop='true'] {
+  opacity: 1;
+}
+
+.cj-insert[data-drop='true'] {
+  background: var(--accent-soft);
+  opacity: 1;
+}
+
+.cj-gate {
+  padding: 0;
+  cursor: pointer;
+}
+
+.cj-gate:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.cj-dot {
+  border: 0;
+  cursor: pointer;
+}
+
+.cj-dot:hover {
+  box-shadow: 0 0 0 4px var(--danger-soft);
+}
+
+.chip[draggable='true'] {
+  cursor: grab;
+}
+
+.chip[draggable='true']:active {
+  cursor: grabbing;
+}
+.controls > .chip-row {
+  flex: 1 1 100%;
+}
+

@@ -1,0 +1,20 @@
+---
+interface Props {
+  wrong: string;
+  right: string;
+  note?: string;
+}
+const { wrong, right, note } = Astro.props;
+---
+
+<div class="misconception">
+  <div class="misconception-row" data-k="wrong">
+    <span class="mark" aria-hidden="true">✕</span>
+    <span><slot name="wrong">{wrong}</slot></span>
+  </div>
+  <div class="misconception-row" data-k="right">
+    <span class="mark" aria-hidden="true">✓</span>
+    <span><slot name="right">{right}</slot></span>
+  </div>
+  {note && <div class="misconception-note">{note}</div>}
+</div>

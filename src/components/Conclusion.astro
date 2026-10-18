@@ -1,0 +1,11 @@
+---
+interface Props {
+  tag?: string;
+}
+const { tag = '一句话结论' } = Astro.props;
+---
+
+<div class="conclusion">
+  <span class="conclusion-tag">{tag}</span>
+  <slot />
+</div>

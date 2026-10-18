@@ -1,0 +1,95 @@
+---
+slug: h-gate
+title: H 门：把确定变成等概率
+thesis: H 不是随机化，它造出的是有相位的叠加
+part: p-qubit
+topic: t-gates
+tag: 交互
+minutes: 6
+order: 311
+demos: ['bloch']
+quiz:
+  - q: 连续按两次 H，态会怎样？
+    options:
+      - 变成一个完全随机的混态
+      - 回到按 H 之前的状态
+      - 变成 |+⟩ 与 |−⟩ 各占一半的混合
+      - 两个概率幅翻倍
+    answer: 1
+    explain: H 的平方等于 I，两次作用正好抵消，所以回到原态。H 之后得到的是纯态 |+⟩，不是混态，振幅也不会翻倍。
+  - q: H|0⟩ 与「抛一枚公平硬币」的关键区别是什么？
+    options:
+      - H 之后两个结果的概率不相等
+      - H 之后是带确定符号的叠加，后续还能干涉；硬币的结果已经固定
+      - H 只对 |0⟩ 有效，硬币对任何态都有效
+      - 没有区别，只是叫法不同
+    answer: 1
+    explain: H 造出的是确定的 |+⟩，两个分支的相位关系是固定的，所以再作用一次 H 能回到 |0⟩。抛硬币在中间过程就随机了，没有可逆的相位关系可以还原。
+  - q: 想让 H 之后某个结果在测量时明显更容易出现，还需要做什么？
+    options:
+      - 在同一个基上再测一次
+      - 让不同路径的振幅按相位相加或相消，也就是干涉
+      - 把比特数增加到足够多
+      - 把 H 换成 X
+    answer: 1
+    explain: H 只负责把确定的态摊成叠加，选择哪个结果要靠后续的相位控制让振幅叠加或抵消。多测一次只会重复采样，换门也不会自动产生路径之间的相加。
+sources:
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §4.2'
+  - 'Qiskit 官方文档，HadamardGate 的矩阵定义'
+  - 'Preskill, Quantum Computation 讲义（Caltech Ph219），单比特门部分'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+一个门，把确定的 0 变成一半一半。看上去像抛硬币，可它偏偏能被第二个同样的门原样还原，抛硬币做不到这件事。
+
+## H 的矩阵
+
+$$
+\mathrm{H}=\frac{1}{\sqrt2}\begin{pmatrix}1&1\\1&-1\end{pmatrix}
+$$
+
+作用在两个基上：
+
+$$
+\mathrm{H}|0\rangle=|+\rangle=\frac{|0\rangle+|1\rangle}{\sqrt2},
+\qquad
+\mathrm{H}|1\rangle=|-\rangle=\frac{|0\rangle-|1\rangle}{\sqrt2}
+$$
+
+测 $|+\rangle$，得到 0 和 1 的概率各一半。可它不是把 0 随机换成 0 或 1：作用之后态是确定的 $|+\rangle$，两个分支都在，符号都已经定好。这个门叫 <Term id="hadamard">H 门</Term>，它也是酉的。
+
+另一种读法是换基：H 把 z 基换成 x 基。所以 H 作用之后去测 x 方向，结果是确定的 +1；不确定的只是你偏要去测 z 方向。H 还是它自己的逆，$H^\dagger=H=H^{-1}$，这一点后面会反复用到。
+
+把 H 作用在 $|1\rangle$ 上得到 $|-\rangle$，测出来仍是一半一半。可 $|+\rangle$ 与 $|-\rangle$ 不是同一个态：它们只差第二个分支的一个负号，正是这个负号让后续的门给出完全不同的结果。等概率只是一个数字，相位才是信息。
+
+按一下 H，箭头从北极转到 +x：长度没变，只是换了方向。
+
+<Demo
+  kind="bloch"
+  label="H 门"
+  caption="按 H，箭头跳到 +x；再按一次 H，它回到北极。连按两次就是原地不动。"
+/>
+
+## 两次就回来
+
+$\mathrm{H}^2=I$。连按两次 H，态精确回到 $|0\rangle$，不是「随机两次变得更随机」。这也是它和抛硬币最硬的区别：抛硬币没有逆操作。所谓「等概率」描述的是测量，态本身完全确定——这两件事很容易被一句话糊在一起。
+
+真正让 H 有用的是符号。$|+\rangle$ 的两个分支同号，$|-\rangle$ 的两个分支反号。再作用一次 H，同号的两条路相加得回 $|0\rangle$，反号的两条路相消，结果落到 $|1\rangle$。相位在这里变成了可观测的差别，而不是一个可以随手丢掉的修饰。后面那些干涉类的算法，用的都是这一招。
+
+也正因为如此，H 几乎总是线路的第一笔：它把初态 $|0\cdots0\rangle$ 摊成所有输入等权重的叠加，后面的门再按相位把想要的答案挑出来。
+
+<Misconception
+  note="抛硬币在中间过程就随机了，H 之后态是确定的叠加 |+⟩；所以第二个 H 能把硬币捡回来，抛硬币不能。"
+>
+  <Fragment slot="wrong">H 门就是把 |0⟩ 随机变成 |0⟩ 或 |1⟩，和抛硬币是一回事。</Fragment>
+  <Fragment slot="right">H 造出的是振幅相等、符号确定的叠加；随机只发生在测量那一刻。</Fragment>
+</Misconception>
+
+<Conclusion>
+  H 门把确定的基态摊成两个等权重的分支，同时给它们定好符号。因为符号是确定的，两次 H 能原样还原，后续的门也能让这些分支相加或相消。它造的不是随机，是有相位的叠加。
+</Conclusion>

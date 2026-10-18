@@ -1,0 +1,74 @@
+---
+slug: lab-guide
+title: 实验室使用指南
+thesis: 自己搭一条线路，比读十页解释管用
+part: p-lab
+topic: t-lab
+tag: 实战
+minutes: 5
+order: 801
+demos: ['circuit']
+quiz:
+  - q: 在 |00⟩ 上先对 q0 做 H，再做 CNOT（控制 q0、目标 q1），测到 01 的概率是多少？
+    options: ['25%', '50%', '0', '100%']
+    answer: 2
+    explain: 结果是 (|00⟩+|11⟩)/√2，只有 00 与 11 两个分支，各约一半，01 的振幅是 0。CNOT 把 q0 的 0 与 1 分别对应到 q1 的 0 与 1，不会产生 01 或 10。
+  - q: 在 |0⟩ 上连着做两次 H，测量结果是什么？
+    options: ['一定是 1', '一定是 0', '一半 0、一半 1', '50% 概率回到 |0⟩，50% 停在 |+⟩']
+    answer: 1
+    explain: 两个 H 相乘是单位矩阵，第一次把 |0⟩ 变成 |+⟩，第二次把 |+⟩ 变回 |0⟩，两条路径的 |1⟩ 振幅相消。这不是概率性的「回到」，而是确定的干涉结果，所以另外三项都不对。
+  - q: 点「采样 1000 次」的主要作用是什么？
+    options: ['把线路重复执行 1000 次以提高保真度', '把 1000 个比特叠加在一起', '把线路深度压缩到 1000 以内', '按当前概率抽 1000 个比特串，估计分布']
+    answer: 3
+    explain: 采样是对最终概率分布做统计，让你看到频率与理论概率的偏差，偏差随采样次数按 1/√N 缩小。它不改变线路、不提高保真度，也不改变比特数，所以其余三项都理解错了。
+sources:
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §4.2 与 §4.3'
+  - 'Qiskit 官方文档：Circuit construction 与 OpenQASM 导出'
+  - 'Cross et al., 2022, OpenQASM 3: A broader and deeper quantum assembly language, ACM Transactions on Quantum Computing'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+读十页「H 门把 |0⟩ 变成 |+⟩」，不如自己点两下，看概率条从一根变成两根。这一节不讲课，只告诉你怎么用实验室，以及三个值得亲手做一遍的练习。
+
+## 五件事
+
+加门：先点 TARGET 选比特，再点 H、X、CNOT 这些门，它会加到线路末尾。双门的控制位是你选中的比特，目标位是它的下一位——想换控制位，就先选另一个比特。
+
+插门与删门：线路里每两道门之间有一个「+」，点它就把当前门插到那个位置；也可以把门直接拖过去。门本身点一下就能删掉，删错了按撤销。
+
+采样：点「采样 1000 次」，按当前概率抽 1000 个比特串；再点一次会重新抽一批，柱高随之抖动，这就是 <Term id="shot">采样次数</Term> 有限带来的统计误差。
+
+导出与分享：展开 OpenQASM 2.0 可以复制到别的平台；点「复制分享链接」会把整条线路编进 URL，发给别人打开就是同一条线路。粘到真机之前，先确认比特顺序对不对。
+
+先把预设切到 Bell 态，用「下一步」走一遍。
+
+<Demo
+  kind="circuit"
+  props={{ qubits: 2 }}
+  label="线路实验室"
+  caption="默认就是 Bell 态线路，起点在第一个门之前。按两次「下一步」：H 之后是 |00⟩ 与 |10⟩ 各半，CNOT 之后才变成 |00⟩ 与 |11⟩ 各半——中间那一步正是纠缠发生的地方。"
+/>
+
+## 三个练习
+
+1. **做 Bell 态。** 清空线路，对 q0 做 <Term id="hadamard">H 门</Term>，再选中 q0 点 CNOT。概率条应该只剩 00 与 11，各约一半；如果只剩一根柱子在 00，说明 CNOT 没加上。
+2. **H 做两次。** 连着两个 H，看它是否回到 |0⟩；再试 H、Z、H 三步，结果一定是 |1⟩。两次 H 不是「随机再随机」，而是确定的相消干涉。
+3. **换控制位。** 把 TARGET 切到 q1 再点 CNOT，此时控制位是 q1、目标是 q0。重做 Bell 态，你会发现纠缠没造出来：q1 是 0，目标位什么也没发生，概率条只剩 00 与 10。要让 CNOT 造纠缠，控制位必须是那个处于叠加的比特。
+
+浏览器端的模拟器把整个态向量放在内存里，比特数上限是 14，实际练习建议不超过 8：再往上，概率柱状图与采样都会变慢，而且你看不清每一根柱子。
+
+<Misconception
+  note="概率条是「很多次测量的统计」，不是「下一次测量的预告」。单次测量只给你一个比特串。"
+>
+  <Fragment slot="wrong">柱子的高度就是下一次测量会得到的结果。</Fragment>
+  <Fragment slot="right">柱子是概率的估计值，来自大量采样；单次测量按这个分布随机落在一个比特串上。</Fragment>
+</Misconception>
+
+<Conclusion>
+  自己搭一条线路，比读十页解释管用。会加门、会单步、会采样、会导出 QASM，你就已经能把纸上的线路变成可检验的结果。下一步，是把它送到真机上，看噪声怎么改写它。
+</Conclusion>

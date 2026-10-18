@@ -1,0 +1,70 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../config';
+import { loadCourse } from '../lib/course';
+import '../styles/portal.css';
+
+const course = await loadCourse();
+---
+
+<BaseLayout
+  title="关于本站：怎么写的，凭什么信"
+  description="叠加学堂的编写原则、来源规范、勘误方式与授权说明。"
+  path="/about"
+>
+  <div class="doc-page prose">
+    <span class="eyebrow">关于</span>
+    <h1 class="section-title" style="font-size:clamp(28px,3.6vw,38px);margin:12px 0 18px">
+      怎么写的，凭什么信
+    </h1>
+
+    <p>
+      {site.name}是一个免费开放的量子计算学习站，目前有 {course.flat.length} 节正文、
+      12 个可交互演示。它不卖课，也不做任何产品推荐。
+    </p>
+
+    <h2>写给谁</h2>
+    <p>
+      写给「看过很多量子新闻，但说不清量子比特到底哪里不一样」的人。
+      不假设你学过线性代数，也不假装不需要数学：第 02 篇把真正用到的部分挑出来单独讲。
+    </p>
+
+    <h2>四条编写原则</h2>
+    <ol>
+      <li><strong>一节课只说一件事。</strong>每节 500–750 字，一条主张，一个演示，三道题。</li>
+      <li><strong>能跑的不写成图。</strong>偏振片、双缝、布洛赫球、线路、Grover、纠错、BB84 全部可以自己改参数。</li>
+      <li><strong>讲不清就说讲不清。</strong>测量问题、量子优势的边界、容错路线的取舍，都不装作有定论。</li>
+      <li><strong>每个断言都能追到来源。</strong>文末列出教材章节或原始论文；数值只写量级。</li>
+    </ol>
+
+    <h2>来源与审校</h2>
+    <p>
+      主线依据 Nielsen &amp; Chuang《Quantum Computation and Quantum Information》与
+      Preskill 的量子信息讲义；直觉部分参考 Feynman《QED》与 Bell 1964 原文；
+      算法与工程部分参考原始论文（Shor 1994、Grover 1996、Preskill 2018 的 NISQ 论述）。
+      演示里的数值由本站自研的 <code>qsim</code> 引擎计算，该引擎用手写的 numpy 参照实现做过逐振幅比对。
+    </p>
+
+    <h2>勘误</h2>
+    <p>
+      讲错了请直接写信：<a href={`mailto:${site.email}`}>{site.email}</a>，
+      邮件标题写清课节名即可。确认后会在该节文末标注修订日期与改动内容，不悄悄改掉。
+    </p>
+
+    <h2>授权</h2>
+    <p>
+      正文与插图采用 CC BY-NC-SA 4.0：署名、非商业、相同方式共享。
+      代码（含 qsim 引擎与演示组件）采用 MIT。
+    </p>
+
+    <h2>免责</h2>
+    <p>
+      本站内容是科普与教学材料，不是投资建议，也不构成对任何厂商技术路线的评价。
+      量子计算行业变化很快，涉及「当前进展」的表述请以原始文献与官方文档为准。
+    </p>
+
+    <p class="tiny muted" style="margin-top:32px">
+      建站于 {site.startYear} · 最近一次内容更新见各节课文末
+    </p>
+  </div>
+</BaseLayout>

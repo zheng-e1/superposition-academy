@@ -1,0 +1,73 @@
+---
+slug: benchmarking
+title: 随机基准与量子体积：指标怎么读
+thesis: 一个数字概括不了一台机器
+part: p-hw
+topic: t-engineer
+tag: 概念
+minutes: 7
+order: 612
+demos: ['noise']
+quiz:
+  - q: '厂商报「单门保真度 99.9%」，这个数最准确的来源是什么？'
+    options: ['随机 Clifford 门上的平均错误率，按马尔可夫模型拟合', '整条算法线路的成功率', '读出 0 与 1 的判断正确率', '所有门里最好的那一个的保真度']
+    answer: 0
+    explain: '随机基准把一长串随机门的错误累积成衰减曲线，再折算成每次门的平均错误率，并尽量扣掉制备与测量误差。它既不是某个算法的成功率，也不是读出错误或最好那个门，所以其余三项都错。'
+  - q: 'T₁ 描述的到底是什么？'
+    options: ['相位退相干的时间尺度', '能量弛豫的时间尺度，即从 |1⟩ 掉回 |0⟩ 的大致时间', '双门错误率', '读出错误率']
+    answer: 1
+    explain: 'T₁ 是能量弛豫：激发态把能量交给环境，布居慢慢回到基态；相位失去关联的时间尺度是 T₂。两者都不等于门错误率，读出错误又是另一本账，所以另外三项都不对。'
+  - q: '一台设备的 T₂ 从 100 微秒提到 200 微秒，可双门错误率没降。下面哪种解释最合理？'
+    options: ['测量一定出了问题', 'T₂ 只是上限之一，门错误还受门时间、串扰、泄漏与读出限制', 'T₂ 与门错误率完全无关', '设备的比特数一定变少了']
+    answer: 1
+    explain: '相干时间给的是「最多能相干多久」，门错误还取决于门有多快、驱动多强、邻近比特的串扰与读出误差。说完全无关也不对：T₂ 太短时它会成为硬上限；比特数与这件事没有必然联系，所以其余三项都不成立。'
+sources:
+  - 'Knill et al., 2008, Randomized benchmarking of quantum gates, Physical Review A'
+  - 'Cross et al., 2019, Validating quantum computers using randomized model circuits, Physical Review A'
+  - 'IBM Quantum 官方文档：Randomized benchmarking 与 Quantum volume'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+两台机器都报「双门保真度 99.9%」。一台能跑两百层，一台跑到五十层就散架。数字一样，机器不一样——因为那个数是某个测试的平均值，而测试带着自己的假设。
+
+## 随机基准：平均数是怎么来的
+
+随机基准的做法：随机挑一串 Clifford 门，长度 $m$，末尾补一个把整串收回初态的门，然后测回到 $|0\rangle$ 的概率。$m$ 变长，成功概率按 $p^m$ 衰减，从 $p$ 反推每次门的平均错误率：
+
+$$
+r=\frac{d-1}{d}(1-p)
+$$
+
+$d$ 是维度，单比特取 2。关键在「随机」与「平均」：它对随机 Clifford 门取平均，并假设错误是马尔可夫的、与门无关。串扰、泄漏到 $|2\rangle$、关联错误都不在这个模型里。所以 <Term id="fidelity">保真度</Term> 的这个数字干净、可比较，但不完整。
+
+想知道某一个特定双门有多好，要做插入式随机基准：把这一个门夹在随机序列中间，比较衰减斜率的变化。斜率变陡多少，才是这个门的账。
+
+<Demo
+  kind="noise"
+  label="保真度与深度"
+  caption="把纵轴当成「每一步做对的概率」，看它怎么随深度塌下去。真实的机器还要再叠上串扰、泄漏与读出，那些不在单门数字里。"
+/>
+
+## T₁、T₂ 与量子体积
+
+T₁ 是能量弛豫时间，T₂ 是相位弛豫时间。它们是时间，不是错误率；要换算成错误率，得看你这段时间里做了什么。粗略的量级关系是 $r\sim t_{\text{gate}}/T_2$，它连串扰与读出都没算进去。
+
+<Term id="quantum-volume">量子体积</Term> 把比特数、门保真度、连通性、测量与编译揉成一个数：取边长 $n$ 的方形线路，随机化后跑，要求重输出概率超过 2/3，能通过的最大 $n$ 给出 $2^n$。它衡量整机跑一条方形线路能多宽多深，不衡量某个应用快多少。
+
+读厂商指标，可以问四个问题：这是哪个门、几位比特上的？报的是平均值、中位数还是最好值？测试线路与编译假设是什么？含不含读出与串扰？
+
+<Misconception
+  note="时间与错误率是两个量纲。把 T₂ 当成「保真度」，就像把油箱容量当成油耗。"
+>
+  <Fragment slot="wrong">T₂ 越长，门错误率就越低，所以看 T₂ 就够了。</Fragment>
+  <Fragment slot="right">T₂ 只是上限之一；门时间、驱动强度、串扰、泄漏与读出都进错误率，长 T₂ 是必要条件，不是充分条件。</Fragment>
+</Misconception>
+
+<Conclusion>
+  随机基准给的是随机门上的平均错误率，量子体积给的是整机跑方形线路的能力，T₁ 与 T₂ 是时间而不是错误率。任何单个数字都概括不了一台机器；读指标时先问：它在什么条件下测的，测的到底是哪一层。
+</Conclusion>

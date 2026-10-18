@@ -1,0 +1,80 @@
+---
+slug: bell-state
+title: Bell 态：单独看是噪声，一起看是完美
+thesis: Bell 态的单比特部分完全没有信息，相关性全在联合态里
+part: p-entangle
+topic: t-bell
+tag: 概念
+minutes: 7
+order: 411
+demos: ['bell']
+quiz:
+  - q: 'Alice 与 Bob 共享 $|\Phi^+\rangle$。Alice 在 Z 基测得 0 之后，Bob 也在 Z 基测量，他会得到什么？'
+    options: ['一定是 0', '一定是 1', '各一半', '取决于 Alice 用哪台仪器']
+    answer: 0
+    explain: '$|\Phi^+\rangle$ 只有 $|00\rangle$ 与 $|11\rangle$ 两项，Alice 得 0 后联合态投影到 $|00\rangle$，Bob 必得 0。得 1 的是反号的那类态；「各一半」忽略了两端的相关性。'
+  - q: '接上题，Bob 把自己的测量轴转过 90° 再测，两人同号的概率是多少？'
+    options: ['100%', '50%', '0%', '取决于 Alice 先测还是 Bob 先测']
+    answer: 1
+    explain: '同号概率是 $\cos^2(\varphi/2)$，$\varphi=90^\circ$ 时等于 $\cos^2 45^\circ=1/2$。要区分两件事：同号只剩一半说明两边配不成对、关联强度 $E=\cos\varphi$ 归零；要到 $\varphi=180^\circ$ 才会每对都反号。测量先后顺序不影响这个统计。'
+  - q: '贝尔不等式被实验违反，最直接的结论是什么？'
+    options: ['量子力学的计算有误', '不存在同时满足局域性与实在性的隐变量理论', '信息可以超光速传递', '每个比特的测量结果可以提前预测']
+    answer: 1
+    explain: '违反排除的是一整类局域隐变量模型，不是量子力学的概率规则。超光速与提前预测都不被实验支持；量子力学的预测与实验一致，谈不上「计算有误」。'
+sources:
+  - 'Bell, 1964, On the Einstein Podolsky Rosen paradox, Physics'
+  - 'Clauser, Horne, Shimony & Holt, 1969, Proposed experiment to test local hidden-variable theories, Physical Review Letters'
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §2.2.8（复合系统）'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+把两个比特分开看，各自都是一半一半的随机；合起来看，它们却永远同步。Bell 态把「信息在局部、相关性在整体」这件事推到了极限。
+
+## 四个态，一组基
+
+$$
+|\Phi^\pm\rangle=\frac{|00\rangle\pm|11\rangle}{\sqrt2},\qquad
+|\Psi^\pm\rangle=\frac{|01\rangle\pm|10\rangle}{\sqrt2}
+$$
+
+四个态两两正交，任意两比特态都能用它们展开。它们都不能写成两个单比特态的乘积。以 $|\Phi^+\rangle$ 为例，无论怎么试，都找不到 $(\alpha|0\rangle+\beta|1\rangle)\otimes(\gamma|0\rangle+\delta|1\rangle)$ 等于它。这不是「还没找到」，而是不存在——这就是<Term id="entanglement">纠缠</Term>的定义。
+
+单看任何一个比特，约化<Term id="density-matrix">密度矩阵</Term>都是 $I/2$。测量结果各一半，与另一个比特做了什么无关。信息不在单比特里，只在「同号还是反号」这种联合性质里。
+
+## 转一个角度，相关性就变
+
+让 Alice 固定在 Z 基测量，Bob 把自己的测量轴转过 $\varphi$。对 $|\Phi^+\rangle$，两人得到同号的概率是
+
+$$
+P(\text{同号})=\cos^2\frac{\varphi}{2}=\frac{1+\cos\varphi}{2}
+$$
+
+$\varphi=0$ 时永远同号；$\varphi=90^\circ$ 时同号只剩一半，关联强度 $E=\cos\varphi$ 归零；$\varphi=180^\circ$ 时永远反号。中间按半角的余弦平方过渡——是 $\varphi/2$，不是 $\varphi$，这是最容易记错的一处。
+
+这条曲线不是「还没找到隐藏的说明书」，而是任何局域隐变量模型都给不出的。贝尔不等式把它变成可检验的命题：如果每个比特在测量前就带着确定的值，而且两边的选择互不影响，那么某种组合的平均值必须落在一条界内。实验看到的是对这个界的违反。
+
+结论不是「量子力学很奇怪」，而是：不存在同时满足局域性与实在性的隐变量理论。要强调统计——单次测量只给一个 0 或 1，违反是在大量配对上的平均里显现的。
+
+把 $\varphi$ 拖到 $180^\circ$，同号占比才归零；停在 $90^\circ$ 时它是 50%，但右侧的关联强度 $E$ 已经归零。
+
+<Demo
+  kind="bell"
+  label="两端一起看"
+  caption="A 端固定在 Z 基，拖动 B 端的 φ：0° 时每对都同号，90° 时只剩一半同号（关联归零），180° 时才每对都反号。多点几次「测 200 对」，看同号占比贴着 cos²(φ/2) 走。"
+/>
+
+<Misconception
+  note="「都有叠加」不等于「有纠缠」；纠缠看的是能不能写成张量积，而不是单个比特是不是叠加。"
+>
+  <Fragment slot="wrong">Bell 态只是「两个比特都处于叠加」，和两个独立的 |+⟩ 没有区别。</Fragment>
+  <Fragment slot="right">|+⟩|+⟩ 展开后有四项，|Φ+⟩ 只有两项；前者单看是纯态，后者单看是最大混态。</Fragment>
+</Misconception>
+
+<Conclusion>
+  <Term id="bell-state">Bell 态</Term>的单比特部分没有信息，全部信息都在联合态里。四个态构成一组正交基；转过角度 $\varphi$，同号概率按 $\cos^2(\varphi/2)$ 变化，关联强度按 $\cos\varphi$ 变化；贝尔不等式的违反则排除了局域隐变量。它不是「两个比特各自随机」，而是「随机得完全同步」。
+</Conclusion>

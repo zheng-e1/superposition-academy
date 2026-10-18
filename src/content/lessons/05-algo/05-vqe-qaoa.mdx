@@ -1,0 +1,66 @@
+---
+slug: vqe-qaoa
+title: VQE 与 QAOA：近期设备能做什么
+thesis: 变分算法把难题分给经典优化器，代价是大量采样
+part: p-algo
+topic: t-variational
+tag: 深入
+minutes: 8
+order: 531
+demos: []
+quiz:
+  - q: 在 VQE 的循环里，经典计算机主要负责哪一步？
+    options: ['制备量子态', '根据测量结果调整参数，寻找更低的能量', '执行受控门', '做量子纠错']
+    answer: 1
+    explain: 量子部分只负责按参数制备态并测量；经典优化器读这些期望值，提出下一组参数。把 VQE 说成「纯量子算法」，会忽略它一半的计算量在经典侧。
+  - q: 什么叫 barren plateau（贫瘠高原）？
+    options: ['量子态在测量后坍缩', '损失函数的梯度随比特数增加指数变小，优化器几乎收不到方向', '采样次数太少导致的统计噪声', '量子比特的相干时间太短']
+    answer: 1
+    explain: 在一些参数化线路里，梯度的方差随比特数指数衰减，参数怎么动代价函数都几乎不变。它不是噪声问题，而是优化景观本身变平；换初始化、局部代价或结构化线路只能缓解，没有通用解法。
+  - q: 为什么 VQE 的每次评估都很贵？
+    options: ['因为要重复制备和测量，用采样估计期望值', '因为每次都要重新造一台机器', '因为经典优化器需要做 QFT', '因为必须把态复制很多份']
+    answer: 0
+    explain: 一个期望值要拆成多个可观测量的测量，每个都要重复若干次采样，误差只按 1/√shots 下降。线路越深、项数越多，评估越贵；这正是「浅线路」优势的另一面。
+sources:
+  - 'Peruzzo et al., 2014, A variational eigenvalue solver on a photonic quantum processor, Nature Communications'
+  - 'Farhi, Goldstone & Gutmann, 2014, A quantum approximate optimization algorithm'
+  - 'McClean, Boixo, Smelyanskiy, Babbush & Neven, 2018, Barren plateaus in quantum neural network training landscapes, Nature Communications'
+updated: 2026-10-18
+---
+
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+<Term id="vqe">VQE</Term> 和 <Term id="qaoa">QAOA</Term> 都不像传统「算法」：它们交给你一张带旋钮的线路图，旋钮由经典计算机来拧。量子部分负责制备态和测量，经典部分负责看数字、调参数，来回循环。
+
+## 参数化线路加一个经典优化器
+
+VQE 的目标通常是基态能量：把分子或材料的 <Term id="hamiltonian">哈密顿量</Term> 拆成若干可测项，线路按参数 $\theta$ 制备试探态，测量每一项的期望值再加起来。经典优化器改 $\theta$，让这个数往下走。
+
+QAOA 的结构更像交替序列：一层代价哈密顿量、一层混合哈密顿量，重复 $p$ 次，参数是每层的角度。它常被用在组合优化上，比如 MaxCut；$p$ 越大，线路越深，能表达的解空间也越大。
+
+两者共享同一个循环：量子评估，经典更新。这就是「变分」：量子侧不直接给答案，只给一个可优化的数。
+
+## 浅线路的代价
+
+近期设备没有容错，深线路跑不完。变分线路可以只做几层，把深度压在相干时间以内，所以它成了 <Term id="nisq">NISQ</Term> 设备上的主流框架。
+
+代价在循环里。每次评估都要把同一个线路重复 <Term id="shot">采样</Term> 很多次（记为 $S$），误差按 $1/\sqrt{S}$ 下降；参数一多，要评估的点也变多。更麻烦的是贫瘠高原：在某些参数化线路里，梯度随比特数指数变小，优化器几乎收不到方向。
+
+「线路浅」不等于「便宜」：它换掉相干时间压力，换来采样开销和优化难度。
+
+截至 2026 年公开报道的量级，还没有一个变分实验在真实化学或工业优化问题上稳定超过经典方法。演示多集中在可经典模拟的小规模问题上；规模一上去，噪声、采样和优化三重成本会一起涨。
+
+这不意味着 VQE 没有价值：它是研究含噪设备的有用框架。但把它当成「近期就能商用」的解法，是把原理上的可行性当成了工程上的临近。
+
+<Misconception
+  note="变分算法能容忍一定噪声，不等于噪声消失；它把纠错换成了错误缓解，代价是精度和采样量。"
+>
+  <Fragment slot="wrong">VQE 不需要纠错，所以近期的量子计算机就能用它解决真实的化学问题。</Fragment>
+  <Fragment slot="right">浅线路只降低了对相干时间的要求，采样成本、测量误差和贫瘠高原仍然在；真实问题上的优势还没有被证明。</Fragment>
+</Misconception>
+
+<Conclusion>
+  VQE 与 QAOA 把计算拆成两半：量子侧制备参数化态并测量，经典侧优化参数。它们适合含噪设备，是因为线路可以很浅；但每次评估都要大量采样，优化还可能掉进贫瘠高原。对「近期实用」的说法，先问三个问题：多少比特、多少采样、和哪个经典方法比。
+</Conclusion>

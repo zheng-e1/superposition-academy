@@ -1,0 +1,91 @@
+---
+slug: pauli-gates
+title: X/Y/Z：三个转轴
+thesis: 泡利门就是布洛赫球上的 180° 旋转
+part: p-qubit
+topic: t-gates
+tag: 概念
+minutes: 6
+order: 312
+demos: ['bloch']
+quiz:
+  - q: 忽略全局相位，X 作用在 |+⟩ 上得到什么？
+    options:
+      - "|−⟩"
+      - "|+⟩"
+      - "|0⟩"
+      - "|1⟩"
+    answer: 1
+    explain: "|+⟩ 是 X 的本征态，本征值为 +1，所以 X|+⟩=|+⟩：箭头在 x 轴上绕自身转 180°，仍然指向原方向。把 |+⟩ 变成 |−⟩ 的是 Z 门。"
+  - q: Z 作用在 |1⟩ 上，能测出什么差别？
+    options:
+      - 能，测量会得到 −1 而不是 1
+      - 不能，整个态只是乘了 −1，全局相位不可观测
+      - 能，概率会变成负数
+      - 不能，因为 Z 不是酉矩阵
+    answer: 1
+    explain: Z|1⟩=−|1⟩，对单个基态而言这是全局相位，测量仍以 100% 给出 1，取不到任何差别。Z 真正的作用要在叠加里才显形，它改变的是相对相位。
+  - q: 先测 X 再测 Z，与先测 Z 再测 X，结果的统计不一样。原因是？
+    options:
+      - 测量仪器存在误差
+      - X 与 Z 不对易，没有共同本征态，第一次测量改变了第二次面对的态
+      - Z 不是可观测量
+      - 第二次测量总会重复第一次的结果
+    answer: 1
+    explain: XZ 不等于 ZX，两者没有共同的完备本征基，第一次测量把态投影到自己的基上，第二次面对的已经不是原来的态。这是非对易性在测量顺序上的直接后果。
+sources:
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §4.2'
+  - 'Qiskit 官方文档，PauliGate 与 XGate、YGate、ZGate 的矩阵定义'
+  - 'Preskill, Quantum Computation 讲义（Caltech Ph219），单比特门与对易关系部分'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+三个门都被说成「翻转」，可在球上看，它们翻的方向完全不同。搞清这一点，单比特门基本就不用背了。
+
+## 三个矩阵，三根轴
+
+$$
+X=\begin{pmatrix}0&1\\1&0\end{pmatrix},
+\quad
+Y=\begin{pmatrix}0&-i\\i&0\end{pmatrix},
+\quad
+Z=\begin{pmatrix}1&0\\0&-1\end{pmatrix}
+$$
+
+X 交换 $|0\rangle$ 与 $|1\rangle$，在球上绕 x 轴转 180°。Z 不动 $|0\rangle$，给 $|1\rangle$ 添一个负号，绕 z 轴转 180°。Y 既交换比特又添相位，绕 y 轴转。三个都是 <Term id="pauli">泡利矩阵</Term>，都厄米、都酉，所以都等于自己的逆：连按两次回到原处。
+
+Y 是三者里唯一带虚数的，它的两个本征态落在赤道上、方向是 ±y。把三个门依次乘起来得到 $XYZ=iI$；那个 i 不是装饰，它正是三个门两两不对易的记账方式：换一个顺序乘，结果就换一个符号。
+
+按 X、Z、Y，看箭头怎么动：有的把它翻到另一侧，有的让它待在原地。
+
+<Demo
+  kind="bloch"
+  label="X / Y / Z"
+  caption="依次按 X、Z、Y：X 把北极送到南极，Z 让箭头留在原地不动，Y 又把它送回北极。"
+/>
+
+## 改比特，还是改相位
+
+X 改的是比特值：$|0\rangle$ 变 $|1\rangle$。Z 改的是 <Term id="phase">相位</Term>：$|0\rangle$ 不动，$|1\rangle$ 变号。对 $|+\rangle$，X 不动它，Z 把它送到 $|-\rangle$。
+
+Z 还是一整族相位门的原型：S 与 T 分别是它的二分之一次方和四分之一次方，只改相位，不改比特值。
+
+三个门同时还是三个方向上的测量算符：本征值只有 +1 与 −1，正好对应球上投影的正负。所谓「测 X」，就是把态投影到 X 的本征基上，再用这两个数记账。
+
+$XZ\neq ZX$，两个门不对易。在单个比特上两者只差一个全局负号，测不出来；可一旦它们被夹进叠加，或者作为受控门使用，这个负号就变成相对相位，结果完全不同——比如在 H 与 H 之间插一个 Z，输出就从 $|0\rangle$ 换成 $|1\rangle$。同理，先测 X 再测 Z 与反过来，联合统计也不一样，因为它们没有共同的本征态。全局相位看不见，相对相位看得见，差别就在这里。
+
+<Misconception
+  note="只有当 −1 乘在整个态上，它才是全局相位、才看不见；乘在其中一个分支上，它就成了可测的相对相位。"
+>
+  <Fragment slot="wrong">Z 门只是给态乘了一个 −1，什么也没改变，可以直接忽略。</Fragment>
+  <Fragment slot="right">作用在叠加的某个分支上时，Z 改的是相对相位，会改变后续干涉的结果。</Fragment>
+</Misconception>
+
+<Conclusion>
+  X 绕 x 轴翻，Y 绕 y 轴翻，Z 绕 z 轴翻，三者都是布洛赫球上的 180° 旋转。X 改比特值，Z 改相位；因为 X 与 Z 不对易，「差一个负号」在叠加与受控操作里会变成可观测的后果。全局相位看不见，相对相位看得见。
+</Conclusion>
