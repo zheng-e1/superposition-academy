@@ -1,8 +1,10 @@
-import { button, el, pct, toggle } from './kit';
+﻿import { button, el, pct, toggle } from './kit';
 
 /**
  * BB84：Alice 随机选比特与基，Bob 随机选基，基相同时保留。
  * 打开 Eve 后，她也要随机选基测量再转发，筛后误码率会跳到 25%。
+ * 单批只有 8 轮、筛后约 4 位，统计噪声太大：判决用「累计」，
+ * 至少攒到 20 位再下结论，避免把有窃听的一批误判成安全。
  */
 export function mount(host: HTMLElement) {
   const table = el('div', { class: 'bb-table' });
@@ -12,7 +14,10 @@ export function mount(host: HTMLElement) {
   host.append(table, verdict, readoutRow, controls);
 
   const ROUNDS = 8;
+  const MIN_SAMPLE = 20;
   let eve = false;
+  let totalBits = 0;
+  let totalErrs = 0;
   let rows: {
     bit: number;
     ab: number;
@@ -39,6 +44,11 @@ export function mount(host: HTMLElement) {
       const kept = bb === ab;
       rows.push({ bit, ab, bb, bbit, kept, err: kept && bbit !== bit });
     }
+    for (const r of rows) {
+      if (!r.kept) continue;
+      totalBits += 1;
+      if (r.err) totalErrs += 1;
+    }
     paint();
   };
 
@@ -58,9 +68,10 @@ export function mount(host: HTMLElement) {
     const keptRows = rows.filter((r) => r.kept);
     const errs = keptRows.filter((r) => r.err).length;
     const rate = keptRows.length ? errs / keptRows.length : 0;
+    const totalRate = totalBits ? totalErrs / totalBits : 0;
 
-    sifted.value.textContent = `${keptRows.length} / ${ROUNDS} 位`;
-    qber.value.textContent = keptRows.length ? pct(rate, 0) : '—';
+    sifted.value.textContent = `${keptRows.length} / ${ROUNDS} 位 · 累计 ${totalBits} 位`;
+    qber.value.textContent = totalBits ? `${pct(totalRate, 0)}（累计）` : '—';
 
     table.innerHTML = `
       <div class="bb-row bb-head">
@@ -85,12 +96,15 @@ export function mount(host: HTMLElement) {
     if (!keptRows.length) {
       verdict.dataset.tone = 'idle';
       verdict.textContent = '还没有保留位。点「再跑一批」。';
-    } else if (rate > 0.11) {
+    } else if (totalBits < MIN_SAMPLE) {
+      verdict.dataset.tone = 'idle';
+      verdict.textContent = `累计只有 ${totalBits} 位筛后密钥（本批 ${keptRows.length} 位），样本太少，先别下结论——多点几次「再跑一批」攒到 ${MIN_SAMPLE} 位以上。`;
+    } else if (totalRate > 0.11) {
       verdict.dataset.tone = 'bad';
-      verdict.textContent = `误码率 ${pct(rate, 0)} 超过 11% 阈值 —— 这一批密钥必须丢弃，信道上有窃听者。`;
+      verdict.textContent = `累计误码率 ${pct(totalRate, 0)}（${totalErrs} / ${totalBits} 位）超过 11% 阈值 —— 这批密钥必须丢弃，信道上有窃听者。`;
     } else {
       verdict.dataset.tone = 'good';
-      verdict.textContent = `误码率 ${pct(rate, 0)} 低于 11% 阈值 —— 可以继续做保密性放大，生成最终密钥。`;
+      verdict.textContent = `累计误码率 ${pct(totalRate, 0)}（${totalErrs} / ${totalBits} 位）低于 11% 阈值 —— 可以继续做保密性放大，生成最终密钥。`;
     }
   };
 
@@ -98,6 +112,8 @@ export function mount(host: HTMLElement) {
     value: false,
     onChange: (v) => {
       eve = v;
+      totalBits = 0;
+      totalErrs = 0;
       run();
     },
   });
@@ -107,8 +123,8 @@ export function mount(host: HTMLElement) {
 
   return {
     replay: () => {
-      eve = false;
-      eveToggle.setAttribute('aria-pressed', 'false');
+      totalBits = 0;
+      totalErrs = 0;
       run();
     },
   };

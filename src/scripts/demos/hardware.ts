@@ -5,6 +5,7 @@ import { el } from './kit';
 interface Row {
   name: string;
   qubits: string;
+  qubitsN: number;
   one: number;
   two: number;
   t2: string;
@@ -17,6 +18,7 @@ const ROWS: Row[] = [
   {
     name: '超导（transmon）',
     qubits: '50 – 1000+',
+    qubitsN: 1000,
     one: 99.9,
     two: 99.4,
     t2: '~100 µs',
@@ -27,6 +29,7 @@ const ROWS: Row[] = [
   {
     name: '离子阱',
     qubits: '20 – 60',
+    qubitsN: 60,
     one: 99.99,
     two: 99.7,
     t2: '~1 s',
@@ -37,6 +40,7 @@ const ROWS: Row[] = [
   {
     name: '中性原子',
     qubits: '100 – 1000+',
+    qubitsN: 800,
     one: 99.9,
     two: 99.5,
     t2: '~1 – 10 s',
@@ -47,6 +51,7 @@ const ROWS: Row[] = [
   {
     name: '光子',
     qubits: '数十 – 数百',
+    qubitsN: 200,
     one: 99.9,
     two: 99.0,
     t2: '—',
@@ -57,6 +62,7 @@ const ROWS: Row[] = [
   {
     name: '拓扑',
     qubits: '个位数（实验）',
+    qubitsN: 5,
     one: 99.0,
     two: 95.0,
     t2: '—',
@@ -118,8 +124,8 @@ export function mount(host: HTMLElement) {
   const render = () => {
     renderHead();
     const rows = [...ROWS].sort((a, b) => {
-      const av = a[sortKey];
-      const bv = b[sortKey];
+      const av = sortKey === 'qubits' ? a.qubitsN : a[sortKey];
+      const bv = sortKey === 'qubits' ? b.qubitsN : b[sortKey];
       if (typeof av === 'number' && typeof bv === 'number') return desc ? bv - av : av - bv;
       return desc
         ? String(bv).localeCompare(String(av), 'zh-CN')
