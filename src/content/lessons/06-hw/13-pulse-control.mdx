@@ -1,0 +1,64 @@
+---
+slug: pulse-control
+title: 从门到脉冲：门是一个理想化的说法
+thesis: 真正作用在硬件上的是有形状的脉冲
+part: p-hw
+topic: t-engineer
+tag: 深入
+minutes: 8
+order: 615
+demos: []
+quiz:
+  - q: 一个单比特门的旋转角由什么决定？
+    options: ['脉冲的绝对相位', '脉冲包络对时间的积分', '比特所处的温度', '读出腔的共振频率']
+    answer: 1
+    explain: 旋转角等于 Rabi 频率对门时间的积分，包络的形状与时长合起来决定它。相位决定的是绕哪根轴转，温度与读出腔频率会影响错误率，但不直接定义旋转角，所以另外三项都不对。
+  - q: DRAG 修正在解决什么问题？
+    options: ['脉冲频谱过宽造成的泄漏', '读出速度太慢', '稀释制冷机温度不够低', '比特之间耦合太弱']
+    answer: 0
+    explain: 脉冲越短，频谱越宽，越容易把 |1⟩ 也推到 |2⟩；DRAG 给包络加一个正交分量，抵消通往 |2⟩ 的路径。它不改变制冷、读出速度或耦合强度，所以另外三项都不对。
+  - q: 为什么门参数需要周期性地重新标定？
+    options: ['量子门本身带有随机性', '温度、磁通与电子学漂移会让共振频率和 Rabi 幅度变化', '软件升级会自动改掉门', '比特数会自己变化']
+    answer: 1
+    explain: 共振频率与 Rabi 频率会随温度、磁通和线缆状态缓慢漂移，昨天调好的 π 脉冲今天可能只转了 0.98π。门的量子随机性不是漂移的原因，软件与比特数也不会让校准失效，所以另外三项都不对。
+sources:
+  - 'Motzoi, Gambetta, Rebentrost & Wilhelm, 2009, Simple pulses for elimination of leakage in weakly nonlinear qubits, Physical Review Letters'
+  - 'Kjaergaard et al., 2020, Superconducting Qubits: Current State of Play, Annual Review of Condensed Matter Physics'
+  - 'IBM Quantum 官方文档：Pulse 控制与校准'
+updated: 2026-10-18
+---
+
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+你说「在 q0 上做一个 X 门」。硬件收到的不是一条指令，而是一段几个 GHz 的微波：有包络、有相位、持续几十纳秒。
+
+## 门是脉冲的形状
+
+超导比特的驱动可以写成 $H_d(t)=\hbar\Omega(t)(\cos\phi\,X+\sin\phi\,Y)/2$。$\Omega(t)$ 是包络，$\phi$ 是相位。在共振驱动下，布居在两个能级之间来回振荡，叫 Rabi 振荡；旋转角是包络对时间的积分：
+
+$$\theta=\int_0^T\Omega(t)\,dt$$
+
+所以「转 90°」不是一条抽象指令，而是「把幅度与时长配到积分等于 π/2」。改幅度、改时长、改相位，都是在改这个积分与转轴。离子阱换用激光或微波，脉冲形状不同，逻辑一样：包络决定转多少。
+
+## 快、泄漏与漂移
+
+脉冲不能太慢：门时间一长，退相干就把相位吃掉了。也不能太快：<Term id="transmon">超导量子比特</Term>的非谐性只有几百 MHz，脉冲越短，频谱越宽，越容易把 |1⟩ 也推到 |2⟩，这叫泄漏。工程上把门时间放在几十纳秒，再用 DRAG 修正：给包络加一个正交的小分量，抵消掉通往 |2⟩ 的那条路径。
+
+双比特门同理，只是「形状」变成耦合的开启与关闭曲线。门时间、泄漏、串扰三者互相牵制。
+
+脉冲的参数不是写死的常数。温度变化、磁通漂移、线缆与电子学的老化，都会让共振频率与 Rabi 频率慢慢走。今天调好的 π 脉冲，明天可能只转了 0.98π。
+
+所以实验流程里有一整套周期性重标定：先用 Rabi 振荡找幅度，用 Ramsey 找频率与相位，再用随机基准确认门错误没有变差。校准不是「装机器时做一次」，而是运行的一部分。
+
+<Misconception
+  note="门是写给算法看的抽象；脉冲才是硬件真正执行的东西。中间的翻译并不免费。"
+>
+  <Fragment slot="wrong">门就是那个矩阵，脉冲怎么打不影响门的结果。</Fragment>
+  <Fragment slot="right">脉冲的包络、时长、相位与校准状态直接决定旋转角与泄漏；同一个门在不同校准下，保真度并不相同。</Fragment>
+</Misconception>
+
+<Conclusion>
+  门是理想化的说法，硬件上执行的是有包络、有相位、有时长的脉冲。旋转角由包络的积分决定，脉冲太慢会被退相干吃掉，太快会泄漏到高能级。校准还会漂移，所以重标定是运行的一部分。
+</Conclusion>

@@ -1,0 +1,73 @@
+---
+slug: qkd-devices
+title: QKD 落地：协议之外还有设备
+thesis: 协议安全不等于设备安全
+part: p-app
+topic: t-crypto
+tag: 实战
+minutes: 8
+order: 714
+demos: ['bb84']
+quiz:
+  - q: 诱骗态方法主要解决哪一类问题？
+    options: ['探测器被强光致盲', '光源一次发出多个光子带来的光子数分离攻击', '光纤损耗导致的距离限制', '经典计算机对密钥的暴力搜索']
+    answer: 1
+    explain: 诱骗态通过随机改变脉冲强度，让窃听者在多光子脉冲上的取舍留下统计痕迹，从而给光子数分离攻击设上界。致盲属于探测器侧信道，损耗是链路距离问题，暴力搜索针对的是密钥空间而不是光源，所以另外三项都不对。
+  - q: 探测器致盲攻击得手，说明 BB84 的数学证明有漏洞吗？
+    options: ['是，证明本身写错了', '不是，设备偏离证明所依赖的模型，安全性结论不再自动适用', '是，只要把密钥加长就能补上', '不是，因为 QKD 本来就不安全']
+    answer: 1
+    explain: 致盲攻击利用的是探测器在强光下进入经典模式，协议与证明都没有错，错在实现不满足模型假设。加长密钥解决不了侧信道，而「QKD 本来就不安全」把实现问题错记成了协议问题。
+  - q: 一条跨城链路用可信节点中继，安全的准确含义是什么？
+    options: ['端到端仍是信息论安全的', '每一段是 QKD，但节点必须被信任，端到端安全性降到节点安全', '可信节点会让误码率归零', '有了可信节点就不再需要 QKD']
+    answer: 1
+    explain: 可信节点在中间解密再加密，长链路由若干段 QKD 拼接，安全性取决于每个节点是否真的可信。端到端的信息论安全要靠量子中继而不是可信节点；节点不会消除误码，也不会取代 QKD 本身。
+sources:
+  - 'Bennett & Brassard, 1984, Quantum Cryptography: Public Key Distribution and Coin Tossing, Proceedings of the IEEE International Conference on Computers, Systems and Signal Processing'
+  - 'Lo, Curty & Tamaki, 2014, Secure quantum key distribution, Nature Photonics'
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §12'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+一条 QKD 链路验收通过，协议测试全绿，误码率也正常。三个月后，安全团队用一台廉价激光器从外部照进探测器，整条链路就交出了密钥。协议没有错，错的是协议假设的那台设备。
+
+## 从协议到机柜
+
+<Term id="bb84">BB84</Term> 的安全性证明建立在一个模型上：光源每次只发一个光子，信道只做损耗，探测器按量子力学工作。真实机柜里的每一条都不成立。
+
+光源用的是衰减激光，输出是弱相干态，有一定概率一次发出两个以上光子。窃听者可以拿走一个、让另一个通过，这叫光子数分离攻击。诱骗态方法把不同强度的脉冲混在一起发，让这种攻击在统计上露馅。它是 QKD 从论文走向工程的第一个补丁，也说明证明与实现之间隔着一层。
+
+探测器一侧更难缠。强光可以把雪崩二极管致盲，让它进入经典模式；两个探测器效率不完全相同，也会泄漏基的信息。这些统称侧信道，攻击的是设备，不是数学。
+
+<Demo
+  kind="bb84"
+  label="BB84 与窃听"
+  caption="8 轮里 Alice 与 Bob 各随机选基；打开 Eve 开关，她猜错基就会扰动状态，多跑几批会看到筛后 QBER 大多在 25% 附近，越过 11% 阈值。只有 8 轮时样本太少，偶尔会有一批 QBER 落在阈值以下——多按几次「再跑一批」就能看出分布。演示只覆盖理想协议模型，不含光源与探测器的侧信道。"
+/>
+
+## 距离、信任与分工
+
+光纤里的光子按指数衰减，透射率大致是
+
+$$
+\eta = 10^{-\alpha L/10}
+$$
+
+$\alpha$ 是每公里损耗系数，$L$ 是长度。以 0.2 dB/km 为例，100 km 就是 20 dB，透射率只剩 1%；大约每多 50 km，$\eta$ 再掉一个量级。想跨城，就得在中间放可信节点：节点先解密再加密，等于把端到端的安全性换成了「你相信这个机房」。
+
+点对点链路和网络是两种东西。前者只需要两端；后者要路由、要节点、要运维，安全性也随之分层。这也是为什么 QKD 的现实部署多在小范围城域网，而不是「全球量子网」。与 <Term id="pqc">后量子密码</Term> 的分工很清楚：QKD 换的是密钥分发的物理基础，PQC 换的是公钥算法。前者要专用硬件与链路，后者只要改软件。多数实际系统会两者并用，再加一层经典算法兜底。
+
+<Misconception
+  note="「无条件安全」指的是协议在理想模型下的安全性，不是整台机器的安全性。"
+>
+  <Fragment slot="wrong">QKD 有物理学保证，所以设备怎么造都安全。</Fragment>
+  <Fragment slot="right">证明的前提是设备符合模型；致盲、效率失配、多光子光源都是模型之外的攻击面。</Fragment>
+</Misconception>
+
+<Conclusion>
+  QKD 的协议层已经相当成熟，落地难在设备：光源、探测器、节点与距离，每一项都要单独设防。把「协议安全」当成「设备安全」，是这一行最常见的误读。
+</Conclusion>

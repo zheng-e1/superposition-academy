@@ -1,0 +1,69 @@
+---
+slug: amplitude-damping
+title: 振幅阻尼：能量泄漏长什么样
+thesis: "|1⟩ 会掉回 |0⟩，叠加态被慢慢拉向基态"
+part: p-qubit
+topic: t-measure
+tag: 概念
+minutes: 7
+order: 324
+demos: []
+quiz:
+  - q: '一个比特起初是 |+⟩，经历很长时间的振幅阻尼之后，最接近下面哪个态？'
+    options: ['最大混态 I/2', '纯态 |0⟩，相干已经没了', '还是 |+⟩，只是整体变暗', '纯态 |1⟩']
+    answer: 1
+    explain: '阻尼把 |1⟩ 的分量一点点搬到 |0⟩，同时把非对角元压到零，终态是纯态 |0⟩。它不会停在 I/2：布洛赫矢量最终回到 +z 极点，长度也回到 1，只是相干信息已经丢给了环境；|1⟩ 是起点，不是终点。'
+  - q: '某个比特的布居数明显向 |0⟩ 回落，同时干涉条纹越来越浅。最可能是什么在起作用？'
+    options: ['纯相位噪声', '读出误差', '门保真度下降', '振幅阻尼']
+    answer: 3
+    explain: '布居数向基态回落是能量弛豫的标志，非对角元同时衰减，于是条纹变浅，这正是振幅阻尼。纯相位噪声不改布居数；读出误差主要让统计有偏、按 (1−2p) 压低对比度，但它不改自由演化里的布居数；门保真度下降是操作层面的问题，与自由演化时的布居数漂移不是一回事。'
+  - q: '只考虑能量弛豫时，T2 与 T1 的关系是？'
+    options: ['T2 恒等于 T1', 'T2 最多是 2T1，实际因纯相位噪声而更短', 'T2 与 T1 完全无关', 'T2 可以任意长于 2T1']
+    answer: 1
+    explain: '能量弛豫让非对角元按 e^{−t/(2T1)} 衰减，所以只考虑这一条通道时 T2=2T1，这是上限。真实系统里还有纯相位噪声，它让非对角元额外衰减，T2 因而更短，不可能随便长过 2T1。'
+sources:
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §8.3（噪声信道的算符和表示）'
+  - 'Krantz et al., 2019, A quantum engineer''s guide to superconducting qubits, Applied Physics Reviews'
+  - 'Houck et al., 2008, Controlling the spontaneous emission of a superconducting transmon qubit, Physical Review Letters'
+updated: 2026-10-18
+---
+
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+把比特制备到 |1⟩，然后什么都不做。过一会儿再测，它有相当一部分概率已经变成 |0⟩。没有人动它，能量自己漏走了——这条通道叫振幅阻尼，它的时间常数就是 T1。
+
+## |1⟩ 的指数衰减
+
+物理图像不复杂：超导比特的激发态通过腔或传输线辐射掉一个光子，离子阱里则是自发辐射。衰减不是酉的，信息被环境带走了，你只看到布居数按 $p_1(t)=e^{-t/T_1}$ 往下掉。
+
+用算符语言写一句就够了。取 $\gamma=1-e^{-t/T_1}$，
+
+$$
+E_0=|0\rangle\langle0|+\sqrt{1-\gamma}|1\rangle\langle1|,\qquad
+E_1=\sqrt{\gamma}|0\rangle\langle1|
+$$
+
+$E_1$ 把 |1⟩ 搬到 |0⟩，这就是「掉下去」那条分支；$E_0$ 保留 |0⟩，同时把 |1⟩ 的振幅按 $\sqrt{1-\gamma}$ 缩小。
+
+对比另外两种噪声：相位噪声不改布居数，只压非对角元；比特翻是对称的，|0⟩ 与 |1⟩ 一样可能被翻。振幅阻尼两头都不对称——它只往基态方向推，而且有终点。有限温度下环境还会反向激发，稳态不再是纯 |0⟩，只是 |0⟩ 仍占多数。
+
+## |+⟩ 被拉向基态
+
+对 |+⟩，衰减先改布居数：|1⟩ 的比重越来越小。同时非对角元按 $e^{-t/(2T_1)}$ 缩小，干涉随之变浅，<Term id="purity">纯度</Term> 中途会先掉下去。
+
+终点值得多看一眼：t 很大时，态趋于纯态 |0⟩，不是混态，纯度回到 1。所以「回到基态」不等于「量子性恢复了」——它只是把信息全丢给了环境，剩下的那个态恰好很纯。在<Term id="bloch-sphere">布洛赫球</Term>上，箭头一边向 +z 极点漂，一边变短。
+
+只考虑能量弛豫时，T2 最多是 T1 的两倍；实际系统里总有纯相位噪声，T2 通常更短。测 T1 的办法很直接：制备 |1⟩、等不同时长、读布居数，再拟合指数。这也是为什么<Term id="coherence-time">相干时间</Term>要分开报：T1 管能量，T2 管相位，只给一个数就看不出瓶颈在哪条通道上。
+
+<Misconception
+  note="「概率变小」只是表面；阻尼同时压掉相干，而且不对称、有终点。"
+>
+  <Fragment slot="wrong">振幅阻尼只是让 |1⟩ 的概率慢慢变小，效果和相位噪声差不多。</Fragment>
+  <Fragment slot="right">它同时压低非对角元，并且只往基态方向推：终态是 |0⟩ 而不是某个混态。相位噪声不改布居数，也不会把态拉到一个极点上。</Fragment>
+</Misconception>
+
+<Conclusion>
+  振幅阻尼描述能量泄漏：|1⟩ 的布居数按 $e^{-t/T_1}$ 衰减，同时非对角元按 $e^{-t/(2T_1)}$ 缩小。对 |+⟩ 的结果不是停在混态，而是被拉向纯态 |0⟩——相干没了，纯度却回来了。它是 T1 的微观图像，也是 T2 上限的来源。
+</Conclusion>

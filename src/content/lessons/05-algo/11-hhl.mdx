@@ -1,0 +1,64 @@
+---
+slug: hhl
+title: HHL：解线性方程组，但读出很贵
+thesis: 解在振幅里，读出来可能比算更贵
+part: p-algo
+topic: t-linear-algo
+tag: 深入
+minutes: 9
+order: 541
+demos: []
+quiz:
+  - q: '用 HHL 解出一个 100 万维的 x 之后，想把它存成经典数组，最直接的障碍是什么？'
+    options: ['量子态根本无法测量', '一次测量只给一个基态结果，读全部分量需要 N 次量级的采样', 'A 必须是对称的实数矩阵', 'HHL 只能解 2×2 的方程']
+    answer: 1
+    explain: '输出确实是一个量子态，也可以测量，但每次测量只给一个结果，要重建 N 个分量就得付出 N 次量级的代价，指数级的门数优势在这里被抵掉。A 的厄米性可以通过扩维绕开，HHL 也不限于二维，所以另外几项都不成立。'
+  - q: '条件数 κ 从 10 涨到 1000，HHL 的代价大致怎样变化？'
+    options: ['不变，门数只看 log N', '反而下降，因为本征值变大了', '只影响经典后处理，与量子线路无关', '按 κ² 量级上涨，因为相位估计需要更细的分辨率']
+    answer: 3
+    explain: '本征值跨的数量级变大，最接近 0 的那一档要被分辨出来，相位估计就得更细，受控迭代的次数跟着涨，代价按 κ² 量级上升。门数不会只由 log N 决定，本征值变大也不是好事；κ 直接进入量子线路的深度，不是经典后处理的事。'
+  - q: '下面哪一种任务最适合交给 HHL？'
+    options: ['需要把完整解向量输出给下游程序', '只需估计 ⟨x|M|x⟩ 这样的一个期望值，且 A 稀疏、κ 较小、|b⟩ 易制备', 'A 是稠密随机矩阵且条件数极大', '求解非线性方程组']
+    answer: 1
+    explain: 'HHL 的优势在「只要一个全局量」时最实在：期望值可以用约 1/ε² 次测量估出来，不必读出 N 个分量。要完整向量就得付出 N 次量级，稠密矩阵与病态矩阵分别破坏稀疏性和 κ 小的前提，非线性方程组也不在它的适用范围内。'
+sources:
+  - 'Harrow, Hassidim & Lloyd, 2009, Quantum algorithm for linear systems of equations, Physical Review Letters'
+  - 'Childs, Kothari & Somma, 2017, Quantum algorithm for systems of linear equations with exponentially improved dependence on precision, SIAM Journal on Computing'
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §5.2（相位估计）'
+updated: 2026-10-18
+---
+
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+科学计算里最常见的动作是解 $Ax=b$：结构分析、流体、电路，最后都落成一个线性方程组。HHL 在 2009 年给出一个量子做法，门数只随比特数多项式增长——但它交回来的不是一个能抄进文件的向量，而是一个量子态。
+
+## 拆开 b，读出 λ，按 1/λ 缩放
+
+假设 A 是厄米的、稀疏的，$|b\rangle$ 已经制备好。先把 $|b\rangle$ 在 A 的本征基里展开：$|b\rangle=\sum_j\beta_j|u_j\rangle$。用 $U=e^{iAt}$ 做<Term id="phase-estimation">相位估计</Term>，把每个本征值 $\lambda_j$ 写进辅助寄存器；再用一个受控旋转，给这一支的振幅乘上 $C/\lambda_j$；最后把相位估计逆回去。三步合起来：
+
+$$
+\sum_j\beta_j|u_j\rangle\ \longmapsto\ \sum_j\frac{\beta_j}{\lambda_j}|u_j\rangle\ \propto\ A^{-1}|b\rangle
+$$
+
+常数 C 是为了让振幅不超过 1，所以结果只是正比于解，归一化要另算。代价的量级是 $\tilde O(\log N\cdot\kappa^2/\epsilon)$：κ 是条件数，描述本征值跨了多少个数量级；ε 是目标精度。κ 越大，相位估计要越细，代价按 κ² 涨；ε 越小，采样与相位读数也要越细。2017 年的改进把对 $1/\epsilon$ 的依赖压到了多项式对数（polylog），但对 κ 的依赖仍然在。
+
+## 贵的不是算，是读
+
+量子态里确实编码着 N 个振幅，可你只能测量。想要一个期望值 $\langle x|M|x\rangle$，重复约 $1/\epsilon^2$ 次就能估到 ε 精度，这时账是划算的；要把每个分量都写成经典数字，就得做层析或大量采样，至少 N 次，优势基本消失。
+
+这就是读出瓶颈：解在振幅里，读出来可能比算更贵。它决定了适用场景——答案是泛函、期望值、判别量，而不是一整条向量。
+
+前提也常被忽略：A 要稀疏或能做成块编码，κ 不能太大，$|b\rangle$ 要能高效制备，你还得知道 $\lVert x\rVert$ 才能把结果归一化。哪一条不满足，加速就没了。所以它不是「量子加速解一切方程」，而是「在特定结构下，估计解的某个性质」。
+
+<Misconception
+  note="「解出来了」和「读得出来」是两件事，HHL 的账要在读出这一步结清。"
+>
+  <Fragment slot="wrong">HHL 用 log N 的时间解出 Ax=b，所以线性代数都能指数加速。</Fragment>
+  <Fragment slot="right">它交回的是量子态，读全部 N 个分量要 N 次量级的测量；只有当你只要一个期望值，且 A 稀疏、κ 小、b 易制备时，优势才真实存在。</Fragment>
+</Misconception>
+
+<Conclusion>
+  HHL 用相位估计加受控旋转，把 $A^{-1}b$ 写进振幅：门数对 N 只按 log N 增长，代价则与条件数 κ 的平方挂钩。瓶颈在读出：要完整向量就得付出 N 次量级，指数优势消失。它加速的是「估计解的某个性质」，不是「解一切方程」。
+</Conclusion>

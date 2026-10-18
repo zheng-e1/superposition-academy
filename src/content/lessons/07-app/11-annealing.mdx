@@ -1,0 +1,66 @@
+---
+slug: annealing
+title: 量子退火：是量子计算吗
+thesis: 退火是专用启发式，不是通用门模型
+part: p-app
+topic: t-hype
+tag: 概念
+minutes: 7
+order: 724
+demos: []
+quiz:
+  - q: 退火机与门模型量子计算机的主要区别是什么？
+    options: ['退火机不用量子比特', '退火机是专用设备，只实现特定哈密顿量的演化，不能跑任意线路', '退火机在室温下工作', '退火机没有噪声']
+    answer: 1
+    explain: 退火机同样用量子比特，但它把计算限制在伊辛型代价函数与绝热演化上，不是通用门模型。它通常需要低温，也有噪声与耦合误差，所以另外三项都不对。
+  - q: 「量子隧穿让退火更快」这句话应该怎么看待？
+    options: ['已被严格证明，所有问题都快', '在封闭系统模型里有依据，但真实设备的贡献仍有争议，要用经典基线检验', '完全不可能，隧穿不存在', '只对整数分解成立']
+    answer: 1
+    explain: 绝热模型里隧穿可以帮助系统穿过势垒，但开放系统里的噪声与温度会改变结论，实证上也有经典模拟复现结果的报告。说「全都能快」或「完全不可能」都过头，整数分解也不是退火的目标。
+  - q: 一条「量子退火快上百倍」的宣传，最该先追问什么？
+    options: ['机器有多少个比特', '比较的经典基线、问题规模，以及时间是否包含编程与读出', '公司成立多久', '机器是不是国产']
+    answer: 1
+    explain: 加速比只在明确基线与规模下有意义，时间口径不同会差出几个数量级。比特数是单机指标，公司历史与产地都不决定结果的可比性。
+sources:
+  - 'Kadowaki & Nishimori, 1998, Quantum annealing in the transverse Ising model, Physical Review E'
+  - 'Farhi et al., 2001, A Quantum Adiabatic Evolution Algorithm Applied to Random Instances of an NP-Complete Problem, Science'
+  - 'Boixo et al., 2014, Evidence for quantum annealing with more than one hundred qubits, Nature Physics'
+updated: 2026-10-18
+---
+
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+一台机器有几千个比特，却只会做一件事：找能量最低的构型。它跑不了 Shor，也跑不了 Grover。它叫量子退火机。问题是，「量子」这两个字在这里值多少？
+
+## 伊辛模型与代价函数
+
+组合优化可以先写成一个能量函数。每个比特对应一个自旋 $\sigma_i^z=\pm 1$，要最小化的<Term id="hamiltonian">哈密顿量</Term>是
+
+$$
+H_{\text{problem}}=\sum_i h_i\sigma_i^z+\sum_{i \lt j}J_{ij}\sigma_i^z\sigma_j^z
+$$
+
+$h_i$ 是每个自旋的偏好，$J_{ij}$ 是两个自旋之间的耦合。排班、着色、旅行商，都能想办法塞进这个形式，解就是基态。
+
+退火的做法是：先加一个很强的横向场 $-\sum_i\sigma_i^x$，让系统处在容易制备的均匀叠加；再慢慢把横向场关掉、把 $H_{\text{problem}}$ 打开。如果过程足够慢，系统会留在瞬时基态，最后落到问题的低能解。这个过程叫绝热演化，退火机是它的硬件版本。
+
+## 隧穿值多少，仍有争议
+
+量子退火与经典模拟退火最大的区别，是它可以借量子隧穿穿过势垒，而不是翻越。听上去很美，但在真实设备里，温度、噪声、耦合精度都会干扰；隧穿到底贡献了多少，学术上一直有争论。有些工作报告了量子效应存在的证据，另一些工作用经典模拟就复现了相同的分布。
+
+这不是说退火没用，而是说「量子」两个字不能自动折算成加速。它是专用启发式：比特多、连接固定、只能解某类问题，和通用门模型是两种东西。门模型能跑任意线路，退火机不能；退火机的规模优势，也换不来通用性。它适合的是组合优化与采样这类能写成伊辛形式的问题，不适合需要通用线路的算法任务。
+
+判断宣传时看三件事：比较的经典基线是什么（模拟退火、专用求解器，还是穷举）；解的质量与时间是否包含编程和读出；问题规模是否到了经典方法真的吃力的地方。
+
+<Misconception
+  note="专用机的比特数不是通用机的比特数，先看任务，再看数字。"
+>
+  <Fragment slot="wrong">退火机有几千个比特，所以比几十比特的门模型计算机更强。</Fragment>
+  <Fragment slot="right">比特数只在它能解的那类问题上可比；退火机不能跑通用线路，两者的「强」不是同一个量纲。</Fragment>
+</Misconception>
+
+<Conclusion>
+  量子退火是专用启发式：把优化问题写成伊辛模型，用绝热演化找低能解。量子隧穿是否带来实际优势仍有争议，它也不能替代通用门模型。看到「量子退火更快」，先问基线、问规模、问时间怎么算。
+</Conclusion>

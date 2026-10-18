@@ -7,3 +7,4 @@ dist/
 *.log
 .wrangler/
 dist.zip
+.tmp/

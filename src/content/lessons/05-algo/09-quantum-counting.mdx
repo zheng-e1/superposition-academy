@@ -1,0 +1,73 @@
+---
+slug: quantum-counting
+title: 量子计数：数一数有多少个解
+thesis: 用相位估计把「几个解」读出来
+part: p-algo
+topic: t-search
+tag: 深入
+minutes: 7
+order: 523
+demos: ['grover']
+quiz:
+  - q: 'N = 1000 个条目，M 未知。要在「没有解」和「恰好一个解」之间做判断，经典的查询次数与量子计数分别是多少量级？'
+    options: ['都是 1000 次', '经典约 1000 次，量子约 30 次', '经典约 30 次，量子约 1000 次', '经典约 30 次，量子 1 次']
+    answer: 1
+    explain: '经典必须查到几乎每一项才能排除「只有一个解」，是 Ω(N) 的量级，这里约 1000 次。量子计数要分辨 M 与 M+1，查询次数量级为 √(NM)，M=1 时约 32 次。「量子 1 次」也不成立：计数同样需要足够的相位精度，读得越细，受控迭代的次数越多。'
+  - q: '量子计数最后读出的那个相位，对应的是什么？'
+    options: ['解在列表里的编号', '神谕里门的个数', 'N 的二进制位长', 'Grover 迭代的旋转角 θ，满足 sin(θ/2)=√(M/N)']
+    answer: 3
+    explain: '计数把 Grover 迭代的本征相位 e^{±iθ} 读出来，θ 与解数由 sin(θ/2)=√(M/N) 挂钩，反解就得到 M。编号根本不在相位里，这正是它不告诉你「哪个是解」的原因；门数与 N 的位长只影响代价，不改变相位。'
+  - q: '神谕一个解也不标记（M=0）时，量子计数与 Grover 分别会怎样？'
+    options: ['两者都会给出一个随机解', '两者都直接报错退出', '计数读到 θ≈0，能判断「没有解」；Grover 转下去只会测到非解', '计数读到 θ=π，Grover 立刻成功']
+    answer: 2
+    explain: 'M=0 时旋转角为 0，Grover 迭代等于恒等，相位估计读到 0，于是 M=0 可以判定。Grover 的态在这种情况下一动不动，测到的永远是普通条目，它没有「停下来宣布无解」的机制。θ=π 对应的是 M=N，即全部条目都是解，那是另一个极端。'
+sources:
+  - 'Brassard, Høyer, Mosca & Tapp, 2002, Quantum amplitude amplification and estimation, Contemporary Mathematics 305'
+  - 'Grover, 1996, A fast quantum mechanical algorithm for database search, STOC 1996'
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §6.3（量子计数）'
+updated: 2026-10-18
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+抽屉里有钥匙，但你不知道是一把、两把，还是一把也没有。<Term id="grover">Grover 算法</Term> 能帮你拉开有钥匙的那一屉，却不会告诉你还有没有下一把。量子计数问的是另一个问题：**不是「哪个是解」，而是「一共有几个」。**
+
+## 转多少下，取决于有几个解
+
+Grover 的一步迭代，是在一个二维平面里旋转。这个平面由两个方向张成：所有解等权叠加的 $|\beta\rangle$，和所有非解等权叠加的 $|\alpha\rangle$。均匀叠加落在两者之间，旋转角 $\theta$ 满足
+
+$$
+\sin\frac{\theta}{2}=\sqrt{\frac{M}{N}},\qquad M=N\sin^2\frac{\theta}{2}
+$$
+
+每转一次前进 $\theta$，所以最优步数与 $\sqrt{N/M}$ 成正比。N 是一百万时，M 从 1 变成 4，最优步数就少一半。不知道 M，就不知道该转几下：转少了抬不起来，转多了越过顶点。
+
+这条曲线的起伏周期，正是被 M 与 N 的比值定住的。下面这个演示里 M 固定为 1，你能拖的只有迭代次数。
+
+<Demo
+  kind="grover"
+  label="周期的来源"
+  caption="默认 N = 8，标记项是 |111⟩，M 固定为 1（演示不真的做计数）。拖「迭代 k」，命中概率会周期性起伏；周期由 M/N 决定，计数正是从这段周期反推 M。点「跳到最优步数」只是按 √(N/M) 估一个 k，不等价于估计出 M。"
+/>
+
+## 把周期读成相位
+
+计数不去找解，而是去问迭代算符转了多少度。做法是把 <Term id="phase-estimation">相位估计</Term> 套在 Grover 迭代上：均匀叠加可以写成两个本征态的组合，本征相位是 $e^{\pm i\theta}$，于是相位寄存器读出的就是 $\pm\theta/2\pi$，取绝对值再反解，M 就有了。整套东西与 <Term id="amplitude-amplification">振幅放大</Term> 共用同一个<Term id="oracle">神谕</Term>，区别只在最后量的是「哪个」还是「几个」。
+
+代价要算清楚。要分辨 M 与 M+1，相位精度得细到 $\Delta\theta\approx 1/\sqrt{NM}$，查询次数量级是 $\sqrt{NM}$；M 很小时退回 $\sqrt N$，与 Grover 同阶。收益却不同：经典要区分「没有解」和「恰好一个解」，得查到几乎每一项，是 Ω(N)；计数只要 $\sqrt N$ 量级。加速落在「计数」这个任务上，不落在「找出一个解」上。
+
+两者是配套的。先用计数把 M 估出来，再按 $\frac{\pi}{4}\sqrt{N/M}$ 步跑 Grover，就不用猜步数。计数自己也不便宜：要神谕、要辅助比特、要受控迭代。
+
+<Misconception
+  note="「数命中次数」是采样估计，分辨能力被命中率本身卡住；计数读的是旋转角，不是频率。"
+>
+  <Fragment slot="wrong">量子计数就是反复跑 Grover，数一数命中了多少次，再反推解数。</Fragment>
+  <Fragment slot="right">反复跑只能估命中率，命中率接近 1 时分不清 M 是 1 还是 2，而且每次都要重新制备；计数用相位估计直接读出旋转角，再反解出 M。</Fragment>
+</Misconception>
+
+<Conclusion>
+  量子计数把 Grover 的旋转角读成相位：$\sin(\theta/2)=\sqrt{M/N}$，有了 θ 就有 M。它比经典计数少一个平方根，代价是 $\sqrt{NM}$ 次神谕调用；它给的仍然是估计值，不是解的清单。与 Grover 配起来，才构成「先数、再找」的完整流程。
+</Conclusion>

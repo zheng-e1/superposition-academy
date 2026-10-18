@@ -97,6 +97,7 @@ export const PARTS: PartDef[] = [
       { id: 't-search', title: '搜索与因数分解' },
       { id: 't-variational', title: '变分与近期算法' },
       { id: 't-complexity', title: '复杂度与边界' },
+      { id: 't-linear-algo', title: '线性方程与矩阵算法' },
     ],
   },
   {
@@ -122,6 +123,7 @@ export const PARTS: PartDef[] = [
       { id: 't-crypto', title: '密码与安全' },
       { id: 't-hype', title: '祛魅与判断' },
       { id: 't-tools', title: '工具与平台' },
+      { id: 't-network', title: '量子网络' },
     ],
   },
   {

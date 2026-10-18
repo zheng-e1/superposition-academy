@@ -1,0 +1,64 @@
+---
+slug: entanglement-distillation
+title: 纠缠蒸馏：把脏的纠缠提纯
+thesis: 用多个低质量纠缠换一个高质量纠缠
+part: p-entangle
+topic: t-teleport
+tag: 深入
+minutes: 8
+order: 424
+demos: []
+quiz:
+  - q: '你有一对保真度 0.7 的 Bell 态，做一次蒸馏，最可能的结果是什么？'
+    options: ['两对 0.7 变成两对 0.9', '一定得到一对完美的 Bell 态', '以小于 1 的概率得到一对保真度更高的态，两对被消耗', '两对纠缠被换成四个经典比特']
+    answer: 2
+    explain: '蒸馏是概率性的：成功时保真度上升，失败时这一轮白费，而且输入的两对都在测量中被消耗。保真度是一点点挪上去的，不会一步到 1；蒸馏也不产生经典比特，经典通信只用来传测量结果。'
+  - q: '在量子中继里，为什么通常先蒸馏、再交换？'
+    options: ['因为交换会消耗更多纠缠', '因为交换会把两段的误差叠在一起，先提纯才能让长程对的保真度达标', '因为蒸馏必须在经典通信之前完成', '因为交换只能作用在纯态上']
+    answer: 1
+    explain: '两段各自有噪声，交换后的长程对继承了两边的误差，保真度往往比每一段都低；先分别提纯，交换结果才够用。交换的代价是以一对换一对，并不比蒸馏更费；蒸馏本身也需要经典通信，顺序的理由在误差叠加，不在通信时序。'
+  - q: '关于束缚纠缠（bound entanglement），下面哪种说法对？'
+    options: ['所有纠缠态都能蒸馏，只是效率不同', '存在纠缠却不能蒸馏的态；两比特情形没有，更高维有', '束缚纠缠就是可分离态', '束缚纠缠只出现在纯态里']
+    answer: 1
+    explain: '束缚纠缠指的是确实纠缠、却无法用 LOCC 蒸馏出 Bell 态的态，这类例子在更高维系统里存在。两比特的纠缠态都可以蒸馏，所以不能说所有维度都行；它也不是可分离态，更不是纯态——纯态恰恰是最容易用的那一类。'
+sources:
+  - 'Bennett, Brassard, Popescu, Schumacher, Smolin & Wootters, 1996, Purification of noisy entanglement and faithful teleportation via noisy channels, Physical Review Letters'
+  - 'Briegel, Dür, Cirac & Zoller, 1998, Quantum repeaters: The role of imperfect local operations in quantum communication, Physical Review Letters'
+  - 'Horodecki, Horodecki, Horodecki & Horodecki, 2009, Quantum entanglement, Reviews of Modern Physics'
+updated: 2026-10-18
+---
+
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+你手里有一对保真度 0.8 的 Bell 态：做一次传态，五次里大约有一次出错。再要一对，还是 0.8。蒸馏说：别指望单对变好，拿两对 0.8 的，换一对更接近 1 的。
+
+## 用数量换质量
+
+Bennett 等人在 1996 年给出这个想法：只做本地操作加经典通信（LOCC），把 n 个同样的噪声纠缠态变成 m < n 个更纯的纠缠态。做法是让两对的「哪一支」通过双边受控门关联起来，再测掉其中一对，错误被部分筛掉；成功率小于 1，但成没成能从测量结果看出来。
+
+关键阈值：两比特 Werner 态的保真度必须高于 1/2，也就是它得真的<Term id="entanglement">纠缠</Term>；低于这个值，任何 LOCC 都提不出 Bell 态。过了阈值，反复迭代能把保真度一路推向 1，代价是每一轮都要消耗拷贝。
+
+而且不是所有纠缠都能蒸馏：存在束缚纠缠——纠缠着，却无论多少拷贝都提不纯。两比特情形没有这种例外，维度一高就有了。
+
+## 在中继里的位置
+
+长距离分发时，光纤损耗让成功率随距离指数下降，中继把链路切段，段内先建立纠缠，再用交换接起来。
+
+多数中继方案里，顺序是先蒸馏、再交换：交换会把两段的误差叠在一起，一段 0.8 和另一段 0.8 换出来的长程对，保真度会掉到 0.8 以下；先把每段提纯到 0.95 左右，交换后的结果才够做传态。也有先交换再蒸馏的设计，取决于设备与误差模型，没有唯一正确的顺序。
+
+这就是嵌套提纯：每一级都「提纯、交换、再提纯」。代价是成对消耗：每次蒸馏都要牺牲若干对低质量的纠缠；如果每一级都要求同样高的保真度，所需对数会随级数指数增长。所以中继设计要在保真度、速率和存储时间之间取平衡。
+
+工程上难的是配套：能存住纠缠的量子存储器、确定性的两比特门、低损耗的 Bell 测量，以及来回跑的经典通信。原理清楚，账很硬。
+
+<Misconception
+  note="蒸馏不是「洗干净」的一次操作，而是用概率和数量换取保真度的过程。"
+>
+  <Fragment slot="wrong">多蒸馏几轮就能得到完美的纠缠，想要多纯就有多纯。</Fragment>
+  <Fragment slot="right">每轮成功概率小于 1 且消耗拷贝，保真度只能渐近趋近 1；对束缚纠缠根本无效，初始保真度还要过阈值。</Fragment>
+</Misconception>
+
+<Conclusion>
+  纠缠蒸馏用多个低质量纠缠换一个高质量纠缠：LOCC 加测量，成功是概率性的，产物更接近 <Term id="bell-state">Bell 态</Term>。中继里要先蒸馏再交换，否则两段的误差会叠成更脏的长程对；代价是对数消耗，所以保真度、速率与存储时间要一起权衡。
+</Conclusion>

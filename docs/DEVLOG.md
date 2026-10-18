@@ -5,7 +5,7 @@
 
 ## 1. 一句话状态
 
-「叠加学堂」是一个纯静态的中文量子计算学习站：60 节正文、181 道自测题、11 个浏览器内交互演示，Astro 7 构建，部署在 Cloudflare Workers 静态资源上，push 即自动发布。域名 `diejiacademy.com` 已购买，等待实名/注册审核。
+「叠加学堂」是一个纯静态的中文量子计算学习站：80 节正文、241 道自测题、11 个浏览器内交互演示，Astro 7 构建，部署在 Cloudflare Workers 静态资源上，push 即自动发布。域名 `diejiacademy.com` 已购买，等待实名/注册审核。
 
 - 线上：`https://superposition-academy.481828896.workers.dev`（国内直连需代理）
 - 仓库：`github.com/zheng-e1/superposition-academy`（分支 `main`）
@@ -26,6 +26,7 @@
 | 20:23 | 首次提交 | `f1f4640`，GitHub 推送（SSH over 443） |
 | 21:36 | 部署适配 | Workers 静态资源 `wrangler.jsonc`，push 自动部署 |
 | 22:22 | 域名准备 | `set-domain.ps1`、等待期手册 `docs/DEPLOY.md` |
+| 22:35 | 内容 80 节 | 第三批 20 节（中性原子、光子、拓扑、HHL、玻色采样、QKD 设备、量子互联网……） |
 
 ## 3. 关键决策（及为什么）
 
@@ -85,9 +86,9 @@ src/
 ## 7. 下一步队列
 
 1. **域名上线**（审核通过后）：Cloudflare Connect a domain → 改 NS → Active → `npm run set-domain -- -Domain diejiacademy.com` → Worker Add custom domain → 验证证书/canonical/robots。
-2. **补课到 80 节**：中性原子、光子、退火、量子互联网、QML 祛魅、编译与校准、量子计数/HHL/量子漫步。
+2. **第三轮审校**：20 节新内容已交由独立审校，修完后复核整体口径（尤其 HHL、玻色采样、拓扑三节）。
 3. **移动端打磨**：触控目标 ≥44px、布洛赫球手势、抽屉滚动。
-4. **第三轮审校**：对抗式核对公式/数值/演示一致性。
+4. **内容再扩**（可选）：100 节以上时补「量子控制」「低温工程」「评测方法」等工程细节；先把现有 80 节的完成度做满。
 
 ## 8. 如何恢复工作
 
