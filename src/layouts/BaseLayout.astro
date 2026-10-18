@@ -33,7 +33,7 @@ const {
   bare = false,
 } = Astro.props;
 
-const fullTitle = title.includes(site.name) ? title : `${title} · ${site.name}`;
+const fullTitle = title.includes(site.name) ? title : `${title} · ${site.name} · 量子计算`;
 const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site);
 const ogImage = new URL(image, Astro.site);
 const blocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
