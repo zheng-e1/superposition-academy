@@ -124,10 +124,31 @@ git push             # 触发 Cloudflare 自动构建
 | `da7c1ae` | 记录线上地址与自动部署状态 |
 | `0e70f0a` | 标题与眉标强化「量子计算」品类词 |
 | `112ee71` | 域名切换脚本与等待期手册 |
+| `c9a2a9b` | 新增开发日志 DEVLOG |
+| `v0.1.0` | 第一个可用版本的 Git tag（上线当天） |
 
 ## 10. 项目外部的资料
 
-- 方案文档：`D:\liangzikeou\量子计算学习站-开发方案.md`（含对标拆解与实现状态）
+- 方案文档：仓库内 `docs/PLAN.md`（原文件在 `D:\liangzikeou\量子计算学习站-开发方案.md`）
 - 参照站抓取：`D:\liangzikeou\_reference\`（小山学堂的 course-data、learn.html、lesson.css 等）
 - 域名：`diejiacademy.com`（阿里云，审核中）
 - Cloudflare：账号 `481828896`，Worker `superposition-academy`，子域 `481828896.workers.dev`
+
+## 11. 连续性约定（每次改动都照做）
+
+为了避免「开发只活在聊天记录里」，每次改动按这个顺序收尾：
+
+1. `npm run check:content && npm test`（内容与引擎都不能退化）
+2. `npm run build`（确保能构建）
+3. `git commit` + `git push`（push 会自动部署）
+4. 在本文第 9 节追加一行变更记录；涉及决策的，补进第 3 节
+5. 遇到新坑，写进第 6 节「已知问题」
+
+状态自检（新会话/换机器时先跑这个）：
+
+```powershell
+npm run status
+```
+
+它一次性输出：分支、最后一次提交、工作区是否干净、课节数、题目数、构建产物与搜索索引状态。tag `v0.1.0` 是第一个可用版本的检查点，出问题可以 `git checkout v0.1.0` 对照。
+
