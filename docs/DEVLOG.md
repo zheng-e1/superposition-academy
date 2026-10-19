@@ -76,7 +76,7 @@ src/
 | 级别 | 问题 | 位置 |
 |---|---|---|
 | 高 | 内容无外部物理审读，Shor/VQE/纠错三节建议请人通读 | `src/content/lessons/05-algo`、`06-hw` |
-| 高 | 国内直连 `workers.dev` 不通，等域名审核 | 部署层 |
+| ~~高~~ | ~~国内直连不通~~ 已解决：`diejiacademy.com` 自定义域生效，国内可直连 | `a961265` |
 | 中 | Pagefind 对中文不分词，搜索主要靠标题/摘要 JSON 回退 | `scripts/site.ts` |
 | 中 | 演示的点击/拖拽没有自动化测试，只有渲染与恢复验证 | `src/scripts/demos` |
 | ~~中~~ | ~~移动端触控目标偏小~~ 已修：滑块 24px 拇指、chip 40px、线路图门命中区 +11px、抽屉自动定位当前课节 | `28f637e` |
@@ -133,6 +133,8 @@ git push             # 触发 Cloudflare 自动构建
 | `v0.2.0` | 80 节版本 tag |
 | `53208b2` | DEVLOG 记录移动端打磨 |
 | `a7d7108` | 第三轮审校收尾：BB84 累计统计、排序方向、结论绝对化、TeX 包装等 20 处 |
+| `6ba8702` | 切换生产域名到 diejiacademy.com |
+| `a961265` | Workers 静态资源改 drop-trailing-slash，canonical 与 URL 对齐 |
 | `28f637e` | 移动端打磨：触控、滑块、线路图命中区、抽屉定位 |
 
 ## 10. 项目外部的资料

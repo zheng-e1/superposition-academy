@@ -8,9 +8,9 @@
 |---|---|
 | 仓库 | `github.com/zheng-e1/superposition-academy`（SSH over 443 推送） |
 | 部署 | Cloudflare Workers 静态资源，项目名 `superposition-academy` |
-| 网址 | `https://superposition-academy.481828896.workers.dev`（国内访问需代理） |
+| 网址 | `https://diejiacademy.com`（自定义域已生效，国内可直连） |
 | 自动部署 | 已生效：push 到 `main` 触发构建（`npm run build` → `npx wrangler deploy`） |
-| Build variables | 暂未设置；canonical 回退值写在 `astro.config.mjs` 与 `src/config.ts` |
+| Build variables | 暂未设置；canonical 回退值已指向 `https://diejiacademy.com` |
 
 绑定自定义域名后，把 `PUBLIC_SITE_URL` 设为新域名（或在两个配置文件里改回退值），再 push 一次即可。
 
