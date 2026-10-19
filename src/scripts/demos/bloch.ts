@@ -170,8 +170,9 @@ export function mount(host: HTMLElement, props: Record<string, unknown> = {}) {
 
   function build(): Circuit {
     const c = new Circuit(1);
-    if (theta) c.ry(0, theta);
     for (const g of gates) c[g.name](0);
+    // Ry 滑块作用在已选的门外，和文字说明「先按 X/Y/Z，再拖 Ry」保持一致
+    if (theta) c.ry(0, theta);
     return c;
   }
 

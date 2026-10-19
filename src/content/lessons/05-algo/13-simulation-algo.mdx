@@ -32,7 +32,7 @@ import Misconception from '../../../components/Misconception.astro';
 import Conclusion from '../../../components/Conclusion.astro';
 import Term from '../../../components/Term.astro';
 
-把一段连续的演化交给一台只会做门的机器，你只能把它切成小段：设 $H=H_1+H_2$，先让 $H_1$ 作用 $\tau$，再让 $H_2$ 作用 $\tau$，重复 $n$ 次，其中 $\tau=t/n$。切得越细越像真的。问题是，细一倍，误差降多少？
+把一段连续的演化交给一台只会做门的机器，你只能把它切成小段：设 $H=H_1+H_2$，先让 $H_1$ 作用 $\tau$，再让 $H_2$ 作用 $\tau$，重复 $n$ 次，其中 $\tau=t/n$。切得越细越像真的。问题是，细一倍，误差降多少？一阶 Trotter 的账在《量子模拟》那节已经算过（误差 $O(t^2/n)$），这一节把二阶的形式与误差的来源拆开。
 
 ## 误差是对易子的账
 

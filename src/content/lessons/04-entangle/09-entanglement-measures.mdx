@@ -56,7 +56,15 @@ $$
 
 可分态的行列式为 0，$C=0$；Bell 态 $C=1$。行列式是双线性的：对乘积态一定为零，对最大纠缠取到上限。例：$\cos\theta|00\rangle+\sin\theta|11\rangle$ 的 $C=|\sin2\theta|$，$\theta=45^\circ$ 时取满。上一节 W 丢掉一个比特后，剩下的混态按混态定义算出的 $C=2/3$，正好落在中间。
 
-纯态还有一把更通用的尺：纠缠熵 $E=S(\rho_A)=-\sum_i\lambda_i\log_2\lambda_i$，$\lambda_i$ 是施密特系数的平方。Bell 态是 1 ebit，乘积态是 0；$\theta=30^\circ$ 时 $\lambda=(0.75,0.25)$，$E\approx0.81$。两比特纯态里两把尺给出同样的排序，只是刻度不同。到了混态，这两把尺不能直接照搬，要另做延拓；这里先把纯态看清楚。
+纯态还有一把更通用的尺：纠缠熵 $E=S(\rho_A)=-\sum_i\lambda_i\log_2\lambda_i$，$\lambda_i$ 是施密特系数的平方。Bell 态是 1 ebit，乘积态是 0；$\theta=30^\circ$ 时 $\lambda=(0.75,0.25)$，$E\approx0.81$。两比特纯态里两把尺给出同样的排序，只是刻度不同。
+
+混态不能直接套上面的行列式。两比特混态用自旋翻转判据：先构造 $\tilde\rho=(\sigma_y\otimes\sigma_y)\rho^*(\sigma_y\otimes\sigma_y)$，取 $\rho\tilde\rho$ 的本征值平方根并按降序排成 $\lambda_1\ge\lambda_2\ge\lambda_3\ge\lambda_4$，则
+
+$$
+C=\max\left(0,\ \lambda_1-\lambda_2-\lambda_3-\lambda_4\right)
+$$
+
+上一节 W 丢掉一个比特后的混态代进去，正好得到 $C=2/3$。混态的纠缠熵则不再是唯一度量，要按具体用途选。
 
 ## 为什么公理是「不增」
 
