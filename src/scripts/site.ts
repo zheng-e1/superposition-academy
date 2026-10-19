@@ -31,7 +31,12 @@ function initDrawer() {
   const btn = document.getElementById('menuBtn');
   const sidebar = document.getElementById('sidebar');
   const backdrop = document.getElementById('sidebarBackdrop');
-  if (!btn || !sidebar) return;
+  if (!btn) return;
+  if (!sidebar) {
+    // 没有课程目录的页面（首页、实验室、自测等），汉堡按钮点了也没反应，直接隐藏
+    btn.hidden = true;
+    return;
+  }
 
   const set = (open: boolean) => {
     sidebar.dataset.open = String(open);

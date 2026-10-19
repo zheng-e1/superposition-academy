@@ -1,0 +1,49 @@
+---
+interface Props {
+  path?: string;
+}
+const { path = '' } = Astro.props;
+
+const tabs = [
+  {
+    href: '/learn',
+    label: '课程',
+    icon: 'M4 5.5A2.5 2.5 0 0 1 6.5 3H19v16H6.5A2.5 2.5 0 0 0 4 21.5V5.5Z M4 19V5.5 M8 7h7',
+  },
+  {
+    href: '/roadmap',
+    label: '路线',
+    icon: 'M5 19c3-6 11-6 14 0 M5 5c3 6 11 6 14 0 M12 3v3 M12 18v3',
+  },
+  {
+    href: '/lab',
+    label: '实验室',
+    icon: 'M9 3h6 M10 3v6l-5 9a2 2 0 0 0 1.8 3h10.4A2 2 0 0 0 19 18l-5-9V3',
+  },
+  {
+    href: '/exam',
+    label: '自测',
+    icon: 'M9 12.5l2 2 4-4.5 M6 3h9l4 4v14H6z M14 3v5h5',
+  },
+  {
+    href: '/me',
+    label: '我的',
+    icon: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z M4.5 21a7.5 7.5 0 0 1 15 0',
+  },
+];
+
+const isActive = (href: string) => path === href || (href !== '/' && path.startsWith(href));
+---
+
+<nav class="mobile-tabs" aria-label="移动端导航">
+  {
+    tabs.map((t) => (
+      <a href={t.href} aria-current={isActive(t.href) ? 'page' : undefined}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+          <path d={t.icon} stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        <span>{t.label}</span>
+      </a>
+    ))
+  }
+</nav>

@@ -839,3 +839,73 @@ summary {
     padding-block: 8px;
   }
 }
+
+/* ── 移动端底部导航 ─────────────────────────────────────── */
+.mobile-tabs {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .mobile-tabs {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--line);
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: blur(10px);
+  }
+
+  .mobile-tabs a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    min-height: 48px;
+    padding: 5px 2px;
+    color: var(--faint);
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+  }
+
+  .mobile-tabs a svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .mobile-tabs a[aria-current='page'] {
+    color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  /* 给底部标签栏留出空间，避免最后一行内容被挡 */
+  body {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+
+  /* 抽屉打开时，蒙层与抽屉要盖住标签栏 */
+  .sidebar-backdrop[data-open='true'] {
+    z-index: 45;
+  }
+
+  .sidebar[data-open='true'] {
+    z-index: 50;
+  }
+}
+
+@media print {
+  .mobile-tabs {
+    display: none !important;
+  }
+}
+
+/* 兜底：类名里的 display 不要盖掉 hidden 属性（汉堡按钮、继续阅读卡都踩过） */
+[hidden] {
+  display: none !important;
+}
