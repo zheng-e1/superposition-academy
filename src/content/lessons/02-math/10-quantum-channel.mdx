@@ -36,7 +36,7 @@ import Term from '../../../components/Term.astro';
 
 ## 把环境也算进来
 
-真实演化很少是孤立的。系统和环境一起从 $|\psi\rangle\otimes|0\rangle_E$ 出发，做一次联合酉演化 $U$；你只保留系统，把环境的自由度求和掉：
+真实演化很少是孤立的。系统和环境一起从 $\rho\otimes|0\rangle\langle0|$ 出发，做一次联合酉演化 $U$；你只保留系统，把环境的自由度求和掉：
 
 $$
 \mathcal{E}(\rho)=\operatorname{Tr}_E\left[U(\rho\otimes|0\rangle\langle0|)U^\dagger\right]
@@ -44,7 +44,7 @@ $$
 
 这一步是偏迹。它把「信息漏进环境」写成了数学：系统本身不再 <Term id="unitary">酉</Term> 演化，但系统和环境的整体仍然是酉的。
 
-这样的映射都能写成 Kraus 形式：
+任何 CPTP 映射都能写成 Kraus 形式：
 
 $$
 \mathcal{E}(\rho)=\sum_k K_k\rho K_k^\dagger,\qquad \sum_k K_k^\dagger K_k=I
@@ -61,7 +61,7 @@ CPTP 拆成三个词：映射、完全正、保迹。映射：把密度矩阵送
 为什么不能随便写一个矩阵当噪声？它可能不保迹，概率和不为 1；可能不正，给出负概率；也可能只是正而不完全正，和纠缠态一起用就出事。「随机换一个酉门」只是信道的一个很小的子类：酉门的凸组合满足 $\mathcal{E}(I)=I$，而振幅阻尼把 $I$ 送到 $\operatorname{diag}(1+\gamma,1-\gamma)$，不等于 $I$，所以它不可能写成随机酉门的平均。
 
 <Misconception
-  note="「随机」描述的是我们的无知，信道描述的是系统可观测的演化。把两者混为一谈，就会漏掉能量弛豫这类非酉的噪声。"
+  note="把噪声当成随机换门，会漏掉非酉的那一类；信道用 CPTP 把「系统 + 环境」的演化一并算进来。"
 >
   <Fragment slot="wrong">噪声就是按某个概率把门换成一个随机的酉门；把所有可能用到的门列出来，就描述完了。</Fragment>
   <Fragment slot="right">随机酉门只是信道的一个子类，满足 E(I)=I；振幅阻尼不满足，必须用 Kraus 算符或「系统 + 环境 + 偏迹」来描述。</Fragment>

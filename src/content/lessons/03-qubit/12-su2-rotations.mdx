@@ -56,7 +56,7 @@ R_{\mathbf n}(\theta)=\exp\left(-i\frac{\theta}{2}\,\mathbf n\cdot\boldsymbol\si
 =\cos\frac{\theta}{2}I-i\sin\frac{\theta}{2}\,(n_xX+n_yY+n_zZ)
 $$
 
-单位轴两个数，角度一个数，正好三个实数，这就是 SU(2) 的全部参数。绕 z 的特例最好认：$R_z(\theta)=\operatorname{diag}(e^{-i\theta/2},e^{i\theta/2})$，它给 $|0\rangle$ 与 $|1\rangle$ 添上相反的相位，箭头沿纬线转 θ。绕 x 与绕 y 的同款公式把箭头沿经线推；三根坐标轴加上任意斜轴，合起来覆盖整个球面。
+单位轴两个数，角度一个数，正好三个实数，这就是 SU(2) 的全部参数。绕 z 的特例最好认：$R_z(\theta)=\operatorname{diag}(e^{-i\theta/2},e^{i\theta/2})$，它给 $|0\rangle$ 与 $|1\rangle$ 添上相反的相位，箭头沿纬线转 θ。绕 x 与绕 y 的同款公式让箭头绕对应轴转；三根坐标轴加上任意斜轴，合起来覆盖整个球面。
 
 为什么是 θ/2？因为布洛赫矢量在 SO(3) 里转 θ，对应的态矢在 SU(2) 里只转 θ/2。这个二对一的关系有个直接后果：θ=2π 时 $R=-I$，态矢变成 $-|\psi\rangle$，箭头却已经回到原处。−1 是<Term id="phase">全局相位</Term>，任何测量都看不见，所以物理上 360° 才算一圈；但作为矩阵，$R(2\pi)\neq I$，一旦它被写成受控操作，这个负号就会落到某一条分支上，变成看得见的相对相位。
 
