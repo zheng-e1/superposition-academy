@@ -52,7 +52,7 @@ npm run build
 if ($LASTEXITCODE -ne 0) { throw 'Build failed, nothing was pushed.' }
 
 git add -A
-git commit -m "切换生产域名到 $Domain"
+git commit -m "Switch production domain to $Domain"
 git push
 if ($LASTEXITCODE -ne 0) { throw 'Push failed; the commit is local only.' }
 
