@@ -4,7 +4,7 @@ export const site = {
   tagline: '量子计算，从一块偏振片开始',
   description:
     '叠加学堂：面向中文读者的量子计算学习与科普站。不用装软件，每个概念都能在浏览器里跑一遍——布洛赫球、量子线路、Grover 搜索、BB84 窃听。80 节正文，从偏振片讲到量子纠错。',
-  url: (import.meta.env.PUBLIC_SITE_URL as string | undefined) || 'https://superposition-academy.481828896.workers.dev',
+  url: (import.meta.env.PUBLIC_SITE_URL as string | undefined) || 'https://diejiacademy.com',
   author: '叠加学堂编辑部',
   email: 'hi@superposition.academy',
   repo: 'https://github.com/superposition-academy/site',
