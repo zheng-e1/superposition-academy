@@ -58,11 +58,40 @@ const jsonLd = [
             <span>第 {index + 1} / {course.flat.length} 节</span>
             {updated && <><span class="sep"></span><span>更新于 {updated}</span></>}
           </div>
+
+          <div class="lesson-tools">
+            <button class="tool-btn" type="button" data-bookmark aria-pressed="false">
+              <span class="tool-icon" aria-hidden="true">☆</span>
+              <span data-bookmark-label>收藏</span>
+            </button>
+            <button class="tool-btn" type="button" data-note-toggle aria-expanded="false" aria-controls="notePanel">
+              <span class="tool-icon" aria-hidden="true">✎</span>
+              <span>笔记</span>
+            </button>
+          </div>
         </header>
 
         <div class="prose">
           <Content />
         </div>
+
+        <section class="note-panel" id="notePanel" data-note-panel hidden>
+          <div class="note-head">
+            <span>我的笔记</span>
+            <span class="note-count" data-note-count></span>
+          </div>
+          <textarea
+            id="noteInput"
+            data-note-input
+            rows="5"
+            maxlength="4000"
+            placeholder="写点什么：卡住的地方、自己的例子、想问的问题。只保存在这台设备的浏览器里。"
+          ></textarea>
+          <div class="note-foot">
+            <span class="note-status" data-note-status>自动保存到本机</span>
+            <button class="link-btn" type="button" data-note-clear>清空</button>
+          </div>
+        </section>
 
         <Quiz items={node.entry.data.quiz} slug={node.slug} />
 

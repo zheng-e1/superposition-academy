@@ -882,3 +882,111 @@
     padding: 13px 15px;
   }
 }
+
+/* ── 课节工具：收藏与笔记 ───────────────────────────────── */
+.lesson-tools {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--sub);
+  font-size: 12.5px;
+  font-weight: 600;
+  transition: all 0.15s var(--ease);
+}
+
+.tool-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent-line);
+}
+
+.tool-btn[aria-pressed='true'] {
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+  color: var(--accent);
+}
+
+.tool-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.note-panel {
+  margin: 30px 0 10px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+}
+
+.note-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--sub);
+  margin-bottom: 10px;
+}
+
+.note-count {
+  font-weight: 400;
+  color: var(--faint);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.note-panel textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14.5px;
+  line-height: 1.7;
+  resize: vertical;
+}
+
+.note-panel textarea:focus {
+  outline: 2px solid var(--accent-soft);
+  border-color: var(--accent-line);
+}
+
+.note-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--faint);
+}
+
+.link-btn {
+  border: 0;
+  background: none;
+  padding: 4px;
+  color: var(--accent);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.link-danger {
+  color: #b4432f;
+}
+
+.note-panel {
+  scroll-margin-top: 72px;
+}

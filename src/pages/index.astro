@@ -10,6 +10,9 @@ const course = await loadCourse();
 const first = course.flat[0];
 const latest = [...course.flat].slice(-6).reverse();
 const totalLessons = course.flat.length;
+const lessonMap = Object.fromEntries(
+  course.flat.map((l) => [l.slug, { title: l.title, href: `/learn/${l.slug}` }]),
+);
 const totalHours = Math.round(course.totalMinutes / 60);
 
 const partLink = (id: string) => `/learn#${id}`;
@@ -42,6 +45,12 @@ const partLink = (id: string) => `/learn#${id}`;
           <span>约 {totalHours} 小时读完</span>
           <span>11 个可交互演示</span>
         </div>
+
+        <a class="continue-card" data-continue hidden href="/learn">
+          <span class="continue-kicker">继续上次</span>
+          <span class="continue-title" data-continue-title>继续阅读</span>
+          <span class="continue-arrow" aria-hidden="true">→</span>
+        </a>
       </div>
 
       <div class="hero-demo">
@@ -206,4 +215,6 @@ const partLink = (id: string) => `/learn#${id}`;
       </div>
     </section>
   </div>
+
+  <script is:inline type="application/json" id="lessonMap" set:html={JSON.stringify(lessonMap)}></script>
 </BaseLayout>

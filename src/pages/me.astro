@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { loadCourse, partOf } from '../lib/course';
+import '../styles/portal.css';
+
+const course = await loadCourse();
+const catalog = Object.fromEntries(
+  course.flat.map((l) => {
+    const p = partOf(l);
+    return [l.slug, { title: l.title, part: `${p.num} ${p.title}`, href: `/learn/${l.slug}` }];
+  }),
+);
+const total = course.flat.length;
+---
+
+<BaseLayout
+  title="我的收藏与笔记"
+  description="叠加学堂的本地学习数据：收藏、笔记与阅读进度，只保存在浏览器里，可导出为 JSON。"
+  path="/me"`n  noindex
+>
+  <main class="wrap lib-page" data-library-page>
+    <header class="lib-head">
+      <span class="eyebrow">只存本机 · 不需要账号</span>
+      <h1>我的</h1>
+      <p class="lib-lede">
+        收藏、笔记和已读进度都保存在这个浏览器里，不上传服务器。换设备或清缓存前，先用下面的「导出 JSON」备份；在新设备上导入即可。
+      </p>
+      <div class="lib-stats">
+        <div><b data-stat-read>0</b><span>已读 / {total}</span></div>
+        <div><b data-stat-bookmarks>0</b><span>收藏</span></div>
+        <div><b data-stat-notes>0</b><span>笔记</span></div>
+      </div>
+    </header>
+
+    <section class="lib-block">
+      <div class="lib-block-head">
+        <h2>收藏</h2>
+        <span class="lib-hint">课节页点「收藏」，或按 <kbd>b</kbd></span>
+      </div>
+      <div class="lib-list" data-bookmarks></div>
+    </section>
+
+    <section class="lib-block">
+      <div class="lib-block-head">
+        <h2>笔记</h2>
+        <span class="lib-hint">课节页按 <kbd>n</kbd> 打开笔记面板</span>
+      </div>
+      <div class="lib-notes" data-notes></div>
+    </section>
+
+    <section class="lib-block lib-data">
+      <h2>数据</h2>
+      <p class="lib-hint">导入是合并：收藏取并集，同一节的笔记保留更新时间较新的那份。</p>
+      <div class="lib-actions">
+        <button class="btn btn-ghost" type="button" data-export>导出 JSON</button>
+        <label class="btn btn-ghost">
+          导入 JSON
+          <input type="file" accept="application/json,.json" data-import hidden />
+        </label>
+        <button class="link-btn link-danger" type="button" data-clear>清空本机数据</button>
+      </div>
+      <p class="lib-status" data-import-status role="status"></p>
+    </section>
+  </main>
+
+  <script is:inline type="application/json" id="lessonCatalog" set:html={JSON.stringify(catalog)}></script>
+</BaseLayout>

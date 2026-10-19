@@ -1,24 +1,6 @@
 /** 站内通用交互：侧栏抽屉、阅读进度、已读标记、搜索浮层。 */
 
-const PROGRESS_KEY = 'qc_progress_v1';
-
-type ProgressMap = Record<string, { read?: boolean; at?: number }>;
-
-export function readProgress(): ProgressMap {
-  try {
-    return JSON.parse(localStorage.getItem(PROGRESS_KEY) || '{}') as ProgressMap;
-  } catch {
-    return {};
-  }
-}
-
-export function writeProgress(map: ProgressMap) {
-  try {
-    localStorage.setItem(PROGRESS_KEY, JSON.stringify(map));
-  } catch {
-    /* 隐私模式下放弃持久化 */
-  }
-}
+import { readProgress, writeProgress } from '../lib/progress';
 
 function markRead(slug: string) {
   const map = readProgress();
@@ -126,6 +108,7 @@ interface SearchDoc {
   thesis: string;
   part: string;
   partTitle: string;
+  text?: string;
 }
 
 function initSearch() {
@@ -193,12 +176,13 @@ function initSearch() {
     if (!tokens.length || !docs) return [];
     return docs
       .map((d) => {
-        const hay = `${d.title} ${d.thesis} ${d.partTitle}`.toLowerCase();
+        const hay = `${d.title} ${d.thesis} ${d.partTitle} ${d.text ?? ""}`.toLowerCase();
         if (!tokens.every((t) => hay.includes(t))) return null;
         let score = 0;
         for (const t of tokens) {
           if (d.title.toLowerCase().includes(t)) score += 8;
           if (d.thesis.toLowerCase().includes(t)) score += 3;
+          if ((d.text ?? '').toLowerCase().includes(t)) score += 1;
         }
         return { d, score };
       })
