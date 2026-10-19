@@ -89,6 +89,7 @@ src/
 | 低 | 无 i18n、无 PWA、无云同步进度 | — |
 | 低 | PowerShell 5.1 会把无 BOM 的 UTF-8 `.ps1` 当 ANSI，脚本必须纯 ASCII | `scripts/*.ps1` |
 | 低 | dev server 运行时改大文件偶发 `EIO` 文件锁，先停服务再改 | 开发流程 |
+| ~~低~~ | ~~KaTeX 字体带构建哈希~~ 已修：`public/katex/` 自托管，路径稳定、字体 `swap` | `68c899c` |
 
 ## 7. 下一步队列
 
@@ -146,6 +147,7 @@ git push             # 触发 Cloudflare 自动构建
 | `9f40377` | 新 20 节的收尾修订 |
 | `8285bd5` | 修 amplitude 演示 Ry 滑块；校验器不再吞掉公式里的 < |
 | `4655d8b` | 第四轮审校修复：物理、排序、演示 caption |
+| `68c899c` | KaTeX 改为自托管（稳定路径 + font-display: swap），修桌面端公式缺字 |
 | `28f637e` | 移动端打磨：触控、滑块、线路图命中区、抽屉定位 |
 
 ## 10. 项目外部的资料
