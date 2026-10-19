@@ -28,6 +28,7 @@
 | 22:22 | 域名准备 | `set-domain.ps1`、等待期手册 `docs/DEPLOY.md` |
 | 22:35 | 内容 80 节 | 第三批 20 节（中性原子、光子、拓扑、HHL、玻色采样、QKD 设备、量子互联网……） |
 | 22:56 | 第三轮审校 | 一致性核对 80 节；修 BB84 假阴性、排序方向、结论绝对化等 20 处 |
+| 10-19 15:23 | 学习工具 v0.3 | 收藏/笔记/继续阅读/导入导出、正文搜索、/me 页面 |
 
 ## 3. 关键决策（及为什么）
 
@@ -53,6 +54,8 @@ src/
 ├─ lib/qsim/               状态向量引擎（Circuit/gates/bloch/sample/QASM）
 ├─ lib/lab-codec.ts        线路序列化（分享链接、插入/删除，13 测试）
 ├─ lib/course.ts           加载、排序、上下节、篇章聚合
+├─ lib/library.ts          收藏/笔记的纯函数（10 项测试）
+├─ lib/progress.ts         localStorage 阅读进度
 ├─ lib/math.ts            服务端 KaTeX 渲染（自测题里的公式）
 ├─ layouts/                BaseLayout（SEO/主题）、LessonLayout（十段式）
 ├─ components/             Demo/Quiz/Sidebar/Callout/Misconception/Conclusion/Term
@@ -135,6 +138,7 @@ git push             # 触发 Cloudflare 自动构建
 | `a7d7108` | 第三轮审校收尾：BB84 累计统计、排序方向、结论绝对化、TeX 包装等 20 处 |
 | `6ba8702` | 切换生产域名到 diejiacademy.com |
 | `a961265` | Workers 静态资源改 drop-trailing-slash，canonical 与 URL 对齐 |
+| `9fe7e8e` | 本地学习数据：收藏、笔记、继续阅读、导入导出；搜索索引加入正文 |
 | `28f637e` | 移动端打磨：触控、滑块、线路图命中区、抽屉定位 |
 
 ## 10. 项目外部的资料
