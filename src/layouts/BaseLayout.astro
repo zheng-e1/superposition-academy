@@ -1,5 +1,4 @@
 ---
-import 'katex/dist/katex.min.css';
 import '../styles/tokens.css';
 import '../styles/base.css';
 import '../styles/reader.css';
@@ -44,6 +43,8 @@ const blocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- 自托管 KaTeX：路径稳定（不随构建哈希变化），字体用 font-display: swap -->
+    <link rel="stylesheet" href="/katex/katex.css" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical.href} />
