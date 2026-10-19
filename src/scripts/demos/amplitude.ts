@@ -31,9 +31,11 @@ export function mount(host: HTMLElement, props: Record<string, unknown> = {}) {
     for (const op of ops) {
       if (op.g === 'cnot') c.cx(op.q ?? 0, op.t ?? 1);
       else if (op.g === 'cz') c.cz(op.q ?? 0, op.t ?? 1);
-      else if (op.g === 'ry') c.ry(op.q ?? 0, theta);
       else (c as any)[op.g](op.q ?? 0);
     }
+    // 滑块是「在已选的门外，再对第 0 位做一次 Ry(θ)」。
+    // 早先只在 ops 里出现 ry 时才用 theta，但没有任何按钮会 push 它，滑块因此失效。
+    if (theta !== 0) c.ry(0, theta);
     return c;
   };
 

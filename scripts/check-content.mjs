@@ -58,7 +58,7 @@ function countWords(body) {
   const stripped = body
     .replace(/```[\s\S]*?```/g, ' ')
     .replace(/<Demo[\s\S]*?\/>/g, ' ')
-    .replace(/<[^>]+>/g, ' ');
+    .replace(/<[A-Za-z][^>]*>/g, ' ');
   const cjk = (stripped.match(/[\u4e00-\u9fa5]/g) || []).length;
   const latin = (stripped.match(/[A-Za-z][A-Za-z0-9'’-]*/g) || []).length;
   return cjk + latin;
