@@ -62,6 +62,7 @@ src/
 ├─ components/             Demo/Quiz/Sidebar/Callout/Misconception/Conclusion/Term
 ├─ scripts/demos/          11 个演示 + kit + loader
 ├─ scripts/                theme/search/sidebar/progress/quiz/exam
+├─ public/og/              100 张 1200×630 分享卡（scripts/make_og.py 生成）
 ├─ styles/                 tokens/base/reader/demo/portal
 └─ pages/                  首页、learn/[slug]、lab、exam、glossary、roadmap、about、404
 ```
@@ -141,6 +142,8 @@ git push             # 触发 Cloudflare 自动构建
 | `6ba8702` | 切换生产域名到 diejiacademy.com |
 | `a961265` | Workers 静态资源改 drop-trailing-slash，canonical 与 URL 对齐 |
 | `9fe7e8e` | 本地学习数据：收藏、笔记、继续阅读、导入导出；搜索索引加入正文 |
+| `7a130e9` | 内容扩到 100 节；每课 OG 分享卡；打印样式 |
+| `9f40377` | 新 20 节的收尾修订 |
 | `28f637e` | 移动端打磨：触控、滑块、线路图命中区、抽屉定位 |
 
 ## 10. 项目外部的资料
