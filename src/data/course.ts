@@ -98,6 +98,7 @@ export const PARTS: PartDef[] = [
       { id: 't-variational', title: '变分与近期算法' },
       { id: 't-complexity', title: '复杂度与边界' },
       { id: 't-linear-algo', title: '线性方程与矩阵算法' },
+      { id: 't-simulation', title: '模拟与量子线性代数' },
     ],
   },
   {
@@ -124,6 +125,7 @@ export const PARTS: PartDef[] = [
       { id: 't-hype', title: '祛魅与判断' },
       { id: 't-tools', title: '工具与平台' },
       { id: 't-network', title: '量子网络' },
+      { id: 't-sensing', title: '量子传感' },
     ],
   },
   {
@@ -143,6 +145,7 @@ export const PARTS: PartDef[] = [
     topics: [
       { id: 't-history', title: '人物与历史' },
       { id: 't-myth', title: '误区清单' },
+      { id: 't-open', title: '开放问题' },
     ],
   },
 ];

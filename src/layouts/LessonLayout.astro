@@ -34,6 +34,7 @@ const jsonLd = [
   path="/learn"
   slug={node.slug}
   type="article"
+  image={`/og/${node.slug}.png`}
   jsonLd={jsonLd}
 >
   <div class="reading-progress" id="readingProgress"></div>
@@ -67,6 +68,10 @@ const jsonLd = [
             <button class="tool-btn" type="button" data-note-toggle aria-expanded="false" aria-controls="notePanel">
               <span class="tool-icon" aria-hidden="true">✎</span>
               <span>笔记</span>
+            </button>
+            <button class="tool-btn" type="button" data-print>
+              <span class="tool-icon" aria-hidden="true">⎙</span>
+              <span>打印</span>
             </button>
           </div>
         </header>

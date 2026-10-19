@@ -1,0 +1,71 @@
+---
+slug: simulation-algo
+title: 模拟算法：Trotter 误差从哪来
+thesis: 把连续演化切成小步，误差是切法的代价
+part: p-algo
+topic: t-simulation
+tag: 深入
+minutes: 8
+order: 535
+demos: []
+quiz:
+  - q: "H = H₁ + H₂，且两项对易。用一阶 Trotter 走一步，先演化 H₁ 再演化 H₂，结果是什么？"
+    options: ["误差按 t² 增长，必须增加步数", "结果不再酉，概率不守恒", "与真实演化精确相等，没有截断误差", "只有两项都是泡利矩阵时才相等"]
+    answer: 2
+    explain: "两项对易时指数可以拆开，e^{-i(H₁+H₂)t} 正好等于 e^{-iH₁t}e^{-iH₂t}，切多少段都一样。Trotter 误差来自对易子，不来自「切」这个动作；拆分也不会破坏酉性，更不要求两项是泡利矩阵，所以另外三项都不成立。"
+  - q: "一阶 Trotter 的步数从 n 增加到 4n，其他条件不变，截断误差大致变成原来的多少？"
+    options: ["约 1/2", "约 1/4", "约 1/16", "基本不变"]
+    answer: 1
+    explain: "一阶 Trotter 的误差与步数成反比，n 变四倍，误差约剩四分之一。1/2 是把步数只加了一倍的结果，1/16 对应二阶方法的 1/n² 标度，与本题的一阶格式不符；误差也不会与步数无关。"
+  - q: "有人说「把 Trotter 步数加到十倍，结果一定更准」。最该追问的是什么？"
+    options: ["门数也涨了约十倍，硬件噪声的累积会不会盖过截断误差的收益", "Trotter 误差是否与步数完全无关", "二阶方法是否比一阶少用门", "两项哈密顿量是否一定对易"]
+    answer: 0
+    explain: "截断误差确实随步数下降，但每一步都要把所有局部项跑一遍，门数随步数线性上涨，噪声也跟着累积。总误差在某个步数附近有谷底，越过之后再加步数只会更差。误差并非与步数无关，二阶每步通常更贵，对易与否也不会随步数改变。"
+sources:
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §4.7（量子模拟）'
+  - 'Lloyd, 1996, Universal Quantum Simulators, Science'
+  - 'Suzuki, 1991, General theory of higher-order decomposition of exponential operators and symplectic integrators, Physics Letters A'
+updated: 2026-10-19
+---
+
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+把一段连续的演化交给一台只会做门的机器，你只能把它切成小段：先让 $H_1$ 作用 $\tau$，再让 $H_2$ 作用 $\tau$，重复 $n$ 次，其中 $\tau=t/n$。切得越细越像真的。问题是，细一倍，误差降多少？
+
+## 误差是对易子的账
+
+如果 $[H_1,H_2]=0$，两段演化可以交换，乘积精确等于 $e^{-iHt}$，切多少段都一样。真实体系的局部项一般不对易，于是每一小步都多做了一点东西。把两个指数乘起来，用 Baker–Campbell–Hausdorff 公式看：
+
+$$
+e^{-iH_1\tau}e^{-iH_2\tau}
+=\exp\!\left(-i(H_1+H_2)\tau-\frac{\tau^2}{2}[H_1,H_2]+O(\tau^3)\right)
+$$
+
+多出来的 $-\frac{\tau^2}{2}[H_1,H_2]$ 就是这一小步的偏差。它像一个凭空多出的<Term id="hamiltonian">哈密顿量</Term>，把态往错误方向推。走完 $n$ 步，偏差大致按 $n\tau^2=t^2/n$ 累积。所以一阶 Trotter 的误差与对易子的大小成正比，与步数成反比；两项对易，误差为零。
+
+局域性也在这里起作用。自旋链上相邻两项不对易，隔得远的两项往往对易，只有重叠项真正进账。连接越密，非零对易子越多，同样的 $n$ 越不够用。
+
+## 二阶：用门数换精度
+
+把一阶的乘积改成对称形式：
+
+$$
+e^{-iH_1\tau/2}e^{-iH_2\tau}e^{-iH_1\tau/2}
+$$
+
+$\tau^2$ 那一项在对称排列里抵掉了，领头误差退到 $\tau^3$，$n$ 步累积成 $t^3/n^2$。代价是每一步的指数个数变多：两项目的一阶每步 2 个，二阶 3 个；项数一多，差距还会拉大。所以在松精度、短时间的一头，一阶更便宜；在紧精度、长时间的一头，二阶用更少的步数就能达标，反而更省。
+
+还有一层误差不在这条账上：每个 $e^{-i\theta P}$ 自己也要靠 CNOT 与单比特门合成，合成得不完美，门越多错得越多。把 $n$ 调大，截断误差下降，硬件噪声却跟着门数上升。资源估算的第一行因此是三个数相乘：步数、每步的项数、每项的门数；再乘上错误率，才是这条线路能不能跑完的答案。
+
+<Misconception
+  note="Trotter 误差只是总误差的一部分，另一部分是门本身的错误；两者随步数的走向相反。"
+>
+  <Fragment slot="wrong">截断误差随步数单调下降，所以把 n 开到最大，结果就一定最准。</Fragment>
+  <Fragment slot="right">步数越大，门数越多，硬件噪声累积得越厉害；总误差在截断误差与噪声同量级处有一个谷底，超过它再加步数只会更差。</Fragment>
+</Misconception>
+
+<Conclusion>
+  一阶 Trotter 的误差按 $t^2/n$ 乘上对易子的规模累积，二阶按 $t^3/n^2$，对易子为零时两者都没有误差。所谓「切法的代价」，就是这份对易子账，再加上每步合成本身引入的门误差。资源估算要把步数、项数、每项门数乘在一起看，而不是只盯着精度。
+</Conclusion>

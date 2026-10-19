@@ -1,0 +1,93 @@
+---
+slug: su2-rotations
+title: 任意旋转：SU(2) 与布洛赫球的转动
+thesis: 单比特门就是球面上的一次转动
+part: p-qubit
+topic: t-gates
+tag: 深入
+minutes: 8
+order: 315
+demos: ['bloch']
+quiz:
+  - q: '把 $R_z(2\pi)$ 作用在 $|0\rangle$ 上，再在 z 基测量，结果是什么？'
+    options:
+      - '一定得到 1'
+      - '仍以 100% 得到 0，态矢多了一个 −1，但那是全局相位'
+      - '0 与 1 各一半'
+      - '态变成混态，测量结果不可预测'
+    answer: 1
+    explain: '$R_z(2\pi)=\operatorname{diag}(e^{-i\pi},e^{i\pi})=-I$，态矢整体变号；−1 是全局相位，任何测量都看不出，所以仍以 100% 得到 0。它不会翻转比特，也不会把纯态变成混态；把 2π 当成 0 的人，会误以为矩阵也等于 I。'
+  - q: '忽略全局相位，H 门对应布洛赫球上的哪种转动？'
+    options:
+      - '绕 z 轴转 90°'
+      - '绕 x 轴转 180°'
+      - '绕 x 与 z 之间 45° 的那根轴转 180°'
+      - '绕 y 轴转 90°'
+    answer: 2
+    explain: '$H=(X+Z)/\sqrt2$，而 $R_{\mathbf n}(\pi)=-i(n_xX+n_yY+n_zZ)$，取 $\mathbf n=(\hat x+\hat z)/\sqrt2$ 就得到 $H=iR_{\mathbf n}(\pi)$。绕 x 轴转 180° 是 X，绕 z 轴转 90° 差 S 一个全局相位，两者都不对。'
+  - q: '旋转公式里为什么写 $\theta/2$，而不是 $\theta$？'
+    options:
+      - '因为角度只能取 0 到 π，超过就要折半'
+      - '因为 SU(2) 到 SO(3) 是二对一：态矢转 θ/2，布洛赫矢量才转 θ，转满 2π 时态矢得 −1'
+      - '因为概率是振幅的平方，角度也要开方'
+      - '因为旋转必须可逆，半角才保证可逆'
+    answer: 1
+    explain: '半角来自二重覆盖：球面上的箭头转 θ，对应的态矢只转 θ/2；θ=2π 时矩阵是 −I，箭头回到原处而态矢变号。角度范围与可逆性都不是原因，振幅平方也只管概率，不管角度怎么分。'
+sources:
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §4.2（单比特操作）'
+  - 'Sakurai, 1994, Modern Quantum Mechanics, 第 3 章（角动量与旋转）'
+  - 'IBM Quantum 文档，Quantum gates 一节（Rx、Ry、Rz 与全局相位）'
+updated: 2026-10-19
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+把 $|0\rangle$ 转到 $|1\rangle$，听上去就是转 180°。可门的公式里出现的是 $\theta/2$，不是 $\theta$。角度被砍了一半，转 180° 岂不是只走了半圈？球面上的箭头确实只到对面，要转满 360° 才回来——代价是态矢多一个负号。
+
+## 一次旋转，三个数
+
+绕单位轴 $\mathbf n$ 转 $\theta$ 的门写成
+
+$$
+R_{\mathbf n}(\theta)=\exp\left(-i\frac{\theta}{2}\,\mathbf n\cdot\boldsymbol\sigma\right)
+=\cos\frac{\theta}{2}I-i\sin\frac{\theta}{2}\,(n_xX+n_yY+n_zZ)
+$$
+
+单位轴两个数，角度一个数，正好三个实数，这就是 SU(2) 的全部参数。绕 z 的特例最好认：$R_z(\theta)=\operatorname{diag}(e^{-i\theta/2},e^{i\theta/2})$，它给 $|0\rangle$ 与 $|1\rangle$ 添上相反的相位，箭头沿纬线转 θ。绕 x 与绕 y 的同款公式把箭头沿经线推；三根坐标轴加上任意斜轴，合起来覆盖整个球面。
+
+为什么是 θ/2？因为布洛赫矢量在 SO(3) 里转 θ，对应的态矢在 SU(2) 里只转 θ/2。这个二对一的关系有个直接后果：θ=2π 时 $R=-I$，态矢变成 $-|\psi\rangle$，箭头却已经回到原处。−1 是<Term id="phase">全局相位</Term>，任何测量都看不见，所以物理上 360° 才算一圈；但作为矩阵，$R(2\pi)\neq I$，一旦它被写成受控操作，这个负号就会落到某一条分支上，变成看得见的相对相位。
+
+拖动旋转视角；按 X、Y、Z 各绕坐标轴转 180°；把 Ry(θ) 滑块从 0° 拖到 180°，箭头到南极，再拖到 360°，箭头回到北极，(x, y, z) 与 P(0) 完全复原，态矢只差那个 −1。
+
+<Demo
+  kind="bloch"
+  label="球面上的旋转"
+  caption="拖动旋转视角；按 X、Y、Z 是绕对应轴转 180°。把 Ry(θ) 滑块拖到 180°，箭头指向南极；再拖到 360°，箭头回到北极，读数里的 (x, y, z) 与 P(0) 完全复原——态矢只差一个 −1 的全局相位。"
+/>
+
+## H 是斜着转半圈
+
+按 X、Y、Z 之外，S 与 T 是绕 z 的 90° 与 45°（都差一个全局相位）。H 稍特别：
+
+$$
+H=\frac{X+Z}{\sqrt2}=i\,R_{\mathbf n}(\pi),\qquad
+\mathbf n=\frac{\hat x+\hat z}{\sqrt2}
+$$
+
+忽略全局相位，H 就是绕 x 与 z 之间 45° 的那根轴转 180°。这一句解释了两件事：$H^2=I$，因为连转两次 360°，在球上是恒等；H 把 $|0\rangle$ 送到赤道上的 $|+\rangle$，那正是绕斜轴翻过去的结果。
+
+于是设计一个单比特门，等于选一根轴、选一个角。硬件只提供少数几种转动，剩下的靠组合；下一节把任意一门拆成三个角。
+
+<Misconception
+  note="把公式里的 θ/2 当成数学技巧，会误判 180° 与 360° 哪个是「一整圈」。"
+>
+  <Fragment slot="wrong">既然 $R(2\pi)=-I$，转 360° 就不算回到原态，得再转一圈才真的复原。</Fragment>
+  <Fragment slot="right">−1 是全局相位，物理态已经复原；球面上的箭头在 360° 时回到原处，再转一圈只是让矩阵也回到 $I$。</Fragment>
+</Misconception>
+
+<Conclusion>
+  单比特门就是布洛赫球上的一次转动：绕轴 $\mathbf n$ 转 θ，矩阵里写 θ/2，因为 SU(2) 双覆盖 SO(3)。360° 让箭头复原，态矢留下一个看不见的 −1；H 则是绕 x 与 z 之间 45° 的轴转 180°。选轴、选角，单比特门没有别的内容。
+</Conclusion>

@@ -1,0 +1,86 @@
+---
+slug: zyz-decomposition
+title: 一门拆成三旋转：ZYZ 分解
+thesis: 任意单比特门只需三次绕轴旋转
+part: p-qubit
+topic: t-gates
+tag: 深入
+minutes: 7
+order: 316
+demos: ['circuit']
+quiz:
+  - q: 'ZYZ 写成 $U=R_z(\alpha)R_y(\beta)R_z(\gamma)$。对一般 $U(2)$ 矩阵，这个式子还差什么？'
+    options:
+      - '差一个全局相位 $e^{i\delta}$'
+      - '差一个 X 门，否则转不到球面另一侧'
+      - '差一个 CNOT，单比特门不能独立存在'
+      - '什么都不差，所有 $U(2)$ 矩阵都精确等于这个乘积'
+    answer: 0
+    explain: '三个角只覆盖 $SU(2)$；$U(2)$ 比它多一个整体相位，所以要写成 $e^{i\delta}R_z(\alpha)R_y(\beta)R_z(\gamma)$。全局相位不影响任何测量，但写矩阵时不能丢；X 与 CNOT 都不是缺失的参数，$R_y$ 已经能把箭头带到球面任意纬度。'
+  - q: '在 Rz 被实现为虚拟门的超导平台上，一次 ZYZ 分解的实际代价主要落在哪里？'
+    options:
+      - '三次 Rz，因为每次都要打一个微波脉冲'
+      - '两次 Ry（或等价的 √X 类脉冲），Rz 只是改参考系'
+      - '一个 CNOT，用来连接两个比特'
+      - '测量与重置，因为每次旋转后都要读一次'
+    answer: 1
+    explain: '虚拟 Rz 通过改变后续脉冲的参考相位实现，几乎不占时间；真正要打出去的是两次绕 y 的旋转。Rz 并不是三次真实脉冲，ZYZ 也仍然是单比特门，不需要 CNOT，更不需要在中间测量。'
+  - q: '把三个旋转串联起来实现一个门，误差会怎样？'
+    options:
+      - '三个门的误差一定相互抵消，因为旋转角度互补'
+      - '非相干误差大致按门数累加，相干误差还会相干叠加，不能指望抵消'
+      - '总误差只由最后一个门决定，前面的门不影响'
+      - '只要角度选得对，总误差恒等于单门误差'
+    answer: 1
+    explain: '误差不会因为「拆成三步」自动变小：非相干误差近似线性累加，相干误差按振幅叠加，最坏情况比线性更糟。角度互补只改变转轴与转角，不保证误差反号；总误差也不是由最后一个门单独决定的。'
+sources:
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §4.2 与 §4.5'
+  - 'IBM Quantum 文档，Transpiler 与基门分解一节（虚拟 Rz 与 √X）'
+  - 'McKay, Wood, Sheldon, Chow & Gambetta, 2017, Efficient Z gates for quantum computing, Physical Review A'
+updated: 2026-10-19
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+硬件给你的是几种固定角度的脉冲，你要的是任意一个<Term id="unitary">酉矩阵</Term>。中间没有新器件，只有一件事：把三次旋转按顺序排好，再补一个整体相位。听上去像凑，其实三个角刚好够。
+
+## 三个角就够
+
+任意单比特门可以写成
+
+$$
+U=e^{i\delta}R_z(\alpha)R_y(\beta)R_z(\gamma),
+\qquad \alpha,\gamma\in[0,2\pi),\ \beta\in[0,\pi]
+$$
+
+$U(2)$ 有四个实数：三个决定转动，一个决定全局相位 $\delta$。$SU(2)$ 去掉 $\delta$ 正好三个，三个角刚好覆盖。顺序不能换：先绕 z 转 γ，再绕 y 转 β，最后绕 z 转 α；矩阵从右往左作用在态上。也常用 ZXZ 或 XY 约定，角的值不同，能表示的集合一样。
+
+「任意」是精确的，不是逼近。给定 $U$，解出三个角就结束，没有残差。这与用 H、T、CNOT 逼近任意门是两层事：那一层才有 ε，这一层只有解方程。
+
+打开时停在第 0 步，线路上是默认的两门 Bell 线路。按「下一步」走一格：H 之后是 $|00\rangle$ 与 $|10\rangle$ 各半；再按一格，CNOT 之后只剩 $|00\rangle$ 与 $|11\rangle$。按「上一步」可以逐步退回起点。
+
+<Demo
+  kind="circuit"
+  label="一步一个门"
+  caption="打开时停在第 0 步（0 / 2），线路是默认的两门 Bell 态。按「下一步」走一格，H 之后 |00⟩ 与 |10⟩ 各半；再按一格，CNOT 之后只剩 |00⟩ 与 |11⟩；「上一步」可以逐步退回起点。ZYZ 说的是：任意单比特门也能拆成三步，只是三步都落在同一条线上。"
+/>
+
+## 编译时值多少钱
+
+在不少超导平台上，Rz 不是真的脉冲，而是把后续脉冲的参考相位转一下，叫虚拟 Z，几乎不耗时；真正要打出去的是两次 Ry，或与它们等价的 √X 类脉冲。于是「任意单比特门」的编译问题，实际变成「两次固定脉冲加几个相位偏移」。很多门集把 Rz 单列出来，就是因为它便宜。
+
+误差不会因为拆成三步就自动抵消。非相干误差大致按门数线性累加，相干误差按振幅叠加，最坏情况比线性更糟；三个角若能并进相邻门的相位里，就别真做三个门。编译器的活，是在精度、门数和原生门集之间取一个折中。
+
+<Misconception
+  note="把「单比特精确分解」和「有限门集逼近」混在一起，会误以为任意门都只能近似。"
+>
+  <Fragment slot="wrong">任意单比特门都要靠 Solovay–Kitaev 一步步逼近，所以总有误差，ZYZ 只是其中一种近似。</Fragment>
+  <Fragment slot="right">ZYZ 是精确分解：三个连续参数的旋转就能写出任意 $U(2)$。需要 ε 的是把门限制在离散门集里的那一层。</Fragment>
+</Misconception>
+
+<Conclusion>
+  任意单比特门都能精确拆成 $R_z(\alpha)R_y(\beta)R_z(\gamma)$，再乘一个全局相位；三个角就是 $SU(2)$ 的全部参数。编译到原生门集时，Rz 往往便宜、Ry 才要花时间，所以真正的代价是两次脉冲，误差则随门数与相干性累加。下一节把这套转动用到多个比特上。
+</Conclusion>

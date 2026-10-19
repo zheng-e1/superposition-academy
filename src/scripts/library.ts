@@ -84,6 +84,8 @@ function initLessonTools() {
     if (status) status.textContent = lib.notes[slug] ? `上次保存 ${clock(lib.notes[slug].updated)}` : '自动保存到本机';
   }
 
+  document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
+
   toggle?.addEventListener('click', () => openPanel(panel?.hidden ?? true));
 
   // 从「我的」页点「继续编辑」会带 #note，直接展开面板

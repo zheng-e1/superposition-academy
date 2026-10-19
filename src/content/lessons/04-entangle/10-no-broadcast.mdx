@@ -1,0 +1,80 @@
+---
+slug: no-broadcast
+title: 不可广播：为什么不能把未知量子态「发一份给两个人」
+thesis: 不可克隆的加强版：连「广播」也不行
+part: p-entangle
+topic: t-teleport
+tag: 概念
+minutes: 7
+order: 415
+demos: []
+quiz:
+  - q: '广播与克隆的关键差别是什么？'
+    options:
+      - '广播要求两份都是纯态，克隆允许混态'
+      - '广播允许输入混态，只要求输出的两个边缘都等于原来的 ρ'
+      - '广播不需要任何量子信道，克隆需要'
+      - '广播只对纠缠态有定义'
+    answer: 1
+    explain: '克隆要求 $|\psi\rangle\to|\psi\rangle|\psi\rangle$，两份都是纯态；广播只要求一个信道的两个输出边缘都等于输入 ρ，副本可以是混态、可以相关。纯态输入时广播会退化成克隆，但定义上广播管的是更宽的混态情形；两者都作用在量子信道上，也不限于纠缠态。'
+  - q: '下面哪一组态可以被同一台机器广播？'
+    options:
+      - '任意两个纯态'
+      - '$|0\rangle$ 与 $|1\rangle$ 这样对易的一组'
+      - '$|0\rangle$ 与 $|+\rangle$ 这样不对易的一组'
+      - '任意两个混态'
+    answer: 1
+    explain: '一组态能广播，当且仅当它们两两对易、可在同一基下同时对角化。$|0\rangle$ 与 $|1\rangle$ 在 z 基下可区分，测一次再各制备一份即可；$|0\rangle$ 与 $|+\rangle$ 不对易，测量选一个基就会毁掉另一个基的相干性。任意两个纯态或混态都可能不对易，不能一概而论。'
+  - q: '假设存在一台对所有输入都成立的广播机，拿半个 Bell 态去试，矛盾出在哪里？'
+    options:
+      - '会让信息超光速，违反相对论'
+      - '两个联合边缘都会是 Bell 态，但 $A_1B$ 为纯态迫使整体分解，$A_2B$ 只能是无关联的 $I/2\otimes I/2$'
+      - '会把 A 的未知态精确复制成两份纯态，直接违反不可克隆'
+      - '会消耗额外能量，违反能量守恒'
+    answer: 1
+    explain: '通用广播机会让 $A_1B$ 与 $A_2B$ 都保持原来的 Bell 关联；但 $A_1B$ 是纯态时，整个三体态必须写成它与 $A_2$ 的乘积，于是 $A_2B$ 只能是 $I/2\otimes I/2$，不可能再是 Bell 态。超光速与能量守恒都不是这条矛盾的来源；A 那一半是混态 $I/2$，也不是在复制某个纯态。'
+sources:
+  - 'Barnum, Caves, Fuchs, Jozsa & Schumacher, 1996, Noncommuting mixed states cannot be broadcast, Physical Review Letters'
+  - 'Wootters & Zurek, 1982, A single quantum cannot be cloned, Nature'
+  - 'Horodecki, Horodecki, Horodecki & Horodecki, 2009, Quantum entanglement, Reviews of Modern Physics'
+updated: 2026-10-19
+---
+
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+不可克隆管的是「别想复印一份未知的纯态」。退一步：允许副本变成混态，只要求两份的边缘统计一样。这样行不行？只要这组态里有不对易的两个，答案仍是不行。
+
+## 克隆与广播
+
+克隆要求 $|\psi\rangle\to|\psi\rangle|\psi\rangle$，两份都是纯态。广播只要求一个量子信道把 ρ 送到两比特态 σ，且
+
+$$
+\operatorname{Tr}_B\sigma=\rho,
+\qquad
+\operatorname{Tr}_A\sigma=\rho
+$$
+
+副本可以是混态，也可以彼此关联。对纯态输入，广播退化成克隆：一个边缘是纯态，整体就必须写成两个纯态的乘积，另一份也只能是同一个 $|\psi\rangle$。所以广播是不可克隆的加强版。
+
+定理（Barnum、Caves、Fuchs、Jozsa、Schumacher，1996）：一组态能广播，当且仅当它们两两对易。经典信息正落在这一侧：$|0\rangle$ 与 $|1\rangle$ 对易，测一次再各制备一份就行；对 $|0\rangle$ 与 $|+\rangle$ 这样不对易的一对，任何测量都会选一个基，另一个基的信息被抹掉。要注意，单看某一个态，广播可能是平凡的（$I/2$ 直接制备两份），定理管的是整组非对易态。
+
+## 广播会拆掉纠缠
+
+假设真有一台对所有输入都成立的广播机。拿半个 Bell 态来试：A 把一半广播成 $A_1$、$A_2$，B 不动。通用性保证 $\sigma_{A_1B}$ 与 $\sigma_{A_2B}$ 都还是 Bell 态。可 $\sigma_{A_1B}$ 是纯态，纯边缘迫使整体写成「Bell 态乘 $A_2$ 的态」；于是 $\sigma_{A_2B}$ 只能是 $I/2\otimes I/2$，矛盾。
+
+换言之，广播会让同一份纠缠在 B 身上出现两次，而<Term id="entanglement">纠缠</Term>不能这样分叉；靠测量绕过去也不行，测量已经把纠缠换成经典关联。
+
+量子网络因此不能把一对纠缠广播给多个用户；想多份，只能各自建立，或用交换与传态消耗掉原有那份。密钥分发里，窃听者想「留一份、放一份」也得广播未知态，而这做不到。
+
+<Misconception
+  note="「先测再制备」只对某一组对易态有效；换一组基，它就把相干性毁掉了。"
+>
+  <Fragment slot="wrong">先测量、再按结果制备两份，所以混态总能广播；不可克隆只限制纯态。</Fragment>
+  <Fragment slot="right">这招只对能在同一基下区分的态有效。对 $|0\rangle$ 与 $|+\rangle$ 这样的非对易集合，测量选一个基就会毁掉另一个基的信息，做不出两份都等于原 ρ 的副本。</Fragment>
+</Misconception>
+
+<Conclusion>
+  广播比克隆弱：它只要求两个输出的边缘都等于输入，允许副本是混态。可定理说，一组态能广播当且仅当它们对易；非对易的量子态不行。能广播的只有经典信息；量子网络里的每一份纠缠都得单独建立，或者被消耗着搬运。
+</Conclusion>

@@ -1,0 +1,72 @@
+---
+slug: quantum-channel
+title: 量子信道：噪声不是「随机换一个门」
+thesis: 保迹完全正的映射，才是合法的量子演化
+part: p-math
+topic: t-density
+tag: 深入
+minutes: 9
+order: 232
+demos: []
+quiz:
+  - q: "下列哪一组 Kraus 算符满足保迹条件 ΣKₖ†Kₖ=I？"
+    options: ['K₀=|0⟩⟨0|，K₁=|1⟩⟨1|', 'K₀=|0⟩⟨0|', 'K₀=√2|0⟩⟨0|，K₁=√2|1⟩⟨1|', 'K₀=|0⟩⟨0|，K₁=|1⟩⟨0|']
+    answer: 0
+    explain: "第一组两个投影相加正好是 I，描述的是抹掉相位、保留对角元的信道。第二组只覆盖 |0⟩ 方向，总和不是 I，概率会漏；第三组总和是 2I，总概率会变成 2；第四组两项的 K†K 都是 |0⟩⟨0|，加起来是 2|0⟩⟨0|，同样不保迹。"
+  - q: "振幅阻尼为什么不能写成「以概率 p 施加某个酉门」？"
+    options: ['因为它不是线性的', '因为任何随机酉门的平均都满足 E(I)=I，而振幅阻尼把 I 送到 diag(1+γ, 1−γ)', '因为它需要两个以上的 Kraus 算符', '因为它不保迹']
+    answer: 1
+    explain: "随机酉门是酉门的凸组合，作用在 I 上每一项都给出 I，平均仍是 I；振幅阻尼把 I 送到 diag(1+γ,1−γ)，不相等。它是线性的，也保迹；Kraus 算符的个数不是障碍，一个信道可以用任意多个算符表示。"
+  - q: "转置映射 ρ ↦ ρᵀ 把正矩阵送到正矩阵，为什么不是合法信道？"
+    options: ['因为它不保迹', '因为它不可逆', '因为它不是完全正的，作用在 Bell 态的一半上会得到负本征值', '因为它把纯态变成混态']
+    answer: 2
+    explain: "转置保迹、也可逆，问题出在完全正：把转置只作用在纠缠对的一半上，得到的联合算符会出现负本征值，概率无法解释。可逆性与合法性无关；它也不把纯态变成混态，纯态的转置仍是纯态。"
+sources:
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §8.2（量子操作与 Kraus 表示）'
+  - 'Choi, 1975, Completely positive linear maps on complex matrices, Linear Algebra and its Applications'
+  - 'Stinespring, 1955, Positive functions on C*-algebras, Proceedings of the American Mathematical Society'
+updated: 2026-10-18
+---
+
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+把噪声说成「每个门有概率 p 出错，随机换成一个别的酉门」，听起来够用。可有一种最常见的噪声——能量弛豫——根本写不成这种平均：它会把 |1⟩ 按概率变成 |0⟩，也会让最大混态不再是最大混态。要描述它，得换一个对象：信道。
+
+## 把环境也算进来
+
+真实演化很少是孤立的。系统和环境一起从 $|\psi\rangle\otimes|0\rangle_E$ 出发，做一次联合酉演化 $U$；你只保留系统，把环境的自由度求和掉：
+
+$$
+\mathcal{E}(\rho)=\operatorname{Tr}_E\left[U(\rho\otimes|0\rangle\langle0|)U^\dagger\right]
+$$
+
+这一步是偏迹。它把「信息漏进环境」写成了数学：系统本身不再 <Term id="unitary">酉</Term> 演化，但系统和环境的整体仍然是酉的。
+
+这样的映射都能写成 Kraus 形式：
+
+$$
+\mathcal{E}(\rho)=\sum_k K_k\rho K_k^\dagger,\qquad \sum_k K_k^\dagger K_k=I
+$$
+
+$K_k$ 叫 Kraus 算符。第二个条件保迹，保证概率总和始终是 1；能写成这个形式，则保证映射完全正。
+
+## CPTP 三个词与三种噪声
+
+CPTP 拆成三个词：映射、完全正、保迹。映射：把密度矩阵送到密度矩阵，只要求线性。完全正：不仅自己为正，和任意辅助系统纠缠着一起作用也正。转置映射 $\rho\mapsto\rho^{T}$ 是正的，却不是完全正的——作用在 Bell 态的一半上，得到的算符有负本征值，物理演化不允许这种结果，所以「正」不够。保迹：$\sum_kK_k^\dagger K_k=I$，所有结果的概率加起来是 1。
+
+几个标准例子。比特翻转：$K_0=\sqrt{1-p}\,I$，$K_1=\sqrt{p}\,X$，以概率 $p$ 翻，以 $1-p$ 不变。相位阻尼：$K_0=\sqrt{1-p/2}\,I$，$K_1=\sqrt{p/2}\,Z$，非对角元乘 $1-p$，能量分布不动，相位信息流失，这正是 <Term id="decoherence">退相干</Term> 的最简模型。振幅阻尼：$K_0=\begin{pmatrix}1&0\\0&\sqrt{1-\gamma}\end{pmatrix}$，$K_1=\begin{pmatrix}0&\sqrt{\gamma}\\0&0\end{pmatrix}$，$|1\rangle$ 以概率 $\gamma$ 落到 $|0\rangle$，描述能量弛豫，对应 <Term id="coherence-time">相干时间</Term> 里的 T₁。去极化：以概率 $p$ 把态换成 $I/2$，其余不变，布洛赫球上的箭头向球心收缩。
+
+为什么不能随便写一个矩阵当噪声？它可能不保迹，概率和不为 1；可能不正，给出负概率；也可能只是正而不完全正，和纠缠态一起用就出事。「随机换一个酉门」只是信道的一个很小的子类：酉门的凸组合满足 $\mathcal{E}(I)=I$，而振幅阻尼把 $I$ 送到 $\operatorname{diag}(1+\gamma,1-\gamma)$，不等于 $I$，所以它不可能写成随机酉门的平均。
+
+<Misconception
+  note="「随机」描述的是我们的无知，信道描述的是系统可观测的演化。把两者混为一谈，就会漏掉能量弛豫这类非酉的噪声。"
+>
+  <Fragment slot="wrong">噪声就是按某个概率把门换成一个随机的酉门；把所有可能用到的门列出来，就描述完了。</Fragment>
+  <Fragment slot="right">随机酉门只是信道的一个子类，满足 E(I)=I；振幅阻尼不满足，必须用 Kraus 算符或「系统 + 环境 + 偏迹」来描述。</Fragment>
+</Misconception>
+
+<Conclusion>
+  量子信道是 CPTP 映射：完全正保证和纠缠态一起用也不出负概率，保迹保证概率总和为 1；Kraus 表示把这两条写成 ΣKₖ†Kₖ=I。酉演化是只有一个 Kraus 算符的特例，随机酉门是另一个子类。振幅阻尼、相位阻尼、去极化各自抓住一类真实噪声，而它们并不都能被「随机换门」装下。
+</Conclusion>

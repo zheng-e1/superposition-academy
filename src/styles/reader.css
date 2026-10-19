@@ -990,3 +990,124 @@
 .note-panel {
   scroll-margin-top: 72px;
 }
+
+/* ── 打印 / 存为 PDF ─────────────────────────────────────── */
+@media print {
+  @page {
+    margin: 16mm 15mm;
+  }
+
+  :root {
+    --bg: #fff;
+    --card: #fff;
+    --ink: #111;
+    --sub: #333;
+    --faint: #555;
+    --line: #ddd;
+    --line-strong: #bbb;
+  }
+
+  body {
+    background: #fff !important;
+    color: #111;
+  }
+
+  .topbar,
+  .sidebar,
+  .sidebar-backdrop,
+  .site-foot,
+  .reading-progress,
+  .lesson-tools,
+  .note-panel,
+  .quiz,
+  .pager,
+  .feedback,
+  .search-overlay,
+  .skip,
+  .demo,
+  .continue-card {
+    display: none !important;
+  }
+
+  .reader {
+    display: block;
+    max-width: none;
+  }
+
+  .main {
+    padding: 0;
+    max-width: none;
+  }
+
+  .article {
+    max-width: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .lesson-head {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 12pt;
+    margin-bottom: 16pt;
+  }
+
+  .lesson-title {
+    font-size: 20pt;
+    line-height: 1.3;
+  }
+
+  .lesson-thesis {
+    font-size: 11pt;
+    color: #444;
+  }
+
+  .prose {
+    font-size: 11pt;
+    line-height: 1.65;
+    color: #111;
+  }
+
+  .prose h2 {
+    font-size: 14pt;
+    margin-top: 18pt;
+    break-after: avoid;
+  }
+
+  .prose h3 {
+    font-size: 12pt;
+    break-after: avoid;
+  }
+
+  .prose a {
+    color: #111;
+    text-decoration: underline;
+  }
+
+  .prose .katex-display {
+    break-inside: avoid;
+  }
+
+  .callout,
+  .misconception,
+  .conclusion,
+  .sources,
+  .prose figure,
+  .prose table {
+    break-inside: avoid;
+  }
+
+  .lesson-foot {
+    border-top: 1px solid #ccc;
+    margin-top: 18pt;
+    padding-top: 10pt;
+  }
+
+  .sources-title {
+    color: #111;
+  }
+
+  .sources li {
+    font-size: 9.5pt;
+    color: #333;
+  }
+}

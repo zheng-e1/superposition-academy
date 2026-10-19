@@ -1,0 +1,87 @@
+---
+slug: ghz-w
+title: GHZ 与 W：两种截然不同的纠缠
+thesis: 都是三比特纠缠，但「拿掉一个」的后果不同
+part: p-entangle
+topic: t-bell
+tag: 概念
+minutes: 7
+order: 413
+demos: ['circuit']
+quiz:
+  - q: '三比特 GHZ 态里，忽略第三个比特后，前两个比特处于什么态？'
+    options:
+      - '仍是 Bell 态 $(|00\rangle+|11\rangle)/\sqrt2$'
+      - '$|00\rangle$ 与 $|11\rangle$ 各一半的可分离混态，没有纠缠'
+      - '确定的 $|00\rangle$'
+      - '一个纯态，只是纠缠变弱了'
+    answer: 1
+    explain: '对第三个比特取偏迹，得到 $(|00\rangle\langle00|+|11\rangle\langle11|)/2$，这是两个经典可能性的混合，任何两比特纠缠度量都为零。它不再是 Bell 叠加，也不是确定态；混合之后没有纯态可言，所以「纯态但变弱」也不对。'
+  - q: 'W 态 $(|001\rangle+|010\rangle+|100\rangle)/\sqrt3$ 中，测第一个比特得到 0，剩下两个比特是什么态？'
+    options:
+      - '$|00\rangle$'
+      - '$(|01\rangle+|10\rangle)/\sqrt2$，一个 Bell 态'
+      - '一个可分离混态'
+      - '$|11\rangle$'
+    answer: 1
+    explain: '得 0 的那一支是 $(|01\rangle+|10\rangle)/\sqrt3$，归一化后正是 $|\Psi^+\rangle$；得 1 的那一支才留下 $|00\rangle$。所以 W 丢掉一个比特后仍可能留下纠缠，而 GHZ 不会。'
+  - q: '关于 GHZ 与 W 的关系，下面哪种说法准确？'
+    options:
+      - '只要允许转换失败，GHZ 就能以某个非零概率变成 W'
+      - 'W 可以通过本地操作变成 GHZ，反过来不行'
+      - '两者属于不同的纠缠类别，即使允许概率成功也不能互相转换'
+      - '两者只是同一态在不同基下的写法，做一个本地基变换即可互换'
+    answer: 2
+    explain: 'Dür、Vidal 与 Cirac 证明三比特纠缠分成 GHZ 类与 W 类，概率性 LOCC 也不能跨类转换。本地基变换不改变纠缠结构，两者约化态的性质完全不同；「单向可转」也不成立。'
+sources:
+  - 'Dür, Vidal & Cirac, 2000, Three qubits can be entangled in two inequivalent ways, Physical Review A'
+  - 'Greenberger, Horne & Zeilinger, 1989, Going beyond Bell’s theorem（Bell 定理与量子宇宙观论文集）'
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §2.2.8（复合系统）'
+updated: 2026-10-19
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+三个比特，两种纠缠。一种把所有分量压在 $|000\rangle$ 与 $|111\rangle$ 上；另一种摊在三项里。只看「都纠缠」不够：拿掉一个比特，前者什么都不剩，后者还留着一段真正的纠缠。
+
+## 两项与三项
+
+$$
+|GHZ\rangle=\frac{|000\rangle+|111\rangle}{\sqrt2},
+\qquad
+|W\rangle=\frac{|001\rangle+|010\rangle+|100\rangle}{\sqrt3}
+$$
+
+两式都不能写成三个单比特态的乘积，都是真正的三比特<Term id="entanglement">纠缠</Term>。差别在约化：忘掉一个比特，GHZ 剩下 $(|00\rangle\langle00|+|11\rangle\langle11|)/2$，这是可分离的混态，只剩经典的同号关联；W 剩下的两比特仍在纠缠，用下一节要讲的 concurrence 来量是 $2/3$。
+
+测量看得更清楚。GHZ 测第一个比特得 0，另外两个必定是 $|00\rangle$；得 1 就必定是 $|11\rangle$。W 测第一个比特，得 1（概率 $1/3$）时剩下 $|00\rangle$，得 0（概率 $2/3$）时剩下 $(|01\rangle+|10\rangle)/\sqrt2$，一个 Bell 态。实验里「丢掉一个」就是那一路光子没到、或被测量后不再参与，剩下的东西完全不同。
+
+先点预设「GHZ 三比特」：线路变三行，步数回到 0 / 3；再按三次「下一步」，看直方图怎么从一根柱变成两根。
+
+<Demo
+  kind="circuit"
+  label="搭一个 GHZ"
+  caption="先点预设「GHZ 三比特」，线路变三行、步数回到 0 / 3。按三次「下一步」：H 之后是 |000⟩ 与 |100⟩ 各半；第一个 CNOT 之后是 |000⟩ 与 |110⟩；第二个 CNOT 之后只剩 |000⟩ 与 |111⟩。「上一步」可逐步退回。"
+/>
+
+## 不能互相兑换
+
+拿本地操作加经典通信去换，换不过去；即使允许转换以某个概率成功，也不行。Dür、Vidal 与 Cirac 在 2000 年证明，三比特纠缠分成两个不等价类，GHZ 与 W 各占一类，之间没有非零概率的转换。
+
+直观上，GHZ 的纠缠是「全有或全无」：任意一对单独看都没有纠缠，三体关联却拉满；W 的纠缠分布在每一对上，丢一个还剩两个。三-tangle 给 GHZ 满值、给 W 零；反过来，W 对丢比特更稳。没有一把尺能同时说两者谁更纠缠，这也是为什么「纠缠量」在三比特上不再是一个数。
+
+工程上，链路损耗大、随时可能丢比特的场景更像 W 的用武之地；需要三方同时对齐的关联，GHZ 更直接。想要哪一种，就得直接制备，不能先造 GHZ 再「转」成 W。
+
+<Misconception
+  note="「都纠缠」不等于「同一种纠缠」；差别不在写法，在约化态的结构。"
+>
+  <Fragment slot="wrong">GHZ 与 W 只是项数和系数不同，做一次本地基变换就能互换，纠缠程度其实一样。</Fragment>
+  <Fragment slot="right">本地酉变换不改变纠缠类别；GHZ 丢一个比特后完全可分离，W 丢一个还剩两比特纠缠，两者 LOCC 不可互转。</Fragment>
+</Misconception>
+
+<Conclusion>
+  GHZ 与 W 都是真正的三比特纠缠，但结构不同：GHZ 的关联只在三体，拿掉一个比特就只剩可分离的混态；W 的纠缠分布在每一对上，拿掉一个还剩一个 Bell 态。两者属于不同纠缠类别，概率性 LOCC 也不能互转；想要哪一种，只能直接制备。
+</Conclusion>

@@ -1,0 +1,76 @@
+---
+slug: entanglement-measures
+title: 纠缠度量：怎么量化「有多纠缠」
+thesis: 好的度量要单调，不能靠 LOCC 凭空增加
+part: p-entangle
+topic: t-bell
+tag: 深入
+minutes: 8
+order: 414
+demos: []
+quiz:
+  - q: '纯态 $\cos30^\circ|00\rangle+\sin30^\circ|11\rangle$ 的 concurrence 是多少？'
+    options:
+      - '0.25'
+      - '0.5'
+      - '约 0.866'
+      - '1'
+    answer: 2
+    explain: '这里 $a=\cos30^\circ$、$d=\sin30^\circ$，$b=c=0$，所以 $C=2|ad|=|\sin60^\circ|\approx0.866$。0.5 是把 $\sin30^\circ$ 当成了答案，1 是 Bell 态的值，0.25 则来自把概率当振幅。'
+  - q: '下面哪种操作能让一个两比特态的平均纠缠增加，从而违背度量的单调公理？'
+    options:
+      - '对其中一个比特做本地酉操作'
+      - '附加一个处于 $|0\rangle$ 的辅助比特'
+      - '测量一个比特，并把结果用经典信道告诉对方'
+      - '以上都不会'
+    answer: 3
+    explain: '本地酉操作、添乘积态辅助比特、测量加经典通信，合起来正是 LOCC，平均纠缠在它下面不增。若其中任何一步能凭空增加纠缠，就能靠本地设备造出资源，再拿去传态或做密钥分发，整个资源账本会失效。'
+  - q: '纯态 $\cos30^\circ|00\rangle+\sin30^\circ|11\rangle$ 的纠缠熵约为多少？'
+    options:
+      - '0.25'
+      - '0.5'
+      - '约 0.81'
+      - '1'
+    answer: 2
+    explain: '两个施密特系数的平方是 $\cos^2 30^\circ=0.75$ 与 $0.25$，代入 $-\sum\lambda_i\log_2\lambda_i$ 得到约 0.81 ebit。0.25 是较小的那个概率，0.5 是把它当成了熵，1 是 Bell 态的上限。'
+sources:
+  - 'Wootters, 1998, Entanglement of formation of an arbitrary state of two qubits, Physical Review Letters'
+  - 'Bennett, Bernstein, Popescu & Schumacher, 1996, Concentrating partial entanglement by local operations, Physical Review A'
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, §12（量子信息论）'
+updated: 2026-10-19
+---
+
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+「这个态有多纠缠」像在问「它有多重」。可量子纠缠没有唯一的一把秤：两比特还有公认的算法，到了三比特，不同的度量会给出不同的排序。能要求的是底线——只做本地操作，读数不能凭空涨。
+
+## 两比特：concurrence
+
+设纯态 $|\psi\rangle=a|00\rangle+b|01\rangle+c|10\rangle+d|11\rangle$。把四个振幅排成 $2\times2$ 矩阵，行列式是 $ad-bc$。concurrence 定义为
+
+$$
+C=2\,|ad-bc|
+$$
+
+可分态的行列式为 0，$C=0$；Bell 态 $C=1$。它是双线性的：对乘积态一定为零，对最大纠缠取到上限。例：$\cos\theta|00\rangle+\sin\theta|11\rangle$ 的 $C=|\sin2\theta|$，$\theta=45^\circ$ 时取满。上一节 W 丢掉一个比特后 $C=2/3$，正好落在中间。
+
+纯态还有一把更通用的尺：纠缠熵 $E=S(\rho_A)=-\sum_i\lambda_i\log_2\lambda_i$，$\lambda_i$ 是施密特系数的平方。Bell 态是 1 ebit，乘积态是 0；$\theta=30^\circ$ 时 $\lambda=(0.75,0.25)$，$E\approx0.81$。两比特纯态里两把尺给出同样的排序，只是刻度不同。到了混态，这两把尺不能直接照搬，要另做延拓；这里先把纯态看清楚。
+
+## 为什么公理是「不增」
+
+只做 LOCC——本地酉操作、添辅助比特、测量、打电话——平均<Term id="entanglement">纠缠</Term>不能增加。否则你可以凭空造出纠缠，再拿它做传态，资源账本整个失效。本地酉操作不改；添一个 $|0\rangle$ 也不改；测量加经典通信只会让平均下降。蒸馏是这条公理的边界案例：每对更纯了，但对数变少，总量不增。
+
+由此得到可蒸馏纠缠 $E_D$：$n$ 对噪声态能提纯出 $m$ 个 Bell 态时，$m/n$ 的渐近上确界。它是一个速率，不是单对的分数；有些态 $E_D=0$ 却仍然纠缠。三比特没有唯一的度量，上一节的 GHZ 与 W 就是证据，这里不展开。
+
+<Misconception
+  note="把「约化态的熵」直接当成纠缠，会把经典的不确定性也算进纠缠里。"
+>
+  <Fragment slot="wrong">任何态都能用纠缠熵衡量：算出 $\rho_A$ 的熵，数值越大就越纠缠。</Fragment>
+  <Fragment slot="right">只有纯态才有 $E=S(\rho_A)$；混态的总熵包含经典不确定性，可分离态也能有熵，要用 concurrence、可蒸馏纠缠等分开处理。</Fragment>
+</Misconception>
+
+<Conclusion>
+  两比特纯态可以用 concurrence $C=2|ad-bc|$ 或纠缠熵 $E=S(\rho_A)$ 来量，前者 $0$ 到 $1$，后者 $0$ 到 $1$ ebit。好度量的底线是 LOCC 下不增：本地操作、加辅助比特、测量加经典通信都不能凭空造出纠缠；蒸馏只是用数量换质量。三比特没有唯一的一把尺，GHZ 与 W 就是例子。
+</Conclusion>

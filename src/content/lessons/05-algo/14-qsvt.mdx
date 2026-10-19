@@ -1,0 +1,64 @@
+---
+slug: qsvt
+title: QSVT：一个框架吃掉很多「量子线性代数」
+thesis: 把算法统一成「多项式变换 + 块编码」
+part: p-algo
+topic: t-linear-algo
+tag: 深入
+minutes: 9
+order: 542
+demos: []
+quiz:
+  - q: "块编码里的酉门 U 起什么作用？"
+    options: ["把 A 改造成一个酉矩阵，从而可以直接连乘", "把非酉的 A 嵌进一个更大酉门的左上角，辅助比特为 |0⟩ 时等价于调用 A", "把 A 复制到辅助比特上，供后续测量", "直接算出 A 的逆并写进振幅"]
+    answer: 1
+    explain: "块编码不改变 A，而是把它嵌进更大的酉门：辅助比特在 |0⟩ 时，U 的左上角块等于 A，其余块用来补足酉性。它不是把 A 变成酉矩阵，也不是复制 A；求逆是后面用多项式逼近 1/x 才做的事，不是块编码本身。"
+  - q: "QSVT 线路的核心动作是什么？"
+    options: ["对 A 做相位估计，读出每个本征值", "用量子傅里叶变换找出 A 的周期", "用一组经典算出的角度控制辅助比特旋转，整体实现对奇异值的多项式变换", "先把 A 经典求逆，再编码进量子态"]
+    answer: 2
+    explain: "QSVT 交替施加 U、U† 与单比特旋转，角度由目标多项式决定，效果是把 A 的奇异值 σ 换成 p(σ)。它不靠相位估计逐个读本征值，也不做周期查找；经典求逆再编码会丢掉量子部分的意义，也与框架无关。"
+  - q: "有人说「QSVT 统一了量子线性代数，实用加速指日可待」。最准确的回应是哪一句？"
+    options: ["QSVT 不需要块编码，所以输入不再是问题", "QSVT 能解 NP 难问题，因此适用面更广", "QSVT 只有数学表述，至今没有任何线路实现", "统一的是描述与证明工具，块编码成本、条件数、读出瓶颈和经典基线仍然要逐题算账"]
+    answer: 3
+    explain: "QSVT 把算法写成「多项式 + 块编码」，让上界与下界更容易比较，但没有消除输入、条件数与读出这三笔开销。它仍需要块编码，也不解决 NP 难问题；小规模线路实现已经出现，所以说它纯属数学也不符合事实。"
+sources:
+  - 'Gilyén, Su, Low & Wiebe, 2019, Quantum singular value transformation and beyond: exponential improvements for quantum matrix arithmetics, STOC 2019'
+  - 'Martyn, Rossi, Tan & Chuang, 2021, Grand unification of quantum algorithms, PRX Quantum'
+  - 'Harrow, Hassidim & Lloyd, 2009, Quantum algorithm for linear systems of equations, Physical Review Letters'
+updated: 2026-10-19
+---
+
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+HHL 用相位估计，Grover 用振幅放大，模拟用 Trotter——三套线路，三种分析。2019 年前后，它们被收进同一个框架：一个能「调用」矩阵的酉门，加一段骨架固定的线路，把多项式作用在奇异值上。这个框架叫 QSVT。
+
+## 块编码：给矩阵开一扇窗
+
+矩阵 $A$ 一般不是酉的，不能直接当门用。块编码的办法是加辅助比特，造一个更大的酉 $U$，让辅助比特处在 $|0\rangle$ 时，$U$ 的左上角正好是 $A$：
+
+$$
+\langle 0|U|0\rangle=A
+$$
+
+$A$ 的谱范数超过 1 时，先整体缩放；块编码只保证「按比例调用」。其余块只要补足酉性。你没法直接「乘 $A$」，但可以条件地调用它：辅助比特测到 0，系统就相当于被 $A$ 作用了一次。代价是辅助比特和构造 $U$ 的线路。若 $A$ 稀疏、有高效的地址查询，$U$ 可以做得便宜；若 $A$ 是存在硬盘里的稠密矩阵，光把它读进来就可能吃掉全部优势。块编码是一种输入模型，不是免费的包装。
+
+## 一个多项式，三种算法
+
+QSVT 的线路骨架是固定的：交替施加 $U$ 与 $U^\dagger$，中间夹若干单比特旋转，旋转角度由经典计算给出。效果是：若 $U$ 块编码 $A$，整段线路就块编码 $p(A)$，其中 $p$ 是一个次数受控的多项式。换句话说，它把 $A$ 的每个奇异值 $\sigma$ 换成 $p(\sigma)$。
+
+换一个 $p$，就换一种算法。取 $p$ 逼近 $1/x$，得到矩阵求逆，HHL 可以重写成这个特例；取 $p$ 逼近阶跃函数，把标记项的振幅抬起来，就是搜索；取 $p$ 逼近 $e^{-ixt}$，就是<Term id="hamiltonian">哈密顿量</Term>模拟。相位估计、振幅放大这些子程序，要么被吸收进多项式，要么被替换掉。它被称为「统一语言」，原因就在这里：算法设计变成两件事——你要什么多项式，以及块编码有多贵。
+
+但它不承诺实际加速。多项式次数随精度与条件数上涨，块编码要辅助比特与额外线路，读出仍然只给你一个采样。QSVT 把「有没有算法」的问题，换成了「这些代价你付不付得起」的问题；它没有把代价变没。
+
+<Misconception
+  note="统一的是语言，不是开销；同一个框架既能写快速算法，也能写代价高到无法运行的算法。"
+>
+  <Fragment slot="wrong">QSVT 统一了量子线性代数，所以任何矩阵问题都能拿到指数加速。</Fragment>
+  <Fragment slot="right">加速仍取决于块编码成本、条件数、精度与读出方式；稠密矩阵的载入、病态矩阵的多项式次数、只要一个期望值的限制，一个都没消失。</Fragment>
+</Misconception>
+
+<Conclusion>
+  QSVT 把量子算法拆成两个部件：块编码的矩阵，与作用在奇异值上的多项式。换多项式就得到求逆、搜索、模拟，但块编码、条件数、精度与读出这四笔账仍要逐题算——统一语言不等于统一加速。
+</Conclusion>

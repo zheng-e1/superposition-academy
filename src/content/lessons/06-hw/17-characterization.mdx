@@ -1,0 +1,73 @@
+---
+slug: characterization
+title: 表征：Rabi、Ramsey、回声分别在测什么
+thesis: 三种脉冲序列，读出三种不同的时间尺度
+part: p-hw
+topic: t-engineer
+tag: 实战
+minutes: 8
+order: 624
+demos: ['noise']
+quiz:
+  - q: 同一台机器上，Ramsey 的包络衰减比自旋回声快，最合理的解释是什么？
+    options: ['Ramsey 包含低频漂移造成的非均匀展宽，回声在序列里把它重聚焦了', 'Ramsey 的脉冲数量更多，所以更差', '回声用了更强的驱动，把噪声压下去了', '回声序列里读出错误消失了']
+    answer: 0
+    explain: Ramsey 的条纹会被慢变的共振频率抹开，这部分叫非均匀展宽；回声在中间插一个 π 脉冲，让前后两段的慢漂移相互抵消。脉冲数量与驱动强度不是原因，读出错误在两个序列里都还在。
+  - q: 某比特 T₁ = 100 µs、T₂ = 80 µs，下面哪个判断对？
+    options: ['数据一定错了，T₂ 不能超过 T₁', '合理，纯退相干时间约 130 µs，且满足 T₂ ≤ 2T₁', '说明 T₁ 被回声序列拉长了', '说明门时间可以做到 800 ns 而不损失保真度']
+    answer: 1
+    explain: 由 $1/T_2=1/(2T_1)+1/T_\phi$ 可得 $T_\phi$ 约 130 µs，且 80 µs 小于 200 µs，完全在允许范围内。T₂ 超过 T₁ 是正常的，回声不改变 T₁；相干时间再长，门时间与错误率的关系仍要单独算。
+  - q: 一个门报 99.9% 的保真度，但 T₂ 只有 20 µs、门时间 500 ns。哪个说法最站得住？
+    options: ['相干极限给出的单门错误约 2.5%，与 99.9% 差一个量级，说明这个数只覆盖了部分错误或测于不同条件', '两者必然自洽，不需要解释', 'T₂ 与门错误完全无关', '把门时间加长到 2 µs 就能提高保真度']
+    answer: 0
+    explain: 500 ns 与 20 µs 的比值是 2.5%，这是相干给出的量级上限；若实测只有 0.1%，要么门时间远短于假定值，要么报的是某种受限测试的平均值。T₂ 与门错误当然有关，加长门时间只会让相干吃掉的更多。
+sources:
+  - 'Krantz et al., 2019, A quantum engineer''s guide to superconducting qubits, Applied Physics Reviews'
+  - 'Kjaergaard et al., 2020, Superconducting Qubits: Current State of Play, Annual Review of Condensed Matter Physics'
+  - 'Nielsen & Chuang, 2010, Quantum Computation and Quantum Information, 第 8 章（量子噪声）'
+updated: 2026-10-19
+---
+
+import Demo from '../../../components/Demo.astro';
+import Misconception from '../../../components/Misconception.astro';
+import Conclusion from '../../../components/Conclusion.astro';
+import Term from '../../../components/Term.astro';
+
+实验室的监控屏上常并排放着三条曲线：都是概率随脉冲间隔振荡、包络慢慢塌下去。它们看起来像同一件事的三种画法，其实各自回答一个不同的问题：转多快、相位能撑多久、去掉慢漂移之后还剩多少。
+
+## Rabi、Ramsey、回声
+
+Rabi 振荡固定脉宽、改驱动幅度，看 |0⟩ 与 |1⟩ 的布居来回翻。振荡的快慢就是旋转速率 Ω，翻半圈对应的脉宽就是 π 脉冲的长度。它测「转多快」，不测相干。
+
+Ramsey 在两个 π/2 之间隔 τ，扫 τ。驱动频率与比特频率差 δ 时，相位按 δτ 累积：条纹的频率给出 δ，包络的衰减给出 T₂*。T₂* 里混着低频漂移——温度、磁通、邻近比特的慢变让每次实验的共振频率略有不同，条纹被抹开，这叫非均匀展宽。
+
+自旋回声在 τ/2 处插一个 π 脉冲，把前半段积累的相位反转，让慢漂移在末段自己抵消。剩下的衰减才是 T₂。T₂* 总不长于 T₂，两者差多少，就是低频噪声占多少。
+
+<Demo
+  kind="noise"
+  label="保真度与深度"
+  caption="两个滑杆：单门保真度 98% 到 99.99%，线路深度 1 到 2000。假设这些时间已折算成每门错误率，再看深度每加一倍，成功率如何再乘一次。"
+/>
+
+## 从时间到保真度预算
+
+把三个时间放进同一张预算表：门时间 40 ns、T₂* 35 µs、回声 T₂ 90 µs、T₁ 120 µs。用回声 T₂ 算，相干给的单门错误量级是万分之四；换成 T₂*，同样的门就变成千分之一。实测若是千分之一，两种算法一个说「相干不是瓶颈」，一个说「正好卡在相干上」——差别不在机器，而在你把哪个时间填进了预算。
+
+三个时间之间还有一条硬关系：
+
+$$
+\frac{1}{T_2}=\frac{1}{2T_1}+\frac{1}{T_\phi}
+$$
+
+所以 T₂ 最多是 2T₁。T₂ 接近这个上限，说明几乎没有纯退相干，能改进的只剩 T₁。报指标时要问用哪个序列测的：同一台机器，Ramsey 报 35 µs、回声报 90 µs，两个数都可以是真的。<Term id="fidelity">保真度</Term>的预算表里，第一个要填的就是这个差别。
+
+<Misconception
+  note="T₂* 不是「没调好」的 T₂，它包含真实运行时的慢漂移，而那正是算法要面对的噪声。"
+>
+  <Fragment slot="wrong">T₂* 短只是频率没校准，调好之后就接近回声测出的 T₂。</Fragment>
+  <Fragment slot="right">回声靠序列中间的 π 脉冲把慢漂移抵消，算法里没有这个脉冲；长时间运行能用的，就是 T₂* 那个量级。</Fragment>
+</Misconception>
+
+<Conclusion>
+  Rabi 测旋转速率，Ramsey 测 T₂*，回声测 T₂，三者读的是三个不同的时间尺度。它们之间由 $1/T_2=1/(2T_1)+1/T_\phi$ 连起来，再折算成每门错误率，才进得了保真度预算。下次看到「相干时间」三个字，先问是哪个序列测的。
+</Conclusion>
